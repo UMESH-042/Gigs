@@ -22,30 +22,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         email: _emailController.text,
       );
 
-      // showDialog(
-      //   context: context,
-      //   builder: (BuildContext context) {
-      //     return AlertDialog(
-      //       title: Text('Email Sent'),
-      //       content: Text(
-      //           'A password reset email has been sent to your email address.'),
-      //       actions: <Widget>[
-      //         TextButton(
-      //           child: Text('OK'),
-      //           onPressed: () {
-      //             Navigator.of(context).pop();
-      //         Navigator.push(
-      //           context,
-      //           MaterialPageRoute(
-      //             builder: (_) => CheckEmailPage(email: _emailController.text),
-      //           ),
-      //         );
-      //           },
-      //         ),
-      //       ],
-      //     );
-      //   },
-      // );
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
