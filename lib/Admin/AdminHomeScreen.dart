@@ -1,0 +1,16 @@
+import 'package:flutter/material.dart';
+
+class AdminHomeScreen extends StatefulWidget {
+  final String currentuserEmail;
+  const AdminHomeScreen({super.key, required this.currentuserEmail});
+
+  @override
+  State<AdminHomeScreen> createState() => _AdminHomeScreenState();
+}
+
+class _AdminHomeScreenState extends State<AdminHomeScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
