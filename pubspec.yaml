@@ -95,6 +95,12 @@ flutter:
     - assets/app_logo_icon_new.png
     - assets/landing_page_logo.png
     - assets/splash_logo.png
+    - assets/sharing_icon.png
+    - assets/add_icon.png
+    - assets/chat_icon.png
+    - assets/homes_icon.png
+    - assets/save_icon.png
+    
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

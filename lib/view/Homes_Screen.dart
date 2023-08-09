@@ -3,15 +3,17 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:gigs/view/Add_Jobs.dart';
 import 'package:gigs/view/Chats.dart';
 import 'package:gigs/view/Display_Jobs.dart';
 import 'package:gigs/view/Network.dart';
-
+import 'package:permission_handler/permission_handler.dart';
 import '../Screens/login_screen.dart';
 import 'SavedJobs.dart';
+import 'bottomSheet.dart';
 
 class HomePage extends StatefulWidget {
   final String currentUserEmail;
@@ -31,9 +33,29 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
   List<Widget> _screens = [];
 
+  Future<void> storeNotificationToken() async {
+    String? token = await FirebaseMessaging.instance.getToken();
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .set({'token': token}, SetOptions(merge: true));
+  }
+
+  Future<void> _requestNotificationPermissions() async {
+    PermissionStatus status = await Permission.notification.request();
+    if (status.isGranted) {
+      print('Notification allowed');
+    } else if (status.isDenied) {
+      // Notification permissions denied
+    } else if (status.isPermanentlyDenied) {
+      openAppSettings();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    storeNotificationToken();
     _screens = [
       DisplayJobs(),
       Network(),
@@ -42,6 +64,7 @@ class _HomePageState extends State<HomePage> {
       Saved(),
     ];
     _loadUserData();
+    _requestNotificationPermissions();
   }
 
   // Function to handle the logout action
@@ -122,16 +145,47 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: CurvedNavigationBar(
         index: _currentIndex,
         items: [
-          Icon(Icons.home, size: 30),
-          Icon(Icons.people, size: 30),
-          Icon(Icons.add_circle, size: 30),
-          Icon(Icons.chat, size: 30),
-          Icon(Icons.feedback, size: 30),
+          Image.asset(
+            'assets/homes_icon.png',
+            width: 28,
+            height: 28,
+          ),
+          Image.asset(
+            'assets/sharing_icon.png',
+            width: 28,
+            height: 28,
+          ),
+          Image.asset(
+            'assets/add_icon.png',
+            width: 40,
+            height: 40,
+          ),
+          Image.asset(
+            'assets/chat_icon.png',
+            width: 28,
+            height: 28,
+          ),
+          Image.asset(
+            'assets/save_icon.png',
+            width: 28,
+            height: 28,
+          ),
         ],
         onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+          if (index == 2) {
+            // Check if "Add" button is tapped
+            showModalBottomSheet(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)),
+              context: context,
+              isScrollControlled: true,
+              builder: (context) => AddBottomSheet(),
+              
+            );
+          } else {
+            setState(() {
+              _currentIndex = index;
+            });
+          }
         },
       ),
     );
