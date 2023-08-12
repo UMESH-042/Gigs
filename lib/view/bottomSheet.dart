@@ -1,10 +1,18 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:gigs/view/Add_Jobs.dart';
 
 import 'Post_page.dart';
 
 class AddBottomSheet extends StatefulWidget {
+  final String useremail;
+  const AddBottomSheet({
+    Key? key,
+    required this.useremail,
+  }) : super(key: key);
+
   @override
   State<AddBottomSheet> createState() => _AddBottomSheetState();
 }
@@ -87,7 +95,7 @@ class _AddBottomSheetState extends State<AddBottomSheet> {
       child: ElevatedButton(
         onPressed: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => PostPage()));
+              context, MaterialPageRoute(builder: (context) => PostPage(useremail: widget.useremail,)));
         },
         style: ElevatedButton.styleFrom(
           primary: Color(0xFF130160),

@@ -52,6 +52,9 @@ dependencies:
   cached_network_image: ^3.2.3
   firebase_messaging: ^14.6.5
   permission_handler: ^10.4.3
+  velocity_x: ^4.1.1
+  firebase_storage: ^11.2.5
+  image_picker: ^1.0.2
 
 
 

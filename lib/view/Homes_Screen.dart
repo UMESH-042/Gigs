@@ -143,6 +143,10 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       bottomNavigationBar: CurvedNavigationBar(
+            color: Colors.white,
+          buttonBackgroundColor: Colors.white,
+          // backgroundColor: Color(0xFF130160),
+          animationCurve: Curves.fastOutSlowIn,
         index: _currentIndex,
         items: [
           Image.asset(
@@ -178,7 +182,7 @@ class _HomePageState extends State<HomePage> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)),
               context: context,
               isScrollControlled: true,
-              builder: (context) => AddBottomSheet(),
+              builder: (context) => AddBottomSheet(useremail: widget.currentUserEmail,),
               
             );
           } else {
