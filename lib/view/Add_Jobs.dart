@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gigs/APIs/Places_API.dart';
 
+import 'bottomSheet.dart';
+
 class AddJobs extends StatefulWidget {
   const AddJobs({super.key});
 
@@ -10,6 +12,7 @@ class AddJobs extends StatefulWidget {
 
 class _AddJobsState extends State<AddJobs> {
   String selectedJobLocation = '';
+  String selectedWorkplace = '';
 
   void onJobLocationAdded(String location) {
     setState(() {
@@ -20,6 +23,7 @@ class _AddJobsState extends State<AddJobs> {
   @override
   Widget build(BuildContext context) {
     print(selectedJobLocation);
+    print(selectedWorkplace);
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 241, 241, 241),
       appBar: AppBar(
@@ -45,7 +49,6 @@ class _AddJobsState extends State<AddJobs> {
         ],
       ),
       body: SingleChildScrollView(
-        
         child: Container(
           padding: EdgeInsets.all(16),
           child: Column(
@@ -65,9 +68,29 @@ class _AddJobsState extends State<AddJobs> {
               SizedBox(height: 40),
               JobInfoCard(label: "Job Position"),
               SizedBox(height: 8),
-              JobInfoCard(label: "Type of Workplace"),
+              TypeOfWorkPlace(
+                label: "Type of workplace",
+                selectedWorkplace: selectedWorkplace,
+                onPressed: () async {
+                  final selectedOption = await showModalBottomSheet<String>(
+                    context: context,
+                    builder: (context) => BottomSheetForWorkplace(
+                      onOptionSelected: (option) {
+                        setState(() {
+                          selectedWorkplace = option;
+                        });
+                      },
+                    ),
+                  );
+                  if (selectedOption != null) {
+                    setState(() {
+                      selectedWorkplace = selectedOption;
+                    });
+                  }
+                },
+              ),
               SizedBox(height: 8),
-              JobInfoCardforLocation(
+              JobLocation(
                 label: "Job Location",
                 content: selectedJobLocation, // Display selected location
                 onPressed: () async {
@@ -97,13 +120,12 @@ class _AddJobsState extends State<AddJobs> {
   }
 }
 
-class JobInfoCardforLocation extends StatelessWidget {
+class JobLocation extends StatelessWidget {
   final String label;
   final String? content;
   final VoidCallback? onPressed;
 
-  const JobInfoCardforLocation(
-      {required this.label, this.content, this.onPressed});
+  const JobLocation({required this.label, this.content, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +158,7 @@ class JobInfoCardforLocation extends StatelessWidget {
             IconButton(
               icon: Icon(
                 content == '' ? Icons.add_circle_outline_outlined : Icons.edit,
-                color: content == null ? Color(0xFFFCA34D) : Color(0xFFFCA34D),
+                color: Color(0xFFFCA34D),
               ),
               onPressed: onPressed,
             ),
@@ -174,6 +196,58 @@ class JobInfoCard extends StatelessWidget {
               onPressed: () {
                 // Handle adding information for this card
               },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class TypeOfWorkPlace extends StatelessWidget {
+  final String label;
+  final String selectedWorkplace;
+  final VoidCallback onPressed;
+
+  const TypeOfWorkPlace({
+    required this.label,
+    required this.selectedWorkplace,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: Icon(
+                    selectedWorkplace == ''
+                        ? Icons.add_circle_outline_outlined
+                        : Icons.edit,
+                    color: Color(0xFFFCA34D),
+                  ),
+                  onPressed: onPressed,
+                ),
+              ],
+            ),
+            Text(
+              selectedWorkplace, // Display selected workplace as subtitle
+              style: TextStyle(fontSize: 16, color: Colors.black),
             ),
           ],
         ),

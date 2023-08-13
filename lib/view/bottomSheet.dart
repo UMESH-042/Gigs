@@ -95,7 +95,11 @@ class _AddBottomSheetState extends State<AddBottomSheet> {
       child: ElevatedButton(
         onPressed: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => PostPage(useremail: widget.useremail,)));
+              context,
+              MaterialPageRoute(
+                  builder: (context) => PostPage(
+                        useremail: widget.useremail,
+                      )));
         },
         style: ElevatedButton.styleFrom(
           primary: Color(0xFF130160),
@@ -110,6 +114,162 @@ class _AddBottomSheetState extends State<AddBottomSheet> {
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class BottomSheetForWorkplace extends StatefulWidget {
+   final void Function(String selectedOption) onOptionSelected;
+  const BottomSheetForWorkplace({
+    Key? key, required this.onOptionSelected,
+  }) : super(key: key);
+
+  @override
+  State<BottomSheetForWorkplace> createState() =>
+      _BottomSheetForWorkplaceState();
+}
+
+class _BottomSheetForWorkplaceState extends State<BottomSheetForWorkplace> {
+  String selectedWorkplace = '';
+  @override
+  Widget build(BuildContext context) {
+    print(selectedWorkplace);
+    final size = MediaQuery.of(context).size;
+    return Container(
+      height: 400,
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 3,
+            color: Color(0xFF130160),
+          ),
+          SizedBox(height: 70),
+          Text(
+            "Choose the type of workplace",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 23,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 16),
+          Text(
+            "Decide and choose the type of place to work according to what you want",
+            style: TextStyle(
+              fontSize: 16,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 20), // Add spacing
+          RadioOption(
+            title: "On-site",
+            subtitle: "Employees come to work",
+            isSelected: selectedWorkplace == "On-site",
+            onTap: () {
+              setState(() {
+                selectedWorkplace = "On-site";
+              });
+              widget.onOptionSelected(selectedWorkplace); // Notify parent
+          Navigator.pop(context); // Close the bottom sheet
+            },
+          ),
+          RadioOption(
+            title: "Hybrid",
+            subtitle: "Employees work directly on site or off site",
+            isSelected: selectedWorkplace == "Hybrid",
+            onTap: () {
+              setState(() {
+                selectedWorkplace = "Hybrid";
+              });
+              widget.onOptionSelected(selectedWorkplace); // Notify parent
+          Navigator.pop(context); // Close the bottom sheet
+            },
+          ),
+          RadioOption(
+            title: "Remote",
+            subtitle: "Employees working off site",
+            isSelected: selectedWorkplace == "Remote",
+            onTap: () {
+              setState(() {
+                selectedWorkplace = "Remote";
+              });
+              widget.onOptionSelected(selectedWorkplace); // Notify parent
+          Navigator.pop(context); // Close the bottom sheet
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class RadioOption extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final bool isSelected;
+  final Function() onTap;
+
+  const RadioOption({
+    required this.title,
+    required this.subtitle,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isSelected ? Color(0xFF130160) : Colors.black,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isSelected ? Color(0xFF130160) : Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? Colors.orange : Colors.black,
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(4),
+                child: isSelected
+                    ? Icon(Icons.circle, size: 12, color: Colors.orange)
+                    : Container(
+                        width: 12,
+                        height: 12,
+                      ),
+              ),
+            ),
+          ],
         ),
       ),
     );
