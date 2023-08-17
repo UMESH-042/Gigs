@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gigs/APIs/Places_API.dart';
+import 'package:gigs/APIs/companies_API.dart';
 
 import 'bottomSheet.dart';
+
 // added comment
 class AddJobs extends StatefulWidget {
   const AddJobs({super.key});
@@ -13,6 +15,7 @@ class AddJobs extends StatefulWidget {
 class _AddJobsState extends State<AddJobs> {
   String selectedJobLocation = '';
   String selectedWorkplace = '';
+  String selectedCompany = '';
 
   void onJobLocationAdded(String location) {
     setState(() {
@@ -20,10 +23,17 @@ class _AddJobsState extends State<AddJobs> {
     });
   }
 
+  void onCompanyAdded(String company) {
+    setState(() {
+      selectedCompany = company;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     print(selectedJobLocation);
     print(selectedWorkplace);
+    print(selectedCompany);
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 241, 241, 241),
       appBar: AppBar(
@@ -106,7 +116,21 @@ class _AddJobsState extends State<AddJobs> {
                 },
               ),
               SizedBox(height: 8),
-              JobInfoCard(label: "Company"),
+              CompanyName(
+                label: "Company",
+                content: selectedCompany,
+                onPressed: () async {
+                  final selectedCompany = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CompanySearchScreen(),
+                    ),
+                  );
+                  if (selectedCompany != null) {
+                    onCompanyAdded(selectedCompany);
+                  }
+                },
+              ),
               SizedBox(height: 8),
               JobInfoCard(label: "Employment Type"),
               SizedBox(height: 8),
@@ -116,6 +140,55 @@ class _AddJobsState extends State<AddJobs> {
         ),
       ),
       resizeToAvoidBottomInset: true,
+    );
+  }
+}
+
+class CompanyName extends StatelessWidget {
+  final String label;
+  final String? content;
+  final VoidCallback? onPressed;
+
+  const CompanyName({required this.label, this.content, this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8), // Add some spacing
+                  if (content != null)
+                    Text(
+                      content!,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: Icon(
+                content == '' ? Icons.add_circle_outline_outlined : Icons.edit,
+                color: Color(0xFFFCA34D),
+              ),
+              onPressed: onPressed,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
