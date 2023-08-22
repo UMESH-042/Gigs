@@ -121,9 +121,10 @@ class _AddBottomSheetState extends State<AddBottomSheet> {
 }
 
 class BottomSheetForWorkplace extends StatefulWidget {
-   final void Function(String selectedOption) onOptionSelected;
+  final void Function(String selectedOption) onOptionSelected;
   const BottomSheetForWorkplace({
-    Key? key, required this.onOptionSelected,
+    Key? key,
+    required this.onOptionSelected,
   }) : super(key: key);
 
   @override
@@ -176,7 +177,7 @@ class _BottomSheetForWorkplaceState extends State<BottomSheetForWorkplace> {
                 selectedWorkplace = "On-site";
               });
               widget.onOptionSelected(selectedWorkplace); // Notify parent
-          Navigator.pop(context); // Close the bottom sheet
+              Navigator.pop(context); // Close the bottom sheet
             },
           ),
           RadioOption(
@@ -188,7 +189,7 @@ class _BottomSheetForWorkplaceState extends State<BottomSheetForWorkplace> {
                 selectedWorkplace = "Hybrid";
               });
               widget.onOptionSelected(selectedWorkplace); // Notify parent
-          Navigator.pop(context); // Close the bottom sheet
+              Navigator.pop(context); // Close the bottom sheet
             },
           ),
           RadioOption(
@@ -200,7 +201,7 @@ class _BottomSheetForWorkplaceState extends State<BottomSheetForWorkplace> {
                 selectedWorkplace = "Remote";
               });
               widget.onOptionSelected(selectedWorkplace); // Notify parent
-          Navigator.pop(context); // Close the bottom sheet
+              Navigator.pop(context); // Close the bottom sheet
             },
           ),
         ],
@@ -208,6 +209,200 @@ class _BottomSheetForWorkplaceState extends State<BottomSheetForWorkplace> {
     );
   }
 }
+
+class BottomSheetForEmploymentType extends StatefulWidget {
+  final void Function(String selectedOption) onOptionSelected;
+  const BottomSheetForEmploymentType({
+    Key? key,
+    required this.onOptionSelected,
+  }) : super(key: key);
+
+  @override
+  State<BottomSheetForEmploymentType> createState() =>
+      _BottomSheetForEmploymentTypeState();
+}
+
+class _BottomSheetForEmploymentTypeState
+    extends State<BottomSheetForEmploymentType> {
+  String selectedEmploymentType = '';
+  @override
+  Widget build(BuildContext context) {
+    print(selectedEmploymentType);
+    final size = MediaQuery.of(context).size;
+    return Container(
+        height: size.height * 0.6,
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 3,
+            color: Color(0xFF130160),
+          ),
+          SizedBox(height: 30),
+          Text(
+            "Choose Job Type",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 23,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 16),
+          Text(
+            "Determine and choose the type of work according to what you want !!",
+            style: TextStyle(
+              fontSize: 16,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 20), // Add spacing
+          RadioOption(
+            title: "Full Time",
+            subtitle: "",
+            isSelected: selectedEmploymentType == "Full Time",
+            onTap: () {
+              setState(() {
+                selectedEmploymentType = "Full Time";
+              });
+              widget.onOptionSelected(selectedEmploymentType); // Notify parent
+              Navigator.pop(context); // Close the bottom sheet
+            },
+          ),
+          RadioOption(
+            title: "Part Time",
+            subtitle: "",
+            isSelected: selectedEmploymentType == "Part Time",
+            onTap: () {
+              setState(() {
+                selectedEmploymentType = "Part Time";
+              });
+              widget.onOptionSelected(selectedEmploymentType); // Notify parent
+              Navigator.pop(context); // Close the bottom sheet
+            },
+          ),
+          RadioOption(
+            title: "Contract",
+            subtitle: "",
+            isSelected: selectedEmploymentType == "Contract",
+            onTap: () {
+              setState(() {
+                selectedEmploymentType = "Contract";
+              });
+              widget.onOptionSelected(selectedEmploymentType); // Notify parent
+              Navigator.pop(context); // Close the bottom sheet
+            },
+          ),
+          RadioOption(
+            title: "Temporary",
+            subtitle: "",
+            isSelected: selectedEmploymentType == "Temporary",
+            onTap: () {
+              setState(() {
+                selectedEmploymentType = "Temporary";
+              });
+              widget.onOptionSelected(selectedEmploymentType); // Notify parent
+              Navigator.pop(context); // Close the bottom sheet
+            },
+          ),
+          RadioOption(
+            title: "volunteer",
+            subtitle: "",
+            isSelected: selectedEmploymentType == "volunteer",
+            onTap: () {
+              setState(() {
+                selectedEmploymentType = "volunteer";
+              });
+              widget.onOptionSelected(selectedEmploymentType); // Notify parent
+              Navigator.pop(context); // Close the bottom sheet
+            },
+          ),
+          RadioOption(
+            title: "Apprenticeship",
+            subtitle: "",
+            isSelected: selectedEmploymentType == "Apprenticeship",
+            onTap: () {
+              setState(() {
+                selectedEmploymentType = "Apprenticeship";
+              });
+              widget.onOptionSelected(selectedEmploymentType); // Notify parent
+              Navigator.pop(context); // Close the bottom sheet
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// class RadioOption extends StatelessWidget {
+//   final String title;
+//   final String subtitle;
+//   final bool isSelected;
+//   final Function() onTap;
+
+//   const RadioOption({
+//     required this.title,
+//     required this.subtitle,
+//     required this.isSelected,
+//     required this.onTap,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return GestureDetector(
+//       onTap: onTap,
+//       child: Padding(
+//         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+//         child: Row(
+//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//           children: [
+//             Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Text(
+//                   title,
+//                   style: TextStyle(
+//                     fontSize: 18,
+//                     fontWeight: FontWeight.bold,
+//                     color: isSelected ? Color(0xFF130160) : Colors.black,
+//                   ),
+//                 ),
+//                 SizedBox(height: 4),
+//                 Text(
+//                   subtitle,
+//                   style: TextStyle(
+//                     fontSize: 14,
+//                     color: isSelected ? Color(0xFF130160) : Colors.grey,
+//                   ),
+//                 ),
+//               ],
+//             ),
+//             Container(
+//               decoration: BoxDecoration(
+//                 shape: BoxShape.circle,
+//                 border: Border.all(
+//                   color: isSelected ? Colors.orange : Colors.black,
+//                 ),
+//               ),
+//               child: Padding(
+//                 padding: EdgeInsets.all(4),
+//                 child: isSelected
+//                     ? Icon(Icons.circle, size: 12, color: Colors.orange)
+//                     : Container(
+//                         width: 12,
+//                         height: 12,
+//                       ),
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class RadioOption extends StatelessWidget {
   final String title;
@@ -227,7 +422,7 @@ class RadioOption extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15), // Adjusted vertical padding
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -237,12 +432,12 @@ class RadioOption extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16, // Adjusted font size
                     fontWeight: FontWeight.bold,
                     color: isSelected ? Color(0xFF130160) : Colors.black,
                   ),
                 ),
-                SizedBox(height: 4),
+                SizedBox(height: 2), // Adjusted height
                 Text(
                   subtitle,
                   style: TextStyle(
@@ -262,10 +457,10 @@ class RadioOption extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.all(4),
                 child: isSelected
-                    ? Icon(Icons.circle, size: 12, color: Colors.orange)
+                    ? Icon(Icons.circle, size: 10, color: Colors.orange) // Adjusted size
                     : Container(
-                        width: 12,
-                        height: 12,
+                        width: 10,
+                        height: 10,
                       ),
               ),
             ),

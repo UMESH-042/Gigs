@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gigs/APIs/Add_Job_Description.dart';
+import 'package:gigs/APIs/Job_position_API.dart';
 import 'package:gigs/APIs/Places_API.dart';
 import 'package:gigs/APIs/companies_API.dart';
 
@@ -16,6 +19,15 @@ class _AddJobsState extends State<AddJobs> {
   String selectedJobLocation = '';
   String selectedWorkplace = '';
   String selectedCompany = '';
+  String selectedEmploymentType = '';
+  String selectedJobPosition = '';
+  String JobDescription = '';
+
+  void onJobPositionAdded(String position) {
+    setState(() {
+      selectedJobPosition = position;
+    });
+  }
 
   void onJobLocationAdded(String location) {
     setState(() {
@@ -29,11 +41,48 @@ class _AddJobsState extends State<AddJobs> {
     });
   }
 
+  void onJobDescriptionAdded(String description) {
+    setState(() {
+      JobDescription = description;
+    });
+  }
+
+  Future<void> addJobToFirestore(
+    String jobPosition,
+    String jobLocation,
+    String workplaceType,
+    String company,
+    String employmentType,
+    String jobDescription,
+  ) async {
+    try {
+      final CollectionReference jobsCollection =
+          FirebaseFirestore.instance.collection('jobs');
+
+      await jobsCollection.add({
+        'jobPosition': jobPosition,
+        'jobLocation': jobLocation,
+        'workplaceType': workplaceType,
+        'company': company,
+        'employmentType': employmentType,
+        'jobDescription': jobDescription,
+        'timestamp': FieldValue.serverTimestamp(), // Add a timestamp
+      });
+
+      print('Job added to Firestore');
+    } catch (e) {
+      print('Error adding job to Firestore: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     print(selectedJobLocation);
     print(selectedWorkplace);
     print(selectedCompany);
+    print(selectedEmploymentType);
+    print(selectedJobPosition);
+    print(JobDescription);
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 241, 241, 241),
       appBar: AppBar(
@@ -47,9 +96,26 @@ class _AddJobsState extends State<AddJobs> {
           },
         ),
         actions: [
+          // TextButton(
+          //   onPressed: () {
+          //     // Handle the "Post" button action
+          //   },
+          //   child: Text(
+          //     "Post",
+          //     style: TextStyle(color: Color(0xFFFCA34D), fontSize: 17),
+          //   ),
+          // ),
           TextButton(
             onPressed: () {
-              // Handle the "Post" button action
+              addJobToFirestore(
+                selectedJobPosition,
+                selectedJobLocation,
+                selectedWorkplace,
+                selectedCompany,
+                selectedEmploymentType,
+                JobDescription,
+              );
+              // Handle any other necessary actions after posting the job
             },
             child: Text(
               "Post",
@@ -76,7 +142,21 @@ class _AddJobsState extends State<AddJobs> {
                 ),
               ),
               SizedBox(height: 40),
-              JobInfoCard(label: "Job Position"),
+              JobPosition(
+                label: "Job Position",
+                content: selectedJobPosition, // Display selected location
+                onPressed: () async {
+                  final selectedJobPosition = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => JobPositionSearchScreen(),
+                    ),
+                  );
+                  if (selectedJobPosition != null) {
+                    onJobPositionAdded(selectedJobPosition);
+                  }
+                },
+              ),
               SizedBox(height: 8),
               TypeOfWorkPlace(
                 label: "Type of workplace",
@@ -132,9 +212,43 @@ class _AddJobsState extends State<AddJobs> {
                 },
               ),
               SizedBox(height: 8),
-              JobInfoCard(label: "Employment Type"),
+              EmploymentType(
+                label: "Employment Type",
+                selectedEmploymentType: selectedEmploymentType,
+                onPressed: () async {
+                  final selectedOption = await showModalBottomSheet<String>(
+                    context: context,
+                    builder: (context) => BottomSheetForEmploymentType(
+                      onOptionSelected: (option) {
+                        setState(() {
+                          selectedEmploymentType = option;
+                        });
+                      },
+                    ),
+                  );
+                  if (selectedOption != null) {
+                    setState(() {
+                      selectedEmploymentType = selectedOption;
+                    });
+                  }
+                },
+              ),
               SizedBox(height: 8),
-              JobInfoCard(label: "Description"),
+              Description(
+                label: "Description",
+                content: JobDescription, // Display selected location
+                onPressed: () async {
+                  final AddedJobDescription = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddDescriptionScreen(),
+                    ),
+                  );
+                  if (AddedJobDescription != null) {
+                    onJobDescriptionAdded(AddedJobDescription);
+                  }
+                },
+              )
             ],
           ),
         ),
@@ -150,6 +264,55 @@ class CompanyName extends StatelessWidget {
   final VoidCallback? onPressed;
 
   const CompanyName({required this.label, this.content, this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8), // Add some spacing
+                  if (content != null)
+                    Text(
+                      content!,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: Icon(
+                content == '' ? Icons.add_circle_outline_outlined : Icons.edit,
+                color: Color(0xFFFCA34D),
+              ),
+              onPressed: onPressed,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class JobPosition extends StatelessWidget {
+  final String label;
+  final String? content;
+  final VoidCallback? onPressed;
+
+  const JobPosition({required this.label, this.content, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -242,10 +405,12 @@ class JobLocation extends StatelessWidget {
   }
 }
 
-class JobInfoCard extends StatelessWidget {
+class Description extends StatelessWidget {
   final String label;
+  final String? content;
+  final VoidCallback? onPressed;
 
-  const JobInfoCard({required this.label});
+  const Description({required this.label, this.content, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -257,18 +422,30 @@ class JobInfoCard extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.all(16),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              label,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8), // Add some spacing
+                  if (content != null)
+                    Text(
+                      content!,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                ],
+              ),
             ),
             IconButton(
-              icon: Icon(Icons.add_circle_outline_outlined,
-                  color: Color(0xFFFCA34D)),
-              onPressed: () {
-                // Handle adding information for this card
-              },
+              icon: Icon(
+                content == '' ? Icons.add_circle_outline_outlined : Icons.edit,
+                color: Color(0xFFFCA34D),
+              ),
+              onPressed: onPressed,
             ),
           ],
         ),
@@ -320,6 +497,58 @@ class TypeOfWorkPlace extends StatelessWidget {
             ),
             Text(
               selectedWorkplace, // Display selected workplace as subtitle
+              style: TextStyle(fontSize: 16, color: Colors.black),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EmploymentType extends StatelessWidget {
+  final String label;
+  final String selectedEmploymentType;
+  final VoidCallback onPressed;
+
+  const EmploymentType({
+    required this.label,
+    required this.selectedEmploymentType,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: Icon(
+                    selectedEmploymentType == ''
+                        ? Icons.add_circle_outline_outlined
+                        : Icons.edit,
+                    color: Color(0xFFFCA34D),
+                  ),
+                  onPressed: onPressed,
+                ),
+              ],
+            ),
+            Text(
+              selectedEmploymentType, // Display selected workplace as subtitle
               style: TextStyle(fontSize: 16, color: Colors.black),
             ),
           ],
