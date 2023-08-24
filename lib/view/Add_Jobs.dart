@@ -115,6 +115,7 @@ class _AddJobsState extends State<AddJobs> {
                 selectedEmploymentType,
                 JobDescription,
               );
+              Navigator.pop(context);
               // Handle any other necessary actions after posting the job
             },
             child: Text(
