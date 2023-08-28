@@ -10,6 +10,7 @@ import 'package:gigs/view/Add_Jobs.dart';
 import 'package:gigs/view/Chats.dart';
 import 'package:gigs/view/Display_Jobs.dart';
 import 'package:gigs/view/Network.dart';
+import 'package:gigs/view/Porfile/Profile_page.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../Screens/login_screen.dart';
 import 'SavedJobs.dart';
@@ -125,7 +126,12 @@ class _HomePageState extends State<HomePage> {
                           // backgroundColor: Color.fromARGB(255, 76, 175, 142),
                           backgroundImage: NetworkImage(_userImageUrl),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ProfilePage(currentUserEmail: widget.currentUserEmail, imageUrl: _userImageUrl,)));
+                        },
                       ),
                     ),
                   ],
@@ -143,10 +149,10 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       bottomNavigationBar: CurvedNavigationBar(
-            color: Colors.white,
-          buttonBackgroundColor: Colors.white,
-          // backgroundColor: Color(0xFF130160),
-          animationCurve: Curves.fastOutSlowIn,
+        color: Colors.white,
+        buttonBackgroundColor: Colors.white,
+        // backgroundColor: Color(0xFF130160),
+        animationCurve: Curves.fastOutSlowIn,
         index: _currentIndex,
         items: [
           Image.asset(
@@ -179,11 +185,13 @@ class _HomePageState extends State<HomePage> {
           if (index == 2) {
             // Check if "Add" button is tapped
             showModalBottomSheet(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25.0)),
               context: context,
               isScrollControlled: true,
-              builder: (context) => AddBottomSheet(useremail: widget.currentUserEmail,),
-              
+              builder: (context) => AddBottomSheet(
+                useremail: widget.currentUserEmail,
+              ),
             );
           } else {
             setState(() {

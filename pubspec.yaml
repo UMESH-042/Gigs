@@ -103,6 +103,7 @@ flutter:
     - assets/chat_icon.png
     - assets/homes_icon.png
     - assets/save_icon.png
+    - assets/app_bar_background.png
     
 
 
