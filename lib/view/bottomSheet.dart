@@ -63,7 +63,7 @@ class _AddBottomSheetState extends State<AddBottomSheet> {
 
   Widget customMakeAJob(Size size) {
     return SizedBox(
-      height: size.height / 14,
+      height: size.height / 15,
       width: size.width / 1.2,
       child: ElevatedButton(
         onPressed: () {
@@ -230,7 +230,7 @@ class _BottomSheetForEmploymentTypeState
     print(selectedEmploymentType);
     final size = MediaQuery.of(context).size;
     return Container(
-        height: size.height * 0.6,
+      height: size.height * 0.6,
       padding: EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -337,73 +337,6 @@ class _BottomSheetForEmploymentTypeState
   }
 }
 
-// class RadioOption extends StatelessWidget {
-//   final String title;
-//   final String subtitle;
-//   final bool isSelected;
-//   final Function() onTap;
-
-//   const RadioOption({
-//     required this.title,
-//     required this.subtitle,
-//     required this.isSelected,
-//     required this.onTap,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return GestureDetector(
-//       onTap: onTap,
-//       child: Padding(
-//         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-//         child: Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//           children: [
-//             Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Text(
-//                   title,
-//                   style: TextStyle(
-//                     fontSize: 18,
-//                     fontWeight: FontWeight.bold,
-//                     color: isSelected ? Color(0xFF130160) : Colors.black,
-//                   ),
-//                 ),
-//                 SizedBox(height: 4),
-//                 Text(
-//                   subtitle,
-//                   style: TextStyle(
-//                     fontSize: 14,
-//                     color: isSelected ? Color(0xFF130160) : Colors.grey,
-//                   ),
-//                 ),
-//               ],
-//             ),
-//             Container(
-//               decoration: BoxDecoration(
-//                 shape: BoxShape.circle,
-//                 border: Border.all(
-//                   color: isSelected ? Colors.orange : Colors.black,
-//                 ),
-//               ),
-//               child: Padding(
-//                 padding: EdgeInsets.all(4),
-//                 child: isSelected
-//                     ? Icon(Icons.circle, size: 12, color: Colors.orange)
-//                     : Container(
-//                         width: 12,
-//                         height: 12,
-//                       ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 class RadioOption extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -422,7 +355,8 @@ class RadioOption extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15), // Adjusted vertical padding
+        padding: EdgeInsets.symmetric(
+            vertical: 8, horizontal: 15), // Adjusted vertical padding
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -457,7 +391,8 @@ class RadioOption extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.all(4),
                 child: isSelected
-                    ? Icon(Icons.circle, size: 10, color: Colors.orange) // Adjusted size
+                    ? Icon(Icons.circle,
+                        size: 10, color: Colors.orange) // Adjusted size
                     : Container(
                         width: 10,
                         height: 10,
