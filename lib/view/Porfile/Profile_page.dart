@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gigs/profile_APIs/Add_about_me.dart';
 
+import '../../profile_APIs/Add_work_experience.dart';
+
 class ProfilePage extends StatefulWidget {
   final String currentUserEmail;
   final String imageUrl;
@@ -212,7 +214,14 @@ class _ProfilePageState extends State<ProfilePage> {
               WorkExperience(
                 label: 'Work experience',
                 content: _workexperience,
-                onPressed: () {},
+                onPressed: () {
+                   Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddWorkExperiencePage(),
+      ),
+    );
+                },
               )
             ],
           ),
