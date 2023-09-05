@@ -30,6 +30,31 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
+    @override
+  void initState() {
+    super.initState();
+    // Fetch "About Me" content from Firestore when the widget is created
+    fetchAboutMeContent();
+  }
+
+  // Fetch "About Me" content from Firestore
+  void fetchAboutMeContent() async {
+    try {
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.currentUserEmail)
+          .get();
+
+      if (docSnapshot.exists) {
+        setState(() {
+          _aboutme = docSnapshot.data()?['aboutMe'] ?? ''; // Get the "aboutMe" field
+        });
+      }
+    } catch (e) {
+      print('Error fetching About Me: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
