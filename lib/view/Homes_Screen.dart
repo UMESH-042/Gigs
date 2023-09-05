@@ -116,6 +116,14 @@ class _HomePageState extends State<HomePage> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               actions: [
+                IconButton(
+                  icon: Icon(Icons.exit_to_app,
+                      color: Colors.black), // Set the color to black
+                  onPressed: () {
+                    _logout(); // Call the logout function
+                  },
+                ),
+                SizedBox(width: 275,),
                 Row(
                   children: [
                     Container(
@@ -130,7 +138,11 @@ class _HomePageState extends State<HomePage> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => ProfilePage(currentUserEmail: widget.currentUserEmail, imageUrl: _userImageUrl,)));
+                                  builder: (context) => ProfilePage(
+                                        currentUserEmail:
+                                            widget.currentUserEmail,
+                                        imageUrl: _userImageUrl,
+                                      )));
                         },
                       ),
                     ),

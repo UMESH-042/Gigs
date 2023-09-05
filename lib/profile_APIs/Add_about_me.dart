@@ -1,21 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddAboutMe extends StatefulWidget {
+   final String userId;
+
+  const AddAboutMe({super.key, required this.userId});
   @override
   _AddAboutMeState createState() => _AddAboutMeState();
 }
 
 class _AddAboutMeState extends State<AddAboutMe> {
-  final TextEditingController _aboutmeController = TextEditingController();
+
+FirestoreService _firestoreService = FirestoreService();
+
+
+   
+    final TextEditingController _aboutmeController = TextEditingController();
   String Aboutme = ''; // To store entered job description
 
   void addAboutme() {
+  String newAboutMe = _aboutmeController.text;
+
+  if (Aboutme != newAboutMe) {
     setState(() {
-      Aboutme = _aboutmeController.text;
+      Aboutme = newAboutMe;
       _aboutmeController.clear();
     });
-    Navigator.pop(context, Aboutme); // Close the bottom sheet
+
+     _firestoreService.addAboutMe(widget.userId, Aboutme);
   }
+
+  Navigator.pop(context, Aboutme); // Close the bottom sheet
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -116,37 +133,6 @@ class _AddAboutMeState extends State<AddAboutMe> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  //           Container(
-                  //   width: 40,
-                  //   height: 3,
-                  //   color: Color(0xFF130160),
-                  // ),
-                  // SizedBox(height: 70,),
-                  //         Text(
-                  //           'Save Changes?',
-                  //           style: TextStyle(
-                  //             fontWeight: FontWeight.bold,
-                  //             fontSize: 23,
-                  //           ),
-                  //           textAlign: TextAlign.center,
-                  //         ),
-                  //         SizedBox(height: 16),
-                  // ElevatedButton(
-                  //   onPressed: () {
-                  // addAboutme();
-                  // Navigator.pop(context, Aboutme);
-                  //   }, // Call addAboutme when pressed
-                  //   child: Text('Save Changes'),
-                  // ),
-                  //         SizedBox(height: 16), // Add spacing between buttons
-                  // ElevatedButton(
-                  //   onPressed: () {
-                  //     // Add functionality for the second button
-                  //     // For example, you can call a different function
-                  //     // or perform a different action here.
-                  //   },
-                  //   child: Text('Second Button'),
-                  // ),
                   Container(
                     width: 40,
                     height: 3,
@@ -205,6 +191,8 @@ class _AddAboutMeState extends State<AddAboutMe> {
                       onPressed: () {
                         addAboutme();
                         Navigator.pop(context, Aboutme);
+                         _firestoreService.updateAboutMe(widget.userId, Aboutme);
+                     
                       },
                       style: ElevatedButton.styleFrom(
                         primary: Color(0xFFD6CDFE),
@@ -249,5 +237,35 @@ class _AddAboutMeState extends State<AddAboutMe> {
   void dispose() {
     _aboutmeController.dispose();
     super.dispose();
+  }
+}
+
+
+
+
+
+class FirestoreService {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<void> addAboutMe(String userId, String aboutMe) async {
+    try {
+      await _firestore.collection('users').doc(userId).set({
+        'aboutMe': aboutMe,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      // Handle error
+      print('Error adding About Me: $e');
+    }
+  }
+
+  Future<void> updateAboutMe(String userId, String aboutMe) async {
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'aboutMe': aboutMe,
+      });
+    } catch (e) {
+      // Handle error
+      print('Error updating About Me: $e');
+    }
   }
 }

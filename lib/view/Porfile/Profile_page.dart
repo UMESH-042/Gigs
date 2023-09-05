@@ -16,15 +16,23 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   String _aboutme = '';
+  String _workexperience = '';
+
   void onJobDescriptionAdded(String description) {
     setState(() {
       _aboutme = description;
     });
   }
 
+  void onWorkExperienceAdded(String work) {
+    setState(() {
+      _workexperience = work;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-     final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
@@ -160,17 +168,26 @@ class _ProfilePageState extends State<ProfilePage> {
               AboutMe(
                 label: "About Me",
                 content: _aboutme, // Display selected location
+                userId: widget.currentUserEmail,
                 onPressed: () async {
                   final AddedJobDescription = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => AddAboutMe(),
+                      builder: (context) => AddAboutMe(userId: widget.currentUserEmail,),
                     ),
                   );
                   if (AddedJobDescription != null) {
                     onJobDescriptionAdded(AddedJobDescription);
                   }
                 },
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              WorkExperience(
+                label: 'Work experience',
+                content: _workexperience,
+                onPressed: () {},
               )
             ],
           ),
@@ -181,13 +198,13 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-
 class AboutMe extends StatelessWidget {
   final String label;
   final String? content;
   final VoidCallback? onPressed;
+    final String userId;
 
-  const AboutMe({required this.label, this.content, this.onPressed});
+  const AboutMe({required this.label, this.content, this.onPressed, required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -254,6 +271,106 @@ class AboutMe extends StatelessWidget {
             children: [
               Icon(
                 Icons.person_2_outlined,
+                color: Color(0xFFFCA34D),
+              ),
+              SizedBox(width: 20),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              Spacer(),
+              IconButton(
+                icon: Icon(
+                  Icons.add_circle_outline_outlined,
+                  color: Color(0xFFFCA34D),
+                ),
+                onPressed: onPressed,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+  }
+}
+
+class WorkExperience extends StatelessWidget {
+  final String label;
+  final String? content;
+  final VoidCallback? onPressed;
+
+  const WorkExperience({required this.label, this.content, this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    print(content);
+    if (content != '') {
+      return Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.person_2_outlined,
+                    color: Color(0xFFFCA34D),
+                  ),
+                  SizedBox(width: 20),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  Spacer(),
+                  IconButton(
+                    icon: Icon(
+                      Icons.edit,
+                      color: Color(0xFFFCA34D),
+                    ),
+                    onPressed: onPressed,
+                  ),
+                ],
+              ),
+              Divider(
+                color: Color.fromARGB(255, 221, 220, 220),
+                thickness: 1,
+              ),
+              SizedBox(height: 10),
+              Text(
+                content!,
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      return Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Icon(
+                Icons.work,
                 color: Color(0xFFFCA34D),
               ),
               SizedBox(width: 20),
