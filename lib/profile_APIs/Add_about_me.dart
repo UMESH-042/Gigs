@@ -268,4 +268,28 @@ class FirestoreService {
       print('Error updating About Me: $e');
     }
   }
+
+
+  Future<void> addWorkExperience(String userId, Map<String, dynamic> workExperience) async {
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'workExperience': FieldValue.arrayUnion([workExperience]),
+      });
+    } catch (e) {
+      // Handle error
+      print('Error adding Work Experience: $e');
+    }
+  }
+
+  Future<void> updateWorkExperience(String userId, int index, Map<String, dynamic> updatedWorkExperience) async {
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'workExperience.$index': updatedWorkExperience,
+      });
+    } catch (e) {
+      // Handle error
+      print('Error updating Work Experience: $e');
+    }
+  }
+
 }

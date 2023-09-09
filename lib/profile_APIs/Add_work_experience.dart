@@ -1,8 +1,17 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 
+import 'Add_about_me.dart';
+
 class AddWorkExperiencePage extends StatefulWidget {
+  final String email;
+  const AddWorkExperiencePage({
+    Key? key,
+    required this.email,
+  }) : super(key: key);
+
   @override
   _AddWorkExperiencePageState createState() => _AddWorkExperiencePageState();
 }
@@ -13,8 +22,12 @@ class _AddWorkExperiencePageState extends State<AddWorkExperiencePage> {
   TextEditingController _jobtitleController = TextEditingController();
   TextEditingController _companyController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
+  bool isCurrentPosition = false;
+
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    print(widget.email);
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 245, 243, 243),
       appBar: AppBar(
@@ -57,26 +70,6 @@ class _AddWorkExperiencePageState extends State<AddWorkExperiencePage> {
               ),
               Company(),
               SizedBox(height: 20),
-              // Row for Start Date and End Date
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: DateInput(
-              //         _startDateController,
-              //         'Start Date',
-              //         _selectDate,
-              //       ),
-              //     ),
-              //     SizedBox(width: 16.0), // Add some spacing between fields
-              //     Expanded(
-              //       child: DateInput(
-              //         _endDateController,
-              //         'End Date',
-              //         _selectDate,
-              //       ),
-              //     ),
-              //   ],
-              // ),
               Row(
                 children: [
                   Expanded(
@@ -114,6 +107,21 @@ class _AddWorkExperiencePageState extends State<AddWorkExperiencePage> {
                   ),
                 ],
               ),
+              SizedBox(
+                height: 20,
+              ),
+              Row(children: [
+                Checkbox(
+                  value: isCurrentPosition,
+                  onChanged: (newValue) {
+                    setState(() {
+                      isCurrentPosition = newValue!;
+                    });
+                  },
+                  activeColor: Color.fromARGB(255, 107, 107, 107),
+                ),
+                Text('This is my postion now')
+              ]),
               SizedBox(height: 20),
               label('Description'),
               const SizedBox(
@@ -121,12 +129,253 @@ class _AddWorkExperiencePageState extends State<AddWorkExperiencePage> {
               ),
               Description(),
               SizedBox(height: 20),
-              // Save Button
-              ElevatedButton(
-                onPressed: () {
-                  // Implement save logic here
-                },
-                child: Text('Save'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Add spacing between buttons
+                  ElevatedButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled:
+                            true, // Make the bottom sheet scrollable
+                        builder: (context) => Container(
+                          height:
+                              size.height / 2.5, // Set the desired sheet height
+                          padding: EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 3,
+                                color: Color(0xFF130160),
+                              ),
+                              SizedBox(
+                                height: 45,
+                              ),
+                              Text(
+                                "Remove Work Experience?",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 23,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                "Are you sure you want to delete this work experience?",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 30),
+                              SizedBox(
+                                height: size.height / 14,
+                                width: size.width / 1.4,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Color(0xFF130160),
+                                    onPrimary: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'CONTINUE FILLING',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              SizedBox(
+                                  height: 17), // Add spacing between button
+                              SizedBox(
+                                height: size.height / 14,
+                                width: size.width / 1.4,
+                                child: ElevatedButton(
+                                  onPressed: () {},
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Color(0xFFD6CDFE),
+                                    onPrimary: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'UNDO CHANGES',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                        primary: Color(0xFFD6CDFE),
+                        onPrimary: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        minimumSize: Size(160, 48)),
+                    child: Text(
+                      'Remove',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 16.0),
+                  ElevatedButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled:
+                            true, // Make the bottom sheet scrollable
+                        builder: (context) => Container(
+                          height:
+                              size.height / 2.5, // Set the desired sheet height
+                          padding: EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 3,
+                                color: Color(0xFF130160),
+                              ),
+                              SizedBox(
+                                height: 45,
+                              ),
+                              Text(
+                                "Undo Changes?",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 23,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                "Are you sure you want to change what you entered?",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 30),
+                              SizedBox(
+                                height: size.height / 14,
+                                width: size.width / 1.4,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Color(0xFF130160),
+                                    onPrimary: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'CONTINUE FILLING',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              SizedBox(
+                                  height: 17), // Add spacing between button
+                              SizedBox(
+                                height: size.height / 14,
+                                width: size.width / 1.4,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    try {
+                                      // Create a map for the work experience entry
+                                      final workExperienceEntry = {
+                                        'jobTitle': _jobtitleController.text,
+                                        'company': _companyController.text,
+                                        'startDate': _startDateController.text,
+                                        'endDate': _endDateController.text,
+                                        'isCurrent': isCurrentPosition,
+                                        'description':
+                                            _descriptionController.text,
+                                      };
+
+                                      // Replace 'userId' with the actual user ID of the current user
+                                  
+
+                                      // Add the work experience entry to Firestore
+                                      await FirestoreService()
+                                          .addWorkExperience(
+                                              widget.email, workExperienceEntry);
+
+                                      // Close the bottom sheet
+                                      Navigator.pop(context);
+                                       Navigator.pop(context);
+
+                                    } catch (e) {
+                                      print('Error adding work experience: $e');
+                                      // Handle the error as needed
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Color(0xFFD6CDFE),
+                                    onPrimary: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'UNDO CHANGES',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                        primary: Color(0xFF130160),
+                        onPrimary: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        minimumSize: Size(160, 48)),
+                    child: Text(
+                      'Save',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -163,7 +412,7 @@ class _AddWorkExperiencePageState extends State<AddWorkExperiencePage> {
         controller: _descriptionController,
         maxLines: null,
         style: const TextStyle(
-          color: Colors.white70,
+          color: Colors.black,
           fontSize: 17,
         ),
         decoration: InputDecoration(
@@ -263,5 +512,117 @@ class _AddWorkExperiencePageState extends State<AddWorkExperiencePage> {
           fontSize: 16.5,
           letterSpacing: 0.2,
         ));
+  }
+
+  Widget customPostButton(Size size) {
+    return SizedBox(
+      height: size.height / 14,
+      width: size.width / 1.2,
+      child: ElevatedButton(
+        onPressed: () {
+          // Show a bottom sheet with a button to call addAboutme
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true, // Make the bottom sheet scrollable
+            builder: (context) => Container(
+              height: size.height / 2.5, // Set the desired sheet height
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 3,
+                    color: Color(0xFF130160),
+                  ),
+                  SizedBox(
+                    height: 45,
+                  ),
+                  Text(
+                    "Undo Changes?",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 23,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    "Are you sure you want to change what you entered?",
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 30),
+                  SizedBox(
+                    height: size.height / 14,
+                    width: size.width / 1.4,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Color(0xFF130160),
+                        onPrimary: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                      child: Text(
+                        'CONTINUE FILLING',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: 17), // Add spacing between buttons
+
+                  SizedBox(
+                    height: size.height / 14,
+                    width: size.width / 1.4,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        primary: Color(0xFFD6CDFE),
+                        onPrimary: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                      child: Text(
+                        'UNDO CHANGES',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          primary: Color(0xFF130160),
+          onPrimary: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+        ),
+        child: Text(
+          'Save',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -19,6 +19,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   String _aboutme = '';
   String _workexperience = '';
+  List<Map<String, dynamic>> _workExperienceList = [];
 
   void onJobDescriptionAdded(String description) {
     setState(() {
@@ -32,11 +33,39 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-    @override
+// Fetch work experience data from Firestore
+  void fetchWorkExperienceData() async {
+    try {
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.currentUserEmail)
+          .get();
+
+      if (docSnapshot.exists) {
+        final userData = docSnapshot.data();
+
+        if (userData != null) {
+          final workExperience = userData['workExperience'] as List<dynamic>?;
+          if (workExperience != null) {
+            setState(() {
+              _workExperienceList = List<Map<String, dynamic>>.from(
+                workExperience,
+              );
+            });
+          }
+        }
+      }
+    } catch (e) {
+      print('Error fetching Work Experience: $e');
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
     // Fetch "About Me" content from Firestore when the widget is created
     fetchAboutMeContent();
+    fetchWorkExperienceData();
   }
 
   // Fetch "About Me" content from Firestore
@@ -49,7 +78,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (docSnapshot.exists) {
         setState(() {
-          _aboutme = docSnapshot.data()?['aboutMe'] ?? ''; // Get the "aboutMe" field
+          _aboutme =
+              docSnapshot.data()?['aboutMe'] ?? ''; // Get the "aboutMe" field
         });
       }
     } catch (e) {
@@ -61,7 +91,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
-
+    print(_workExperienceList);
     return Scaffold(
       appBar: PreferredSize(
         preferredSize:
@@ -200,7 +230,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   final AddedJobDescription = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => AddAboutMe(userId: widget.currentUserEmail,),
+                      builder: (context) => AddAboutMe(
+                        userId: widget.currentUserEmail,
+                      ),
                     ),
                   );
                   if (AddedJobDescription != null) {
@@ -213,14 +245,16 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               WorkExperience(
                 label: 'Work experience',
-                content: _workexperience,
+                workExperienceData: _workExperienceList,
                 onPressed: () {
-                   Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AddWorkExperiencePage(),
-      ),
-    );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddWorkExperiencePage(
+                        email: widget.currentUserEmail,
+                      ),
+                    ),
+                  );
                 },
               )
             ],
@@ -236,9 +270,13 @@ class AboutMe extends StatelessWidget {
   final String label;
   final String? content;
   final VoidCallback? onPressed;
-    final String userId;
+  final String userId;
 
-  const AboutMe({required this.label, this.content, this.onPressed, required this.userId});
+  const AboutMe(
+      {required this.label,
+      this.content,
+      this.onPressed,
+      required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -333,102 +371,155 @@ class AboutMe extends StatelessWidget {
   }
 }
 
+// class WorkExperience extends StatelessWidget {
+//   final String label;
+//   final VoidCallback? onPressed;
+
+//   const WorkExperience({required this.label,this.onPressed});
+
+//   @override
+//   Widget build(BuildContext context) {
+//       return Card(
+//         elevation: 2,
+//         shape: RoundedRectangleBorder(
+//           borderRadius: BorderRadius.circular(12),
+//         ),
+//         child: Padding(
+//           padding: EdgeInsets.all(16),
+//           child: Row(
+//             children: [
+//               Icon(
+//                 Icons.work,
+//                 color: Color(0xFFFCA34D),
+//               ),
+//               SizedBox(width: 20),
+//               Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Text(
+//                     label,
+//                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+//                   ),
+//                 ],
+//               ),
+//               Spacer(),
+//               IconButton(
+//                 icon: Icon(
+//                   Icons.add_circle_outline_outlined,
+//                   color: Color(0xFFFCA34D),
+//                 ),
+//                 onPressed: onPressed,
+//               ),
+//             ],
+//           ),
+//         ),
+//       );
+
+//   }
+// }
+
 class WorkExperience extends StatelessWidget {
   final String label;
-  final String? content;
+  final List<Map<String, dynamic>> workExperienceData;
   final VoidCallback? onPressed;
 
-  const WorkExperience({required this.label, this.content, this.onPressed});
+  const WorkExperience({
+    required this.label,
+    required this.workExperienceData,
+    this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
-    print(content);
-    if (content != '') {
-      return Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.person_2_outlined,
+    print(workExperienceData);
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.work,
+                  color: Color(0xFFFCA34D),
+                ),
+                SizedBox(width: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Spacer(),
+                IconButton(
+                  icon: Icon(
+                    Icons.add_circle_outline_outlined,
                     color: Color(0xFFFCA34D),
                   ),
-                  SizedBox(width: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        label,
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  Spacer(),
-                  IconButton(
-                    icon: Icon(
-                      Icons.edit,
-                      color: Color(0xFFFCA34D),
-                    ),
-                    onPressed: onPressed,
-                  ),
-                ],
-              ),
-              Divider(
-                color: Color.fromARGB(255, 221, 220, 220),
-                thickness: 1,
-              ),
-              SizedBox(height: 10),
-              Text(
-                content!,
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-        ),
-      );
-    } else {
-      return Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Icon(
-                Icons.work,
-                color: Color(0xFFFCA34D),
-              ),
-              SizedBox(width: 20),
+                  onPressed: onPressed,
+                ),
+              ],
+            ),
+            for (var i = 0; i < workExperienceData.length; i++)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Divider(
+                    color: Color.fromARGB(255, 221, 220, 220),
+                    thickness: 1,
+                  ),
+                  SizedBox(height: 10),
                   Text(
-                    label,
+                    workExperienceData[i]['jobTitle'] ?? '',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        workExperienceData[i]['company'] ?? '',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Spacer(),
+                      IconButton(
+                        icon: Icon(
+                          Icons.edit,
+                          color: Colors.orange, // Orange edit icon color
+                        ),
+                        onPressed: onPressed,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        workExperienceData[i]['startDate'] ?? '',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      SizedBox(width: 5),
+                      Text('--'),
+                      SizedBox(width: 5),
+                      Text(
+                        workExperienceData[i]['endDate'] ?? '',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              Spacer(),
-              IconButton(
-                icon: Icon(
-                  Icons.add_circle_outline_outlined,
-                  color: Color(0xFFFCA34D),
-                ),
-                onPressed: onPressed,
-              ),
-            ],
-          ),
+          ],
         ),
-      );
-    }
+      ),
+    );
   }
 }
