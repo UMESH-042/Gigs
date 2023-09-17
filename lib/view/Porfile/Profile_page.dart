@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gigs/profile_APIs/Add_Education.dart';
 import 'package:gigs/profile_APIs/Add_about_me.dart';
 
 import '../../profile_APIs/Add_work_experience.dart';
@@ -20,6 +21,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String _aboutme = '';
   String _workexperience = '';
   List<Map<String, dynamic>> _workExperienceList = [];
+  List<Map<String, dynamic>> _educationList = [];
 
   void onJobDescriptionAdded(String description) {
     setState(() {
@@ -256,6 +258,20 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   );
                 },
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              Education(
+                label: 'Education',
+                EducationData: _educationList,
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AddEducationPage(
+                              email: widget.currentUserEmail)));
+                },
               )
             ],
           ),
@@ -371,53 +387,6 @@ class AboutMe extends StatelessWidget {
   }
 }
 
-// class WorkExperience extends StatelessWidget {
-//   final String label;
-//   final VoidCallback? onPressed;
-
-//   const WorkExperience({required this.label,this.onPressed});
-
-//   @override
-//   Widget build(BuildContext context) {
-//       return Card(
-//         elevation: 2,
-//         shape: RoundedRectangleBorder(
-//           borderRadius: BorderRadius.circular(12),
-//         ),
-//         child: Padding(
-//           padding: EdgeInsets.all(16),
-//           child: Row(
-//             children: [
-//               Icon(
-//                 Icons.work,
-//                 color: Color(0xFFFCA34D),
-//               ),
-//               SizedBox(width: 20),
-//               Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Text(
-//                     label,
-//                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-//                   ),
-//                 ],
-//               ),
-//               Spacer(),
-//               IconButton(
-//                 icon: Icon(
-//                   Icons.add_circle_outline_outlined,
-//                   color: Color(0xFFFCA34D),
-//                 ),
-//                 onPressed: onPressed,
-//               ),
-//             ],
-//           ),
-//         ),
-//       );
-
-//   }
-// }
-
 class WorkExperience extends StatelessWidget {
   final String label;
   final List<Map<String, dynamic>> workExperienceData;
@@ -496,7 +465,7 @@ class WorkExperience extends StatelessWidget {
                           Icons.edit,
                           color: Colors.orange, // Orange edit icon color
                         ),
-                        onPressed: onPressed,
+                        onPressed: () {},
                       ),
                     ],
                   ),
@@ -517,6 +486,113 @@ class WorkExperience extends StatelessWidget {
                   ),
                 ],
               ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Education extends StatelessWidget {
+  final String label;
+  final List<Map<String, dynamic>> EducationData;
+  final VoidCallback? onPressed;
+
+  const Education({
+    required this.label,
+    required this.EducationData,
+    this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    print(EducationData);
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.school_outlined,
+                  color: Color(0xFFFCA34D),
+                ),
+                SizedBox(width: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Spacer(),
+                IconButton(
+                  icon: Icon(
+                    Icons.add_circle_outline_outlined,
+                    color: Color(0xFFFCA34D),
+                  ),
+                  onPressed: onPressed,
+                ),
+              ],
+            ),
+            // for (var i = 0; i < EducationData.length; i++)
+            //   Column(
+            //     crossAxisAlignment: CrossAxisAlignment.start,
+            //     children: [
+            //       Divider(
+            //         color: Color.fromARGB(255, 221, 220, 220),
+            //         thickness: 1,
+            //       ),
+            //       SizedBox(height: 10),
+            //       Text(
+            //         EducationData[i]['jobTitle'] ?? '',
+            //         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            //       ),
+            //       Row(
+            //         children: [
+            //           Text(
+            //             EducationData[i]['company'] ?? '',
+            //             style: TextStyle(fontSize: 16),
+            //           ),
+            //           Spacer(),
+            //           IconButton(
+            //             icon: Icon(
+            //               Icons.edit,
+            //               color: Colors.orange, // Orange edit icon color
+            //             ),
+            //             onPressed: () {},
+            //           ),
+            //         ],
+            //       ),
+            //       Row(
+            //         children: [
+            //           Text(
+            //             EducationData[i]['startDate'] ?? '',
+            //             style: TextStyle(fontSize: 14),
+            //           ),
+            //           SizedBox(width: 5),
+            //           Text('--'),
+            //           SizedBox(width: 5),
+            //           Text(
+            //             EducationData[i]['endDate'] ?? '',
+            //             style: TextStyle(fontSize: 14),
+            //           ),
+            //         ],
+            //       ),
+            //     ],
+            //   ),
+            
           ],
         ),
       ),
