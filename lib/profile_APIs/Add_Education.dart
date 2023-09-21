@@ -309,30 +309,6 @@ class _AddEducationPageState extends State<AddEducationPage> {
   );
 }
 
-
-  // Widget FieldOfStudy() {
-  //   return Container(
-  //     height: 55,
-  //     width: MediaQuery.of(context).size.width,
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       borderRadius: BorderRadius.circular(15),
-  //     ),
-  //     child: TextFormField(
-  //       controller: _fieldOfStudyController,
-  //       style: const TextStyle(
-  //         color: Colors.black,
-  //         fontSize: 17,
-  //       ),
-  //       decoration: InputDecoration(
-  //         border: InputBorder.none,
-  //         hintText: "",
-  //         hintStyle: TextStyle(color: Colors.grey[500], fontSize: 17),
-  //         contentPadding: EdgeInsets.only(left: 20, right: 20),
-  //       ),
-  //     ),
-  //   );
-  // }
   Widget FieldOfStudy() {
   return GestureDetector(
     onTap: () async {
