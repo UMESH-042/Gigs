@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../firebase/firebaseService.dart';
+
 class AddAboutMe extends StatefulWidget {
    final String userId;
 
@@ -243,53 +245,3 @@ FirestoreService _firestoreService = FirestoreService();
 
 
 
-
-class FirestoreService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  Future<void> addAboutMe(String userId, String aboutMe) async {
-    try {
-      await _firestore.collection('users').doc(userId).set({
-        'aboutMe': aboutMe,
-      }, SetOptions(merge: true));
-    } catch (e) {
-      // Handle error
-      print('Error adding About Me: $e');
-    }
-  }
-
-  Future<void> updateAboutMe(String userId, String aboutMe) async {
-    try {
-      await _firestore.collection('users').doc(userId).update({
-        'aboutMe': aboutMe,
-      });
-    } catch (e) {
-      // Handle error
-      print('Error updating About Me: $e');
-    }
-  }
-
-
-  Future<void> addWorkExperience(String userId, Map<String, dynamic> workExperience) async {
-    try {
-      await _firestore.collection('users').doc(userId).update({
-        'workExperience': FieldValue.arrayUnion([workExperience]),
-      });
-    } catch (e) {
-      // Handle error
-      print('Error adding Work Experience: $e');
-    }
-  }
-
-  Future<void> updateWorkExperience(String userId, int index, Map<String, dynamic> updatedWorkExperience) async {
-    try {
-      await _firestore.collection('users').doc(userId).update({
-        'workExperience.$index': updatedWorkExperience,
-      });
-    } catch (e) {
-      // Handle error
-      print('Error updating Work Experience: $e');
-    }
-  }
-
-}

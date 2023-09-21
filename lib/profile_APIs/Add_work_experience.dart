@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 
+import '../firebase/firebaseService.dart';
 import 'Add_about_me.dart';
 
 class AddWorkExperiencePage extends StatefulWidget {

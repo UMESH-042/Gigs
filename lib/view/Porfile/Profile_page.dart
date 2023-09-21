@@ -62,12 +62,40 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+// Fetch work experience data from Firestore
+  void fetchEducationData() async {
+    try {
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.currentUserEmail)
+          .get();
+
+      if (docSnapshot.exists) {
+        final userData = docSnapshot.data();
+
+        if (userData != null) {
+          final Education = userData['education'] as List<dynamic>?;
+          if (Education != null) {
+            setState(() {
+              _educationList = List<Map<String, dynamic>>.from(
+                Education,
+              );
+            });
+          }
+        }
+      }
+    } catch (e) {
+      print('Error fetching Work Experience: $e');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     // Fetch "About Me" content from Firestore when the widget is created
     fetchAboutMeContent();
     fetchWorkExperienceData();
+    fetchEducationData();
   }
 
   // Fetch "About Me" content from Firestore
@@ -546,53 +574,52 @@ class Education extends StatelessWidget {
                 ),
               ],
             ),
-            // for (var i = 0; i < EducationData.length; i++)
-            //   Column(
-            //     crossAxisAlignment: CrossAxisAlignment.start,
-            //     children: [
-            //       Divider(
-            //         color: Color.fromARGB(255, 221, 220, 220),
-            //         thickness: 1,
-            //       ),
-            //       SizedBox(height: 10),
-            //       Text(
-            //         EducationData[i]['jobTitle'] ?? '',
-            //         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            //       ),
-            //       Row(
-            //         children: [
-            //           Text(
-            //             EducationData[i]['company'] ?? '',
-            //             style: TextStyle(fontSize: 16),
-            //           ),
-            //           Spacer(),
-            //           IconButton(
-            //             icon: Icon(
-            //               Icons.edit,
-            //               color: Colors.orange, // Orange edit icon color
-            //             ),
-            //             onPressed: () {},
-            //           ),
-            //         ],
-            //       ),
-            //       Row(
-            //         children: [
-            //           Text(
-            //             EducationData[i]['startDate'] ?? '',
-            //             style: TextStyle(fontSize: 14),
-            //           ),
-            //           SizedBox(width: 5),
-            //           Text('--'),
-            //           SizedBox(width: 5),
-            //           Text(
-            //             EducationData[i]['endDate'] ?? '',
-            //             style: TextStyle(fontSize: 14),
-            //           ),
-            //         ],
-            //       ),
-            //     ],
-            //   ),
-            
+            for (var i = 0; i < EducationData.length; i++)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Divider(
+                    color: Color.fromARGB(255, 221, 220, 220),
+                    thickness: 1,
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    EducationData[i]['levelOfEducation'] ?? '',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        EducationData[i]['fieldOfStudy'] ?? '',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Spacer(),
+                      IconButton(
+                        icon: Icon(
+                          Icons.edit,
+                          color: Colors.orange, // Orange edit icon color
+                        ),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        EducationData[i]['startDate'] ?? '',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      SizedBox(width: 5),
+                      Text('--'),
+                      SizedBox(width: 5),
+                      Text(
+                        EducationData[i]['endDate'] ?? '',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
           ],
         ),
       ),

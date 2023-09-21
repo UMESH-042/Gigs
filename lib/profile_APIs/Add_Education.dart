@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../APIs/Field_of_Study.dart';
 import '../APIs/level_of_education_API.dart';
+import '../firebase/firebaseService.dart';
 
 class AddEducationPage extends StatefulWidget {
   final String email;
@@ -22,10 +23,9 @@ class _AddEducationPageState extends State<AddEducationPage> {
   TextEditingController _fieldOfStudyController = TextEditingController();
   TextEditingController _educationStartDateController = TextEditingController();
   TextEditingController _educationEndDateController = TextEditingController();
-  TextEditingController _educationDescriptionController = TextEditingController();
+  TextEditingController _educationDescriptionController =
+      TextEditingController();
   bool isCurrentPosition = false;
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -138,10 +138,25 @@ class _AddEducationPageState extends State<AddEducationPage> {
               EducationDescription(),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  // Handle saving education data here
-                  // You can access the entered data using the controllers
-                  // _levelController.text, _institutionController.text, etc.
+                onPressed: () async {
+                  try {
+                    final Education = {
+                      'levelOfEducation': _levelController.text,
+                      'institutionName': _institutionController.text,
+                      'startDate': _educationStartDateController.text,
+                      'endDate': _educationEndDateController.text,
+                      'isCurrent': isCurrentPosition,
+                      'fieldOfStudy':_fieldOfStudyController.text,
+                      'description': _educationDescriptionController.text,
+                    };
+
+                    await FirestoreService()
+                        .addEducation(widget.email, Education);
+                    Navigator.pop(context);
+                  } catch (e) {
+                    print('Error adding work experience: $e');
+                    // Handle the error as needed
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   primary: Color(0xFF130160),
@@ -182,173 +197,128 @@ class _AddEducationPageState extends State<AddEducationPage> {
     }
   }
 
-  // Widget LevelOfEducation() {
-  //   return Container(
-  //     height: 55,
-  //     width: MediaQuery.of(context).size.width,
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       borderRadius: BorderRadius.circular(15),
-  //     ),
-  //     child: TextFormField(
-  //       controller: _levelController,
-  //       style: const TextStyle(
-  //         color: Colors.black,
-  //         fontSize: 17,
-  //       ),
-  //       decoration: InputDecoration(
-  //         border: InputBorder.none,
-  //         hintText: "",
-  //         hintStyle: TextStyle(color: Colors.grey[500], fontSize: 17),
-  //         contentPadding: EdgeInsets.only(left: 20, right: 20),
-  //       ),
-  //     ),
-  //   );
-  // }
   Widget LevelOfEducation() {
-  return GestureDetector(
-    onTap: () async {
-      final selectedValue = await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => DegreeLevelSearchScreen()),
-      );
+    return GestureDetector(
+      onTap: () async {
+        final selectedValue = await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => DegreeLevelSearchScreen()),
+        );
 
-      if (selectedValue != null) {
-        setState(() {
-          _levelController.text = selectedValue; // Set the selected value in your controller
-        });
-      }
-    },
-    child: Container(
-      height: 55,
-      width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: IgnorePointer(
-        child: TextFormField(
-          controller: _levelController,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 17,
-          ),
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: "",
-            hintStyle: TextStyle(color: Colors.grey[500], fontSize: 17),
-            contentPadding: EdgeInsets.only(left: 20, right: 20),
+        if (selectedValue != null) {
+          setState(() {
+            _levelController.text =
+                selectedValue; // Set the selected value in your controller
+          });
+        }
+      },
+      child: Container(
+        height: 55,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: IgnorePointer(
+          child: TextFormField(
+            controller: _levelController,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 17,
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: "",
+              hintStyle: TextStyle(color: Colors.grey[500], fontSize: 17),
+              contentPadding: EdgeInsets.only(left: 20, right: 20),
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-
-  // Widget InstitutionName() {
-  //   return Container(
-  //     height: 55,
-  //     width: MediaQuery.of(context).size.width,
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       borderRadius: BorderRadius.circular(15),
-  //     ),
-  //     child: TextFormField(
-  //       controller: _institutionController,
-  //       style: const TextStyle(
-  //         color: Colors.black,
-  //         fontSize: 17,
-  //       ),
-  //       decoration: InputDecoration(
-  //         border: InputBorder.none,
-  //         hintText: "",
-  //         hintStyle: TextStyle(color: Colors.grey[500], fontSize: 17),
-  //         contentPadding: EdgeInsets.only(left: 20, right: 20),
-  //       ),
-  //     ),
-  //   );
-  // }
   Widget InstitutionName() {
-  return GestureDetector(
-    onTap: () async {
-      final selectedValue = await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => UniversitySearchScreen()),
-      );
+    return GestureDetector(
+      onTap: () async {
+        final selectedValue = await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => UniversitySearchScreen()),
+        );
 
-      if (selectedValue != null) {
-        setState(() {
-          _institutionController.text = selectedValue; // Set the selected value in your controller
-        });
-      }
-    },
-    child: Container(
-      height: 55,
-      width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: IgnorePointer(
-        child: TextFormField(
-          controller: _institutionController,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 17,
-          ),
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: "",
-            hintStyle: TextStyle(color: Colors.grey[500], fontSize: 17),
-            contentPadding: EdgeInsets.only(left: 20, right: 20),
+        if (selectedValue != null) {
+          setState(() {
+            _institutionController.text =
+                selectedValue; // Set the selected value in your controller
+          });
+        }
+      },
+      child: Container(
+        height: 55,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: IgnorePointer(
+          child: TextFormField(
+            controller: _institutionController,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 17,
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: "",
+              hintStyle: TextStyle(color: Colors.grey[500], fontSize: 17),
+              contentPadding: EdgeInsets.only(left: 20, right: 20),
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget FieldOfStudy() {
-  return GestureDetector(
-    onTap: () async {
-      final selectedValue = await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => FieldOfStudySearchScreen()),
-      );
+    return GestureDetector(
+      onTap: () async {
+        final selectedValue = await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => FieldOfStudySearchScreen()),
+        );
 
-      if (selectedValue != null) {
-        setState(() {
-          _fieldOfStudyController.text = selectedValue; // Set the selected value in your controller
-        });
-      }
-    },
-    child: Container(
-      height: 55,
-      width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: IgnorePointer(
-        child: TextFormField(
-          controller: _fieldOfStudyController,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 17,
-          ),
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: "",
-            hintStyle: TextStyle(color: Colors.grey[500], fontSize: 17),
-            contentPadding: EdgeInsets.only(left: 20, right: 20),
+        if (selectedValue != null) {
+          setState(() {
+            _fieldOfStudyController.text =
+                selectedValue; // Set the selected value in your controller
+          });
+        }
+      },
+      child: Container(
+        height: 55,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: IgnorePointer(
+          child: TextFormField(
+            controller: _fieldOfStudyController,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 17,
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: "",
+              hintStyle: TextStyle(color: Colors.grey[500], fontSize: 17),
+              contentPadding: EdgeInsets.only(left: 20, right: 20),
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget EducationDescription() {
     return Container(
