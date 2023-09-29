@@ -137,40 +137,42 @@ class _AddEducationPageState extends State<AddEducationPage> {
               ),
               EducationDescription(),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    final Education = {
-                      'levelOfEducation': _levelController.text,
-                      'institutionName': _institutionController.text,
-                      'startDate': _educationStartDateController.text,
-                      'endDate': _educationEndDateController.text,
-                      'isCurrent': isCurrentPosition,
-                      'fieldOfStudy':_fieldOfStudyController.text,
-                      'description': _educationDescriptionController.text,
-                    };
-
-                    await FirestoreService()
-                        .addEducation(widget.email, Education);
-                    Navigator.pop(context);
-                  } catch (e) {
-                    print('Error adding work experience: $e');
-                    // Handle the error as needed
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: Color(0xFF130160),
-                  onPrimary: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      final Education = {
+                        'levelOfEducation': _levelController.text,
+                        'institutionName': _institutionController.text,
+                        'startDate': _educationStartDateController.text,
+                        'endDate': _educationEndDateController.text,
+                        'isCurrent': isCurrentPosition,
+                        'fieldOfStudy':_fieldOfStudyController.text,
+                        'description': _educationDescriptionController.text,
+                      };
+              
+                      await FirestoreService()
+                          .addEducation(widget.email, Education);
+                      Navigator.pop(context);
+                    } catch (e) {
+                      print('Error adding work experience: $e');
+                      // Handle the error as needed
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Color(0xFF130160),
+                    onPrimary: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    minimumSize: Size(160, 48),
                   ),
-                  minimumSize: Size(160, 48),
-                ),
-                child: Text(
-                  'Save',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                  child: Text(
+                    'Save',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),

@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../firebase/firebaseService.dart';
-import 'Add_about_me.dart';
+
 
 class AddWorkExperiencePage extends StatefulWidget {
   final String email;
@@ -134,183 +134,115 @@ class _AddWorkExperiencePageState extends State<AddWorkExperiencePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Add spacing between buttons
-                  ElevatedButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled:
-                            true, // Make the bottom sheet scrollable
-                        builder: (context) => Container(
-                          height:
-                              size.height / 2.5, // Set the desired sheet height
-                          padding: EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 3,
-                                color: Color(0xFF130160),
-                              ),
-                              SizedBox(
-                                height: 45,
-                              ),
-                              Text(
-                                "Remove Work Experience?",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 23,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              SizedBox(height: 16),
-                              Text(
-                                "Are you sure you want to delete this work experience?",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              SizedBox(height: 30),
-                              SizedBox(
-                                height: size.height / 14,
-                                width: size.width / 1.4,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Color(0xFF130160),
-                                    onPrimary: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'CONTINUE FILLING',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                  // ElevatedButton(
+                  //   onPressed: () {
+                  //     showModalBottomSheet(
+                  //       context: context,
+                  //       isScrollControlled:
+                  //           true, // Make the bottom sheet scrollable
+                  //       builder: (context) => Container(
+                  //         height:
+                  //             size.height / 2.5, // Set the desired sheet height
+                  //         padding: EdgeInsets.all(16),
+                  //         child: Column(
+                  //           crossAxisAlignment: CrossAxisAlignment.center,
+                  //           mainAxisSize: MainAxisSize.min,
+                  //           children: [
+                  //             Container(
+                  //               width: 40,
+                  //               height: 3,
+                  //               color: Color(0xFF130160),
+                  //             ),
+                  //             SizedBox(
+                  //               height: 45,
+                  //             ),
+                  //             Text(
+                  //               "Remove Work Experience?",
+                  //               style: TextStyle(
+                  //                 fontWeight: FontWeight.bold,
+                  //                 fontSize: 23,
+                  //               ),
+                  //               textAlign: TextAlign.center,
+                  //             ),
+                  //             SizedBox(height: 16),
+                  //             Text(
+                  //               "Are you sure you want to delete this work experience?",
+                  //               style: TextStyle(
+                  //                 fontSize: 16,
+                  //               ),
+                  //               textAlign: TextAlign.center,
+                  //             ),
+                  //             SizedBox(height: 30),
+                  //             SizedBox(
+                  //               height: size.height / 14,
+                  //               width: size.width / 1.4,
+                  //               child: ElevatedButton(
+                  //                 onPressed: () {
+                  //                   Navigator.pop(context);
+                  //                 },
+                  //                 style: ElevatedButton.styleFrom(
+                  //                   primary: Color(0xFF130160),
+                  //                   onPrimary: Colors.white,
+                  //                   shape: RoundedRectangleBorder(
+                  //                     borderRadius: BorderRadius.circular(8.0),
+                  //                   ),
+                  //                 ),
+                  //                 child: Text(
+                  //                   'CONTINUE FILLING',
+                  //                   style: TextStyle(
+                  //                     fontSize: 16,
+                  //                     fontWeight: FontWeight.bold,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
 
-                              SizedBox(
-                                  height: 17), // Add spacing between button
-                              SizedBox(
-                                height: size.height / 14,
-                                width: size.width / 1.4,
-                                child: ElevatedButton(
-                                  onPressed: () {},
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Color(0xFFD6CDFE),
-                                    onPrimary: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'UNDO CHANGES',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                        primary: Color(0xFFD6CDFE),
-                        onPrimary: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        minimumSize: Size(160, 48)),
-                    child: Text(
-                      'Remove',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 16.0),
+                  //             SizedBox(
+                  //                 height: 17), // Add spacing between button
+                  //             SizedBox(
+                  //               height: size.height / 14,
+                  //               width: size.width / 1.4,
+                  //               child: ElevatedButton(
+                  //                 onPressed: () {},
+                  //                 style: ElevatedButton.styleFrom(
+                  //                   primary: Color(0xFFD6CDFE),
+                  //                   onPrimary: Colors.white,
+                  //                   shape: RoundedRectangleBorder(
+                  //                     borderRadius: BorderRadius.circular(8.0),
+                  //                   ),
+                  //                 ),
+                  //                 child: Text(
+                  //                   'UNDO CHANGES',
+                  //                   style: TextStyle(
+                  //                     fontSize: 16,
+                  //                     fontWeight: FontWeight.bold,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       ),
+                  //     );
+                  //   },
+                  //   style: ElevatedButton.styleFrom(
+                  //       primary: Color(0xFFD6CDFE),
+                  //       onPrimary: Colors.white,
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(8.0),
+                  //       ),
+                  //       minimumSize: Size(160, 48)),
+                  //   child: Text(
+                  //     'Remove',
+                  //     style: TextStyle(
+                  //       fontSize: 16,
+                  //       fontWeight: FontWeight.bold,
+                  //     ),
+                  //   ),
+                  // ),
+                  // SizedBox(width: 16.0),
                   ElevatedButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled:
-                            true, // Make the bottom sheet scrollable
-                        builder: (context) => Container(
-                          height:
-                              size.height / 2.5, // Set the desired sheet height
-                          padding: EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 3,
-                                color: Color(0xFF130160),
-                              ),
-                              SizedBox(
-                                height: 45,
-                              ),
-                              Text(
-                                "Undo Changes?",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 23,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              SizedBox(height: 16),
-                              Text(
-                                "Are you sure you want to change what you entered?",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              SizedBox(height: 30),
-                              SizedBox(
-                                height: size.height / 14,
-                                width: size.width / 1.4,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Color(0xFF130160),
-                                    onPrimary: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'CONTINUE FILLING',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              SizedBox(
-                                  height: 17), // Add spacing between button
-                              SizedBox(
-                                height: size.height / 14,
-                                width: size.width / 1.4,
-                                child: ElevatedButton(
-                                  onPressed: () async {
+             onPressed: () async {
                                     try {
                                       // Create a map for the work experience entry
                                       final workExperienceEntry = {
@@ -333,33 +265,12 @@ class _AddWorkExperiencePageState extends State<AddWorkExperiencePage> {
 
                                       // Close the bottom sheet
                                       Navigator.pop(context);
-                                       Navigator.pop(context);
+                                  
 
                                     } catch (e) {
                                       print('Error adding work experience: $e');
                                       // Handle the error as needed
                                     }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Color(0xFFD6CDFE),
-                                    onPrimary: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'UNDO CHANGES',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
                     },
                     style: ElevatedButton.styleFrom(
                         primary: Color(0xFF130160),

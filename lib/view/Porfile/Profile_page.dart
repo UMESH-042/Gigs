@@ -23,6 +23,9 @@ class _ProfilePageState extends State<ProfilePage> {
   List<Map<String, dynamic>> _workExperienceList = [];
   List<Map<String, dynamic>> _educationList = [];
 
+   GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
+
   void onJobDescriptionAdded(String description) {
     setState(() {
       _aboutme = description;
@@ -245,7 +248,16 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
       ),
-      body: SingleChildScrollView(
+      body: RefreshIndicator(
+         key: _refreshIndicatorKey,
+        onRefresh: () async {
+          // Implement your refresh logic here
+          fetchAboutMeContent();
+          fetchWorkExperienceData();
+          fetchEducationData();
+        },
+        child:
+       SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.all(16),
           child: Column(
@@ -304,6 +316,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ],
           ),
         ),
+      ),
       ),
       resizeToAvoidBottomInset: true,
     );
