@@ -70,4 +70,19 @@ Future<void> addEducation(String userId, Map<String, dynamic> education) async {
     }
   }
 
+  Future<void> addSkills(String userId, List<String> skills) async {
+  try {
+    await _firestore.collection('users').doc(userId).update({
+      'skills': FieldValue.arrayUnion(skills),
+    });
+  } catch (e) {
+    // Handle error
+    print('Error adding Skills: $e');
+  }
 }
+
+
+}
+
+
+

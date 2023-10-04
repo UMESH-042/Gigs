@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gigs/profile_APIs/Add_Education.dart';
 import 'package:gigs/profile_APIs/Add_about_me.dart';
+import 'package:gigs/profile_APIs/Add_skills.dart';
 
 import '../../profile_APIs/Add_work_experience.dart';
 
@@ -22,6 +23,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String _workexperience = '';
   List<Map<String, dynamic>> _workExperienceList = [];
   List<Map<String, dynamic>> _educationList = [];
+  List<String> skillsDataList = [];
 
    GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
@@ -92,6 +94,34 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+// Fetch skills data from Firestore
+void fetchSkillsData() async {
+  try {
+    final docSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.currentUserEmail)
+        .get();
+
+    if (docSnapshot.exists) {
+      final userData = docSnapshot.data();
+
+      if (userData != null) {
+        final skills = userData['skills'] as List<dynamic>?;
+        if (skills != null) {
+          setState(() {
+            skillsDataList = List<String>.from(
+              skills,
+            );
+          });
+        }
+      }
+    }
+  } catch (e) {
+    print('Error fetching Skills: $e');
+  }
+}
+
+
   @override
   void initState() {
     super.initState();
@@ -99,6 +129,7 @@ class _ProfilePageState extends State<ProfilePage> {
     fetchAboutMeContent();
     fetchWorkExperienceData();
     fetchEducationData();
+    fetchSkillsData();
   }
 
   // Fetch "About Me" content from Firestore
@@ -255,6 +286,7 @@ class _ProfilePageState extends State<ProfilePage> {
           fetchAboutMeContent();
           fetchWorkExperienceData();
           fetchEducationData();
+          fetchSkillsData();
         },
         child:
        SingleChildScrollView(
@@ -312,7 +344,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           builder: (context) => AddEducationPage(
                               email: widget.currentUserEmail)));
                 },
-              )
+              ),
+               SizedBox(
+                height: 8,
+              ),
+              Skills(label: 'Skills', skills: skillsDataList,onPressed: (){
+Navigator.push(context, MaterialPageRoute(builder: (context)=>SkillSearchScreen()));
+              },)
             ],
           ),
         ),
@@ -628,6 +666,199 @@ class Education extends StatelessWidget {
                       Text(
                         EducationData[i]['endDate'] ?? '',
                         style: TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+// class Skills extends StatelessWidget {
+//   final String label;
+//   final List<String>? skills;
+//   final VoidCallback? onPressed;
+
+//   const Skills({
+//     required this.label,
+//     this.skills,
+//     this.onPressed,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Card(
+//       elevation: 2,
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.circular(12),
+//       ),
+//       child: Padding(
+//         padding: EdgeInsets.all(16),
+//         child: Column(
+//           children: [
+//             Row(
+//               children: [
+//                 Icon(
+//                   Icons.star_outline,
+//                   color: Color(0xFFFCA34D),
+//                 ),
+//                 SizedBox(width: 20),
+//                 Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     Text(
+//                       label,
+//                       style: TextStyle(
+//                         fontSize: 18,
+//                         fontWeight: FontWeight.bold,
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//                 Spacer(),
+//                 IconButton(
+//                   icon: Icon(
+//                     Icons.edit,
+//                     color: Color(0xFFFCA34D),
+//                   ),
+//                   onPressed: onPressed,
+//                 ),
+//               ],
+//             ),
+//             if (skills != null && skills!.isNotEmpty)
+//               Divider(
+//                 color: Color.fromARGB(255, 221, 220, 220),
+//                 thickness: 1,
+//               ),
+//             if (skills != null && skills!.isNotEmpty)
+//               Column(
+//                 children: [
+//                   SizedBox(height: 10),
+//                   for (var skill in skills!)
+//                     Text(
+//                       skill,
+//                       style: TextStyle(
+//                         fontSize: 16,
+//                       ),
+//                     ),
+//                 ],
+//               ),
+//             if (skills == null || skills!.isEmpty)
+//               Row(
+//                 children: [
+//                   Icon(
+//                     Icons.star_outline,
+//                     color: Color(0xFFFCA34D),
+//                   ),
+//                   SizedBox(width: 20),
+//                   Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       Text(
+//                         "No skills added",
+//                         style: TextStyle(
+//                           fontSize: 16,
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+
+class Skills extends StatelessWidget {
+  final String label;
+  final List<String>? skills;
+  final VoidCallback? onPressed;
+
+  const Skills({
+    required this.label,
+    this.skills,
+    this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.star_outline,
+                  color: Color(0xFFFCA34D),
+                ),
+                SizedBox(width: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Spacer(),
+                IconButton(
+                  icon: Icon(
+                    Icons.edit,
+                    color: Color(0xFFFCA34D),
+                  ),
+                  onPressed: onPressed,
+                ),
+              ],
+            ),
+            if (skills != null && skills!.isNotEmpty)
+              Divider(
+                color: Color.fromARGB(255, 221, 220, 220),
+                thickness: 1,
+              ),
+            if (skills != null && skills!.isNotEmpty)
+              Wrap(
+                spacing: 8.0, // Adjust spacing as needed
+                children: skills!.map((skill) {
+                  return Chip(
+                    label: Text(skill),
+                    backgroundColor: const Color.fromARGB(255, 216, 216, 216), // Adjust chip color
+                  );
+                }).toList(),
+              ),
+            if (skills == null || skills!.isEmpty)
+              Row(
+                children: [
+                  Icon(
+                    Icons.star_outline,
+                    color: Color(0xFFFCA34D),
+                  ),
+                  SizedBox(width: 20),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "No skills added",
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
                       ),
                     ],
                   ),
