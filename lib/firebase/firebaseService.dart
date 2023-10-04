@@ -82,6 +82,30 @@ Future<void> addEducation(String userId, Map<String, dynamic> education) async {
 }
 
 
+
+ Future<void> addLanguages(String userId, List<String> languages) async {
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'languages': FieldValue.arrayUnion(languages),
+      });
+    } catch (e) {
+      // Handle error
+      print('Error adding Languages: $e');
+    }
+  }
+
+  Future<void> updateLanguages(String userId, List<String> languages) async {
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'languages': languages,
+      });
+    } catch (e) {
+      // Handle error
+      print('Error updating Languages: $e');
+    }
+  }
+
+
 }
 
 

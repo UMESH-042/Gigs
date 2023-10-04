@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gigs/profile_APIs/Add_Education.dart';
 import 'package:gigs/profile_APIs/Add_about_me.dart';
+import 'package:gigs/profile_APIs/Add_language.dart';
 import 'package:gigs/profile_APIs/Add_skills.dart';
 
 import '../../profile_APIs/Add_work_experience.dart';
@@ -24,8 +25,9 @@ class _ProfilePageState extends State<ProfilePage> {
   List<Map<String, dynamic>> _workExperienceList = [];
   List<Map<String, dynamic>> _educationList = [];
   List<String> skillsDataList = [];
+  List<String> LanguageDataList = [];
 
-   GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+  GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
   void onJobDescriptionAdded(String description) {
@@ -95,32 +97,58 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
 // Fetch skills data from Firestore
-void fetchSkillsData() async {
-  try {
-    final docSnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(widget.currentUserEmail)
-        .get();
+  void fetchSkillsData() async {
+    try {
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.currentUserEmail)
+          .get();
 
-    if (docSnapshot.exists) {
-      final userData = docSnapshot.data();
+      if (docSnapshot.exists) {
+        final userData = docSnapshot.data();
 
-      if (userData != null) {
-        final skills = userData['skills'] as List<dynamic>?;
-        if (skills != null) {
-          setState(() {
-            skillsDataList = List<String>.from(
-              skills,
-            );
-          });
+        if (userData != null) {
+          final skills = userData['skills'] as List<dynamic>?;
+          if (skills != null) {
+            setState(() {
+              skillsDataList = List<String>.from(
+                skills,
+              );
+            });
+          }
         }
       }
+    } catch (e) {
+      print('Error fetching Skills: $e');
     }
-  } catch (e) {
-    print('Error fetching Skills: $e');
   }
-}
 
+  // Fetch languages data from Firestore
+  void fetchLanguagesData() async {
+    try {
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.currentUserEmail)
+          .get();
+
+      if (docSnapshot.exists) {
+        final userData = docSnapshot.data();
+
+        if (userData != null) {
+          final languages = userData['languages'] as List<dynamic>?;
+          if (languages != null) {
+            setState(() {
+              LanguageDataList = List<String>.from(
+                languages,
+              );
+            });
+          }
+        }
+      }
+    } catch (e) {
+      print('Error fetching Languages: $e');
+    }
+  }
 
   @override
   void initState() {
@@ -130,6 +158,7 @@ void fetchSkillsData() async {
     fetchWorkExperienceData();
     fetchEducationData();
     fetchSkillsData();
+    fetchLanguagesData();
   }
 
   // Fetch "About Me" content from Firestore
@@ -280,81 +309,101 @@ void fetchSkillsData() async {
         ),
       ),
       body: RefreshIndicator(
-         key: _refreshIndicatorKey,
+        key: _refreshIndicatorKey,
         onRefresh: () async {
           // Implement your refresh logic here
           fetchAboutMeContent();
           fetchWorkExperienceData();
           fetchEducationData();
           fetchSkillsData();
+          fetchLanguagesData();
         },
-        child:
-       SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // SizedBox(height: 20),
-              AboutMe(
-                label: "About Me",
-                content: _aboutme, // Display selected location
-                userId: widget.currentUserEmail,
-                onPressed: () async {
-                  final AddedJobDescription = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AddAboutMe(
-                        userId: widget.currentUserEmail,
-                      ),
-                    ),
-                  );
-                  if (AddedJobDescription != null) {
-                    onJobDescriptionAdded(AddedJobDescription);
-                  }
-                },
-              ),
-              SizedBox(
-                height: 8,
-              ),
-              WorkExperience(
-                label: 'Work experience',
-                workExperienceData: _workExperienceList,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AddWorkExperiencePage(
-                        email: widget.currentUserEmail,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              SizedBox(
-                height: 8,
-              ),
-              Education(
-                label: 'Education',
-                EducationData: _educationList,
-                onPressed: () {
-                  Navigator.push(
+        child: SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // SizedBox(height: 20),
+                AboutMe(
+                  label: "About Me",
+                  content: _aboutme, // Display selected location
+                  userId: widget.currentUserEmail,
+                  onPressed: () async {
+                    final AddedJobDescription = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => AddEducationPage(
-                              email: widget.currentUserEmail)));
-                },
-              ),
-               SizedBox(
-                height: 8,
-              ),
-              Skills(label: 'Skills', skills: skillsDataList,onPressed: (){
-Navigator.push(context, MaterialPageRoute(builder: (context)=>SkillSearchScreen()));
-              },)
-            ],
+                        builder: (context) => AddAboutMe(
+                          userId: widget.currentUserEmail,
+                        ),
+                      ),
+                    );
+                    if (AddedJobDescription != null) {
+                      onJobDescriptionAdded(AddedJobDescription);
+                    }
+                  },
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                WorkExperience(
+                  label: 'Work experience',
+                  workExperienceData: _workExperienceList,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddWorkExperiencePage(
+                          email: widget.currentUserEmail,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Education(
+                  label: 'Education',
+                  EducationData: _educationList,
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AddEducationPage(
+                                email: widget.currentUserEmail)));
+                  },
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Skills(
+                  label: 'Skills',
+                  skills: skillsDataList,
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SkillSearchScreen()));
+                  },
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                LanguageSkills(
+                  label: 'Language',
+                  language: LanguageDataList,
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => LanguageSearchScreen()));
+                  },
+                ),
+              ],
+            ),
           ),
         ),
-      ),
       ),
       resizeToAvoidBottomInset: true,
     );
@@ -678,105 +727,6 @@ class Education extends StatelessWidget {
   }
 }
 
-
-// class Skills extends StatelessWidget {
-//   final String label;
-//   final List<String>? skills;
-//   final VoidCallback? onPressed;
-
-//   const Skills({
-//     required this.label,
-//     this.skills,
-//     this.onPressed,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Card(
-//       elevation: 2,
-//       shape: RoundedRectangleBorder(
-//         borderRadius: BorderRadius.circular(12),
-//       ),
-//       child: Padding(
-//         padding: EdgeInsets.all(16),
-//         child: Column(
-//           children: [
-//             Row(
-//               children: [
-//                 Icon(
-//                   Icons.star_outline,
-//                   color: Color(0xFFFCA34D),
-//                 ),
-//                 SizedBox(width: 20),
-//                 Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     Text(
-//                       label,
-//                       style: TextStyle(
-//                         fontSize: 18,
-//                         fontWeight: FontWeight.bold,
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//                 Spacer(),
-//                 IconButton(
-//                   icon: Icon(
-//                     Icons.edit,
-//                     color: Color(0xFFFCA34D),
-//                   ),
-//                   onPressed: onPressed,
-//                 ),
-//               ],
-//             ),
-//             if (skills != null && skills!.isNotEmpty)
-//               Divider(
-//                 color: Color.fromARGB(255, 221, 220, 220),
-//                 thickness: 1,
-//               ),
-//             if (skills != null && skills!.isNotEmpty)
-//               Column(
-//                 children: [
-//                   SizedBox(height: 10),
-//                   for (var skill in skills!)
-//                     Text(
-//                       skill,
-//                       style: TextStyle(
-//                         fontSize: 16,
-//                       ),
-//                     ),
-//                 ],
-//               ),
-//             if (skills == null || skills!.isEmpty)
-//               Row(
-//                 children: [
-//                   Icon(
-//                     Icons.star_outline,
-//                     color: Color(0xFFFCA34D),
-//                   ),
-//                   SizedBox(width: 20),
-//                   Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Text(
-//                         "No skills added",
-//                         style: TextStyle(
-//                           fontSize: 16,
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ],
-//               ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
 class Skills extends StatelessWidget {
   final String label;
   final List<String>? skills;
@@ -839,7 +789,8 @@ class Skills extends StatelessWidget {
                 children: skills!.map((skill) {
                   return Chip(
                     label: Text(skill),
-                    backgroundColor: const Color.fromARGB(255, 216, 216, 216), // Adjust chip color
+                    backgroundColor: const Color.fromARGB(
+                        255, 216, 216, 216), // Adjust chip color
                   );
                 }).toList(),
               ),
@@ -856,6 +807,100 @@ class Skills extends StatelessWidget {
                     children: [
                       Text(
                         "No skills added",
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LanguageSkills extends StatelessWidget {
+  final String label;
+  final List<String>? language;
+  final VoidCallback? onPressed;
+
+  const LanguageSkills({
+    required this.label,
+    this.language,
+    this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.language,
+                  color: Color(0xFFFCA34D),
+                ),
+                SizedBox(width: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Spacer(),
+                IconButton(
+                  icon: Icon(
+                    Icons.edit,
+                    color: Color(0xFFFCA34D),
+                  ),
+                  onPressed: onPressed,
+                ),
+              ],
+            ),
+            if (language != null && language!.isNotEmpty)
+              Divider(
+                color: Color.fromARGB(255, 221, 220, 220),
+                thickness: 1,
+              ),
+            if (language != null && language!.isNotEmpty)
+              Wrap(
+                spacing: 8.0, // Adjust spacing as needed
+                children: language!.map((skill) {
+                  return Chip(
+                    label: Text(skill),
+                    backgroundColor: const Color.fromARGB(255, 216, 216, 216),
+                  );
+                }).toList(),
+              ),
+            if (language == null || language!.isEmpty)
+              Row(
+                children: [
+                  // Icon(
+                  //   Icons.language,
+                  //   color: Color(0xFFFCA34D),
+                  // ),
+                  SizedBox(width: 20),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "No language skills added",
                         style: TextStyle(
                           fontSize: 16,
                         ),
