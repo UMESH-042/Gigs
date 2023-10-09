@@ -797,10 +797,10 @@ class Skills extends StatelessWidget {
             if (skills == null || skills!.isEmpty)
               Row(
                 children: [
-                  Icon(
-                    Icons.star_outline,
-                    color: Color(0xFFFCA34D),
-                  ),
+                  // Icon(
+                  //   Icons.star_outline,
+                  //   color: Color(0xFFFCA34D),
+                  // ),
                   SizedBox(width: 20),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
