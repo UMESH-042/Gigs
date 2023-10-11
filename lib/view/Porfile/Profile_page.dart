@@ -98,6 +98,33 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  //Fetch Appreciation data from Firestore
+  void fetchAppreciationData() async {
+    try {
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.currentUserEmail)
+          .get();
+
+      if (docSnapshot.exists) {
+        final userData = docSnapshot.data();
+
+        if (userData != null) {
+          final Appreciation = userData['appreciation'] as List<dynamic>?;
+          if (Appreciation != null) {
+            setState(() {
+              _AppreciationList = List<Map<String, dynamic>>.from(
+                Appreciation,
+              );
+            });
+          }
+        }
+      }
+    } catch (e) {
+      print('Error fetching Work Experience: $e');
+    }
+  }
+
 // Fetch skills data from Firestore
   void fetchSkillsData() async {
     try {
@@ -161,6 +188,7 @@ class _ProfilePageState extends State<ProfilePage> {
     fetchEducationData();
     fetchSkillsData();
     fetchLanguagesData();
+    fetchAppreciationData();
   }
 
   // Fetch "About Me" content from Firestore
@@ -319,6 +347,7 @@ class _ProfilePageState extends State<ProfilePage> {
           fetchEducationData();
           fetchSkillsData();
           fetchLanguagesData();
+          fetchAppreciationData();
         },
         child: SingleChildScrollView(
           child: Container(
@@ -416,7 +445,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => AppreciationScreen(userEmail: widget.currentUserEmail,)));
+                            builder: (context) => AppreciationScreen(
+                                  userEmail: widget.currentUserEmail,
+                                )));
                   },
                 ),
               ],
@@ -962,7 +993,7 @@ class Appreciation extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  Icons.work,
+                  Icons.data_thresholding_outlined,
                   color: Color(0xFFFCA34D),
                 ),
                 SizedBox(width: 20),
@@ -998,13 +1029,13 @@ class Appreciation extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    AppreciationData[i]['jobTitle'] ?? '',
+                    AppreciationData[i]['awardname'] ?? '',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   Row(
                     children: [
                       Text(
-                        AppreciationData[i]['company'] ?? '',
+                        AppreciationData[i]['AchievementAchieved'] ?? '',
                         style: TextStyle(fontSize: 16),
                       ),
                       Spacer(),
@@ -1019,10 +1050,10 @@ class Appreciation extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      Text(
-                        AppreciationData[i]['startDate'] ?? '',
-                        style: TextStyle(fontSize: 14),
-                      ),
+                      // Text(
+                      //   AppreciationData[i]['startDate'] ?? '',
+                      //   style: TextStyle(fontSize: 14),
+                      // ),
                       SizedBox(width: 5),
                       Text('--'),
                       SizedBox(width: 5),

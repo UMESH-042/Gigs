@@ -106,6 +106,30 @@ Future<void> addEducation(String userId, Map<String, dynamic> education) async {
   }
 
 
+  Future<void> addAppreciation(String userId, Map<String, dynamic> appreciation) async {
+    try {
+      await _firestore.collection('users').doc(userId).set({
+        'appreciation': FieldValue.arrayUnion([appreciation]),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      // Handle error
+      print('Error adding Education: $e');
+    }
+  }
+
+  Future<void> updateAppreciation(String userId, int index, Map<String, dynamic> updatedAppreciation) async {
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'appreciation.$index': updatedAppreciation,
+      });
+    } catch (e) {
+      // Handle error
+      print('Error updating Appreciation: $e');
+    }
+  }
+
+
+
 }
 
 
