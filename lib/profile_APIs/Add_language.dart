@@ -1,4 +1,3 @@
-
 // import 'package:flutter/material.dart';
 
 // class LanguageSearchScreen extends StatefulWidget {
@@ -9,121 +8,121 @@
 // class _LanguageSearchScreenState extends State<LanguageSearchScreen> {
 //   final TextEditingController _searchController = TextEditingController();
 //   List<String> searchResults = [];
-  // List<String> languages = [
-  //   "English",
-  //   "Spanish",
-  //   "French",
-  //   "German",
-  //   "Chinese",
-  //   "Arabic",
-  //   "Russian",
-  //   "Japanese",
-  //   "Portuguese",
-  //   "Italian",
-  //   "Dutch",
-  //   "Korean",
-  //   "Swedish",
-  //   "Turkish",
-  //   "Polish",
-  //   "Danish",
-  //   "Norwegian",
-  //   "Finnish",
-  //   "Greek",
-  //   "Hungarian",
-  //   "Czech",
-  //   "Thai",
-  //   "Hindi",
-  //   "Bengali",
-  //   "Swahili",
-  //   "Hebrew",
-  //   "Vietnamese",
-  //   "Indonesian",
-  //   "Malay",
-  //   "Tagalog",
-  //   "Romanian",
-  //   "Ukrainian",
-  //   "Persian",
-  //   "Urdu",
-  //   "Bulgarian",
-  //   "Croatian",
-  //   "Slovak",
-  //   "Slovenian",
-  //   "Serbian",
-  //   "Estonian",
-  //   "Latvian",
-  //   "Lithuanian",
-  //   "Icelandic",
-  //   "Irish",
-  //   "Scottish Gaelic",
-  //   "Welsh",
-  //   "Fijian",
-  //   "Maori",
-  //   "Samoan",
-  //   "Tongan",
-  //   "Hawaiian",
-  //   "Navajo",
-  //   "Cherokee",
-  //   "Inuktitut",
-  //   "Yoruba",
-  //   "Zulu",
-  //   "Swedish",
-  //   "Kurdish",
-  //   "Tamil",
-  //   "Punjabi",
-  //   "Gujarati",
-  //   "Marathi",
-  //   "Kannada",
-  //   "Telugu",
-  //   "Malayalam",
-  //   "Sinhala",
-  //   "Nepali",
-  //   "Tibetan",
-  //   "Burmese",
-  //   "Khmer",
-  //   "Lao",
-  //   "Mongolian",
-  //   "Uzbek",
-  //   "Kazakh",
-  //   "Turkmen",
-  //   "Tajik",
-  //   "Azerbaijani",
-  //   "Georgian",
-  //   "Armenian",
-  //   "Kyrgyz",
-  //   "Tatar",
-  //   "Bashkir",
-  //   "Chechen",
-  //   "Chuvash",
-  //   "Udmurt",
-  //   "Mari",
-  //   "Moksha",
-  //   "Erzya",
-  //   "Komi",
-  //   "Karelian",
-  //   "Sami",
-  //   "Estonian",
-  //   "Latvian",
-  //   "Lithuanian",
-  //   "Belarusian",
-  //   "Moldovan",
-  //   "Albanian",
-  //   "Macedonian",
-  //   "Bosnian",
-  //   "Montenegrin",
-  //   "Kosovan",
-  //   "Luxembourgish",
-  //   "Esperanto",
-  //   "Interlingua",
-  //   "Esperanto",
-  //   "Interlingua",
-  //   "Klingon",
-  //   "Pirate Speak",
-  //   "Esperanto",
-  //   "Interlingua",
-  //   "Klingon",
-  //   "Pirate Speak",
-  //   "Pig Latin"
-  // ];
+// List<String> languages = [
+//   "English",
+//   "Spanish",
+//   "French",
+//   "German",
+//   "Chinese",
+//   "Arabic",
+//   "Russian",
+//   "Japanese",
+//   "Portuguese",
+//   "Italian",
+//   "Dutch",
+//   "Korean",
+//   "Swedish",
+//   "Turkish",
+//   "Polish",
+//   "Danish",
+//   "Norwegian",
+//   "Finnish",
+//   "Greek",
+//   "Hungarian",
+//   "Czech",
+//   "Thai",
+//   "Hindi",
+//   "Bengali",
+//   "Swahili",
+//   "Hebrew",
+//   "Vietnamese",
+//   "Indonesian",
+//   "Malay",
+//   "Tagalog",
+//   "Romanian",
+//   "Ukrainian",
+//   "Persian",
+//   "Urdu",
+//   "Bulgarian",
+//   "Croatian",
+//   "Slovak",
+//   "Slovenian",
+//   "Serbian",
+//   "Estonian",
+//   "Latvian",
+//   "Lithuanian",
+//   "Icelandic",
+//   "Irish",
+//   "Scottish Gaelic",
+//   "Welsh",
+//   "Fijian",
+//   "Maori",
+//   "Samoan",
+//   "Tongan",
+//   "Hawaiian",
+//   "Navajo",
+//   "Cherokee",
+//   "Inuktitut",
+//   "Yoruba",
+//   "Zulu",
+//   "Swedish",
+//   "Kurdish",
+//   "Tamil",
+//   "Punjabi",
+//   "Gujarati",
+//   "Marathi",
+//   "Kannada",
+//   "Telugu",
+//   "Malayalam",
+//   "Sinhala",
+//   "Nepali",
+//   "Tibetan",
+//   "Burmese",
+//   "Khmer",
+//   "Lao",
+//   "Mongolian",
+//   "Uzbek",
+//   "Kazakh",
+//   "Turkmen",
+//   "Tajik",
+//   "Azerbaijani",
+//   "Georgian",
+//   "Armenian",
+//   "Kyrgyz",
+//   "Tatar",
+//   "Bashkir",
+//   "Chechen",
+//   "Chuvash",
+//   "Udmurt",
+//   "Mari",
+//   "Moksha",
+//   "Erzya",
+//   "Komi",
+//   "Karelian",
+//   "Sami",
+//   "Estonian",
+//   "Latvian",
+//   "Lithuanian",
+//   "Belarusian",
+//   "Moldovan",
+//   "Albanian",
+//   "Macedonian",
+//   "Bosnian",
+//   "Montenegrin",
+//   "Kosovan",
+//   "Luxembourgish",
+//   "Esperanto",
+//   "Interlingua",
+//   "Esperanto",
+//   "Interlingua",
+//   "Klingon",
+//   "Pirate Speak",
+//   "Esperanto",
+//   "Interlingua",
+//   "Klingon",
+//   "Pirate Speak",
+//   "Pig Latin"
+// ];
 
 //   void searchLanguage(String query) {
 //     if (query.isEmpty) {
@@ -243,6 +242,10 @@ import 'package:flutter/material.dart';
 import 'package:gigs/firebase/firebaseService.dart';
 
 class LanguageSearchScreen extends StatefulWidget {
+  final String userEmail;
+
+  const LanguageSearchScreen({super.key, required this.userEmail});
+
   @override
   _LanguageSearchScreenState createState() => _LanguageSearchScreenState();
 }
@@ -251,7 +254,7 @@ class _LanguageSearchScreenState extends State<LanguageSearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<String> searchResults = [];
   List<String> selectedLanguages = [];
-    List<String> languages = [
+  List<String> languages = [
     "English",
     "Spanish",
     "French",
@@ -409,6 +412,7 @@ class _LanguageSearchScreenState extends State<LanguageSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.userEmail);
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 241, 241, 241),
       appBar: AppBar(
@@ -481,7 +485,8 @@ class _LanguageSearchScreenState extends State<LanguageSearchScreen> {
                     toggleLanguageSelection(language);
                   },
                   // Highlight selected languages
-                  tileColor: isSelected ? Colors.blue.withOpacity(0.3) : null,
+                  // tileColor: isSelected ? Colors.blue.withOpacity(0.3) : null,
+                  tileColor: isSelected?Color(0xFF130160).withOpacity(0.3):null,
                   trailing: isSelected
                       ? Icon(Icons.check)
                       : null, // Checkmark for selected languages
@@ -507,16 +512,16 @@ class _LanguageSearchScreenState extends State<LanguageSearchScreen> {
           SizedBox(height: 20),
           Center(
             child: ElevatedButton(
-              onPressed: () async{
- if (selectedLanguages.isNotEmpty) {
-        
-        final firestoreService = FirestoreService();
+              onPressed: () async {
+                if (selectedLanguages.isNotEmpty) {
+                  final firestoreService = FirestoreService();
 
-        // Add the selected skills to Firestore
-        await firestoreService.addLanguages('202151042@iiitvadodara.ac.in', selectedLanguages);
-        // Navigate back to the previous screen
-        Navigator.pop(context);
-      }
+                  // Add the selected skills to Firestore
+                  await firestoreService.addLanguages(
+                      widget.userEmail, selectedLanguages);
+                  // Navigate back to the previous screen
+                  Navigator.pop(context);
+                }
               },
               style: ElevatedButton.styleFrom(
                 primary: Color(0xFF130160),

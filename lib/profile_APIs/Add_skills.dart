@@ -4,6 +4,9 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 class SkillSearchScreen extends StatefulWidget {
+  final String userEmail;
+
+  const SkillSearchScreen({super.key, required this.userEmail});
   @override
   _SkillSearchScreenState createState() => _SkillSearchScreenState();
 }
@@ -54,6 +57,7 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.userEmail);
     print(selectedSkills);
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 241, 241, 241),
@@ -139,7 +143,8 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
                     });
                   },
                   // Highlight selected skills
-                  tileColor: isSelected ? Colors.blue.withOpacity(0.3) : null,
+                  // tileColor: isSelected ? Colors.blue.withOpacity(0.3) : null,
+                  tileColor: isSelected?Color(0xFF130160).withOpacity(0.3):null,
                   trailing: isSelected
                       ? Icon(Icons.check)
                       : null, // Checkmark for selected skills
@@ -168,18 +173,16 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
           Center(
             child: ElevatedButton(
               onPressed: () async {
-                    // Check if there are selected skills
-      if (selectedSkills.isNotEmpty) {
-        
-        final firestoreService = FirestoreService();
+                // Check if there are selected skills
+                if (selectedSkills.isNotEmpty) {
+                  final firestoreService = FirestoreService();
 
-        // Add the selected skills to Firestore
-        await firestoreService.addSkills('202151042@iiitvadodara.ac.in', selectedSkills);
+                  // Add the selected skills to Firestore
+                  await firestoreService.addSkills(widget.userEmail, selectedSkills);
 
-        // Navigate back to the previous screen
-        Navigator.pop(context);
-      }
-
+                  // Navigate back to the previous screen
+                  Navigator.pop(context);
+                }
               },
               style: ElevatedButton.styleFrom(
                 primary: Color(0xFF130160),

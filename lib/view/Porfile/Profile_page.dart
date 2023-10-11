@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gigs/profile_APIs/Add_Education.dart';
 import 'package:gigs/profile_APIs/Add_about_me.dart';
+import 'package:gigs/profile_APIs/Add_appreciation.dart';
 import 'package:gigs/profile_APIs/Add_language.dart';
 import 'package:gigs/profile_APIs/Add_skills.dart';
 
@@ -26,6 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
   List<Map<String, dynamic>> _educationList = [];
   List<String> skillsDataList = [];
   List<String> LanguageDataList = [];
+  List<Map<String, dynamic>> _AppreciationList = [];
 
   GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
@@ -384,7 +386,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => SkillSearchScreen()));
+                            builder: (context) => SkillSearchScreen(
+                                  userEmail: widget.currentUserEmail,
+                                )));
                   },
                 ),
                 SizedBox(
@@ -397,7 +401,22 @@ class _ProfilePageState extends State<ProfilePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => LanguageSearchScreen()));
+                            builder: (context) => LanguageSearchScreen(
+                                  userEmail: widget.currentUserEmail,
+                                )));
+                  },
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Appreciation(
+                  label: 'Appreciation',
+                  AppreciationData: _AppreciationList,
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AppreciationScreen(userEmail: widget.currentUserEmail,)));
                   },
                 ),
               ],
@@ -904,6 +923,112 @@ class LanguageSkills extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16,
                         ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Appreciation extends StatelessWidget {
+  final String label;
+  final List<Map<String, dynamic>> AppreciationData;
+  final VoidCallback? onPressed;
+
+  const Appreciation({
+    required this.label,
+    required this.AppreciationData,
+    this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    print(AppreciationData);
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.work,
+                  color: Color(0xFFFCA34D),
+                ),
+                SizedBox(width: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Spacer(),
+                IconButton(
+                  icon: Icon(
+                    Icons.add_circle_outline_outlined,
+                    color: Color(0xFFFCA34D),
+                  ),
+                  onPressed: onPressed,
+                ),
+              ],
+            ),
+            for (var i = 0; i < AppreciationData.length; i++)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Divider(
+                    color: Color.fromARGB(255, 221, 220, 220),
+                    thickness: 1,
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    AppreciationData[i]['jobTitle'] ?? '',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        AppreciationData[i]['company'] ?? '',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Spacer(),
+                      IconButton(
+                        icon: Icon(
+                          Icons.edit,
+                          color: Colors.orange, // Orange edit icon color
+                        ),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        AppreciationData[i]['startDate'] ?? '',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      SizedBox(width: 5),
+                      Text('--'),
+                      SizedBox(width: 5),
+                      Text(
+                        AppreciationData[i]['endDate'] ?? '',
+                        style: TextStyle(fontSize: 14),
                       ),
                     ],
                   ),
