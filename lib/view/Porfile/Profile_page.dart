@@ -460,6 +460,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
+// Added comments
+
 class AboutMe extends StatelessWidget {
   final String label;
   final String? content;
