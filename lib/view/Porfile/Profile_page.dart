@@ -4,6 +4,7 @@ import 'package:gigs/profile_APIs/Add_Education.dart';
 import 'package:gigs/profile_APIs/Add_about_me.dart';
 import 'package:gigs/profile_APIs/Add_appreciation.dart';
 import 'package:gigs/profile_APIs/Add_language.dart';
+import 'package:gigs/profile_APIs/Add_resume.dart';
 import 'package:gigs/profile_APIs/Add_skills.dart';
 
 import '../../profile_APIs/Add_work_experience.dart';
@@ -450,6 +451,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                 )));
                   },
                 ),
+                Resume(
+                  label: "Resume",
+                  ResumeData: [],
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => UploadCVWidget()));
+                  },
+                )
               ],
             ),
           ),
@@ -1061,6 +1072,112 @@ class Appreciation extends StatelessWidget {
                       SizedBox(width: 5),
                       Text(
                         AppreciationData[i]['endDate'] ?? '',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Resume extends StatelessWidget {
+  final String label;
+  final List<Map<String, dynamic>> ResumeData;
+  final VoidCallback? onPressed;
+
+  const Resume({
+    required this.label,
+    required this.ResumeData,
+    this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    print(ResumeData);
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.data_thresholding_outlined,
+                  color: Color(0xFFFCA34D),
+                ),
+                SizedBox(width: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Spacer(),
+                IconButton(
+                  icon: Icon(
+                    Icons.add_circle_outline_outlined,
+                    color: Color(0xFFFCA34D),
+                  ),
+                  onPressed: onPressed,
+                ),
+              ],
+            ),
+            for (var i = 0; i < ResumeData.length; i++)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Divider(
+                    color: Color.fromARGB(255, 221, 220, 220),
+                    thickness: 1,
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    ResumeData[i]['awardname'] ?? '',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        ResumeData[i]['AchievementAchieved'] ?? '',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Spacer(),
+                      IconButton(
+                        icon: Icon(
+                          Icons.edit,
+                          color: Colors.orange, // Orange edit icon color
+                        ),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      // Text(
+                      //   AppreciationData[i]['startDate'] ?? '',
+                      //   style: TextStyle(fontSize: 14),
+                      // ),
+                      SizedBox(width: 5),
+                      Text('--'),
+                      SizedBox(width: 5),
+                      Text(
+                        ResumeData[i]['endDate'] ?? '',
                         style: TextStyle(fontSize: 14),
                       ),
                     ],
