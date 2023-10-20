@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
 
 class UploadCVWidget extends StatefulWidget {
@@ -12,32 +14,71 @@ class _UploadCVWidgetState extends State<UploadCVWidget> {
   String? selectedFileName;
   String? fileSizeError;
 
-
 // Function to handle the file selection
-Future<void> _selectFile() async {
-  FilePickerResult? result = await FilePicker.platform.pickFiles(
-    type: FileType.custom,
-    allowedExtensions: ['pdf'],
-  );
+  Future<void> _selectFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
 
-  if (result != null) {
-    PlatformFile file = result.files.first; // Get the selected file
+    if (result != null) {
+      PlatformFile file = result.files.first; // Get the selected file
+      setState(() {
+        selectedFile = File(file.path!);
+        selectedFileName = file.name;
+        fileSizeError = null;
+      });
+    }
+  }
+
+  void clearSelectedFile() {
     setState(() {
-      selectedFile = File(file.path!);
-      selectedFileName = file.name;
-      fileSizeError = null;
+      selectedFile = null;
+      selectedFileName = null;
     });
   }
-}
 
-void clearSelectedFile() {
-  setState(() {
-    selectedFile = null;
-    selectedFileName = null;
-  });
-}
+// Function to save the file to Firebase Storage and its URL to Firestore
+  Future<void> saveFileToFirestore(String userEmail) async {
+    if (selectedFile == null) {
+      // Handle this case as needed (e.g., show an error message)
+      return;
+    }
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
- 
+    // Create a reference to Firebase Storage
+    final storage = FirebaseStorage.instance;
+
+    // Generate a unique filename for the uploaded file
+    String fileName = DateTime.now().millisecondsSinceEpoch.toString() +
+        '_' +
+        selectedFileName!;
+
+    // Upload the file to Firebase Storage
+    UploadTask task = storage.ref('user_cvs/$fileName').putFile(selectedFile!);
+
+    // Wait for the upload to complete
+    await task;
+
+    // Get the URL of the uploaded file
+    String downloadURL =
+        await storage.ref('user_cvs/$fileName').getDownloadURL();
+
+    // Store the download URL in a collection named 'user_cvs'
+    // and associate it with the user's email
+    try {
+      await _firestore.collection('users').doc(userEmail).set({
+        'url': downloadURL,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      // Handle error
+      print('Error adding URL: $e');
+    }
+
+    // Clear the selected file
+    clearSelectedFile();
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,11 +112,10 @@ void clearSelectedFile() {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: GestureDetector(
-                onTap: (){
+                onTap: () {
                   _selectFile();
                 },
                 child: CustomPaint(
-       
                   child: Container(
                     width: MediaQuery.of(context).size.width * 0.9,
                     height: isFileSelected ? 140.0 : 100.0,
@@ -123,9 +163,10 @@ void clearSelectedFile() {
                         ),
                         if (isFileSelected)
                           Padding(
-                            padding: const EdgeInsets.only(right: 20.0, bottom: 1, top: 10),
+                            padding: const EdgeInsets.only(
+                                right: 20.0, bottom: 1, top: 10),
                             child: GestureDetector(
-                              onTap:  clearSelectedFile,
+                              onTap: clearSelectedFile,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -156,7 +197,6 @@ void clearSelectedFile() {
                 ),
               ),
             ),
-
             if (fileSizeError != null)
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -169,6 +209,29 @@ void clearSelectedFile() {
                 ),
               ),
           ],
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ElevatedButton(
+          onPressed: () {
+            saveFileToFirestore("202151042@iiitvadodara.ac.in");
+          },
+          style: ElevatedButton.styleFrom(
+            primary: Color(0xFF130160),
+            onPrimary: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            minimumSize: Size(160, 48),
+          ),
+          child: Text(
+            'Save',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ),
     );
