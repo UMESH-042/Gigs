@@ -26,6 +26,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String _workexperience = '';
   List<Map<String, dynamic>> _workExperienceList = [];
   List<Map<String, dynamic>> _educationList = [];
+  List<Map<String, dynamic>> _ResumeData = [];
   List<String> skillsDataList = [];
   List<String> LanguageDataList = [];
   List<Map<String, dynamic>> _AppreciationList = [];
@@ -180,6 +181,34 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // Fetch work experience data from Firestore
+  void fetchResumeData() async {
+    try {
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.currentUserEmail)
+          .get();
+
+      if (docSnapshot.exists) {
+        final userData = docSnapshot.data();
+
+        if (userData != null) {
+          final Resume = userData['Resume'] as List<dynamic>?;
+          if (Resume != null) {
+            print(Resume);
+            setState(() {
+              _ResumeData = List<Map<String, dynamic>>.from(
+                Resume,
+              );
+            });
+          }
+        }
+      }
+    } catch (e) {
+      print('Error fetching Resume Data $e');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -190,6 +219,7 @@ class _ProfilePageState extends State<ProfilePage> {
     fetchSkillsData();
     fetchLanguagesData();
     fetchAppreciationData();
+    fetchResumeData();
   }
 
   // Fetch "About Me" content from Firestore
@@ -349,6 +379,7 @@ class _ProfilePageState extends State<ProfilePage> {
           fetchSkillsData();
           fetchLanguagesData();
           fetchAppreciationData();
+          fetchResumeData();
         },
         child: SingleChildScrollView(
           child: Container(
@@ -453,12 +484,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Resume(
                   label: "Resume",
-                  ResumeData: [],
+                  ResumeData: _ResumeData,
                   onPressed: () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => UploadCVWidget()));
+                            builder: (context) => UploadCVWidget(email:widget.currentUserEmail)));
                   },
                 )
               ],
@@ -1148,40 +1179,40 @@ class Resume extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    ResumeData[i]['awardname'] ?? '',
+                    ResumeData[i]['FileName'] ?? '',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   Row(
                     children: [
                       Text(
-                        ResumeData[i]['AchievementAchieved'] ?? '',
+                        ResumeData[i]['FileSize'] ?? '',
                         style: TextStyle(fontSize: 16),
                       ),
                       Spacer(),
                       IconButton(
                         icon: Icon(
-                          Icons.edit,
-                          color: Colors.orange, // Orange edit icon color
+                          Icons.delete,
+                          color: Colors.deepOrange, // Orange edit icon color
                         ),
                         onPressed: () {},
                       ),
                     ],
                   ),
-                  Row(
-                    children: [
-                      // Text(
-                      //   AppreciationData[i]['startDate'] ?? '',
-                      //   style: TextStyle(fontSize: 14),
-                      // ),
-                      SizedBox(width: 5),
-                      Text('--'),
-                      SizedBox(width: 5),
-                      Text(
-                        ResumeData[i]['endDate'] ?? '',
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  ),
+                  // Row(
+                  //   children: [
+                  //     // Text(
+                  //     //   AppreciationData[i]['startDate'] ?? '',
+                  //     //   style: TextStyle(fontSize: 14),
+                  //     // ),
+                  //     // SizedBox(width: 5),
+                  //     // Text('--'),
+                  //     // SizedBox(width: 5),
+                  //     // Text(
+                  //     //   ResumeData[i]['endDate'] ?? '',
+                  //     //   style: TextStyle(fontSize: 14),
+                  //     // ),
+                  //   ],
+                  // ),
                 ],
               ),
           ],

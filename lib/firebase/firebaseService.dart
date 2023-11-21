@@ -129,6 +129,18 @@ Future<void> addEducation(String userId, Map<String, dynamic> education) async {
   }
 
 
+  Future<void> addResumeData(String userId, Map<String, dynamic> ResumeData) async {
+    try {
+      await _firestore.collection('users').doc(userId).set({
+        'Resume': FieldValue.arrayUnion([ResumeData]),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      // Handle error
+      print('Error adding Education: $e');
+    }
+  }
+
+
 
 }
 

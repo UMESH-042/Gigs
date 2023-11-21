@@ -1,10 +1,19 @@
-import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+
+import 'package:gigs/firebase/firebaseService.dart';
+
 class UploadCVWidget extends StatefulWidget {
+  final String email;
+  const UploadCVWidget({
+    Key? key,
+    required this.email,
+  }) : super(key: key);
   @override
   _UploadCVWidgetState createState() => _UploadCVWidgetState();
 }
@@ -66,14 +75,20 @@ class _UploadCVWidgetState extends State<UploadCVWidget> {
 
     // Store the download URL in a collection named 'user_cvs'
     // and associate it with the user's email
-    try {
-      await _firestore.collection('users').doc(userEmail).set({
-        'url': downloadURL,
-      }, SetOptions(merge: true));
-    } catch (e) {
-      // Handle error
-      print('Error adding URL: $e');
-    }
+      try {
+                      final resumeData = {
+                        'URL': downloadURL,
+                        'FileName': selectedFileName,
+                        'FileSize':'${selectedFile!.lengthSync() ~/ 1024}kb',
+                      };
+              
+                      await FirestoreService()
+                          .addResumeData( userEmail,resumeData);
+                      // Navigator.pop(context);
+                    } catch (e) {
+                      print('Error adding Resume Data: $e');
+                      // Handle the error as needed
+                    }
 
     // Clear the selected file
     clearSelectedFile();
@@ -215,7 +230,7 @@ class _UploadCVWidgetState extends State<UploadCVWidget> {
         padding: const EdgeInsets.all(8.0),
         child: ElevatedButton(
           onPressed: () {
-            saveFileToFirestore("202151042@iiitvadodara.ac.in");
+            saveFileToFirestore(widget.email);
           },
           style: ElevatedButton.styleFrom(
             primary: Color(0xFF130160),
