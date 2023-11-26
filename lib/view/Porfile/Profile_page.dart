@@ -1,11 +1,14 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+
 import 'package:gigs/profile_APIs/Add_Education.dart';
 import 'package:gigs/profile_APIs/Add_about_me.dart';
 import 'package:gigs/profile_APIs/Add_appreciation.dart';
 import 'package:gigs/profile_APIs/Add_language.dart';
 import 'package:gigs/profile_APIs/Add_resume.dart';
 import 'package:gigs/profile_APIs/Add_skills.dart';
+import 'package:gigs/view/EditProfilePage.dart';
 
 import '../../profile_APIs/Add_work_experience.dart';
 
@@ -323,7 +326,13 @@ class _ProfilePageState extends State<ProfilePage> {
               right: screenWidth * 0.04,
               child: ElevatedButton.icon(
                 onPressed: () {
-                  // Implement the action for the Edit Profile button here
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => EditProfilePage(
+                                currentUserEmail: widget.currentUserEmail,
+                                imageUrl: widget.imageUrl,
+                              )));
                 },
                 icon: Icon(Icons.edit),
                 label: Text(
@@ -489,8 +498,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => UploadCVWidget(email:widget.currentUserEmail)));
+                            builder: (context) => UploadCVWidget(
+                                email: widget.currentUserEmail,imageUrl: widget.imageUrl,)));
                   },
+                  useremail: widget.currentUserEmail,imageUrl: widget.imageUrl,
                 )
               ],
             ),
@@ -1116,20 +1127,310 @@ class Appreciation extends StatelessWidget {
   }
 }
 
-class Resume extends StatelessWidget {
+// class Resume extends StatefulWidget {
+//   final String label;
+//   final List<Map<String, dynamic>> ResumeData;
+//   final VoidCallback? onPressed;
+
+//   const Resume({
+//     required this.label,
+//     required this.ResumeData,
+//     this.onPressed,
+//   });
+
+//   @override
+//   State<Resume> createState() => _ResumeState();
+// }
+
+// class _ResumeState extends State<Resume> {
+
+//   @override
+//   Widget build(BuildContext context) {
+
+//     print(widget.ResumeData);
+//     return Card(
+//       elevation: 2,
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.circular(12),
+//       ),
+//       child: Padding(
+//         padding: EdgeInsets.all(16),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Row(
+//               children: [
+//                 Icon(
+//                   Icons.data_thresholding_outlined,
+//                   color: Color(0xFFFCA34D),
+//                 ),
+//                 SizedBox(width: 20),
+//                 Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     Text(
+//                       widget.label,
+//                       style: TextStyle(
+//                         fontSize: 18,
+//                         fontWeight: FontWeight.bold,
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//                 Spacer(),
+//                 IconButton(
+//                   icon: Icon(
+//                     Icons.add_circle_outline_outlined,
+//                     color: Color(0xFFFCA34D),
+//                   ),
+//                   onPressed: widget.onPressed,
+//                 ),
+//               ],
+//             ),
+//             for (var i = 0; i < widget.ResumeData.length; i++)
+//               Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Divider(
+//                     color: Color.fromARGB(255, 221, 220, 220),
+//                     thickness: 1,
+//                   ),
+//                   SizedBox(height: 10),
+//                   Text(
+//                     widget.ResumeData[i]['FileName'] ?? '',
+//                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+//                   ),
+//                   Row(
+//                     children: [
+//                       Text(
+//                         widget.ResumeData[i]['FileSize'] ?? '',
+//                         style: TextStyle(fontSize: 16),
+//                       ),
+//                       Spacer(),
+//                       IconButton(
+//                         icon: Icon(
+//                           Icons.delete,
+//                           color: Colors.deepOrange, // Orange edit icon color
+//                         ),
+//                         onPressed: () {
+
+//                         },
+//                       ),
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// class Resume extends StatefulWidget {
+//   final String label;
+//   final List<Map<String, dynamic>> ResumeData;
+//   final VoidCallback? onPressed;
+//   final String useremail;
+
+//   const Resume({
+//     required this.label,
+//     required this.ResumeData,
+//     this.onPressed, required this.useremail,
+//   });
+
+//   @override
+//   State<Resume> createState() => _ResumeState();
+// }
+
+// class _ResumeState extends State<Resume> {
+//   void deleteResumeDataAtIndex(int index) async {
+//     try {
+//       final CollectionReference usersCollection =
+//           FirebaseFirestore.instance.collection('users');
+
+//       // Fetch the document
+//       DocumentSnapshot docSnapshot =
+//           await usersCollection.doc(widget.useremail).get();
+
+//       if (docSnapshot.exists) {
+//         final userData = docSnapshot.data() as Map<String, dynamic>?;
+
+//         if (userData != null) {
+//           List<dynamic>? resumeData = userData['Resume'] as List<dynamic>?;
+
+//           if (resumeData != null) {
+//             // Remove the entry at the specified index
+//             resumeData.removeAt(index);
+
+//             // Update the document in Firestore
+//             await usersCollection
+//                 .doc(widget.useremail)
+//                 .update({'Resume': resumeData});
+
+//             // Create a new variable for updated data
+//             List<Map<String, dynamic>> updatedResumeData =
+//                 List<Map<String, dynamic>>.from(resumeData);
+
+//             // Update the local state
+//             setState(() {
+//               widget.ResumeData = updatedResumeData;
+//             });
+//           }
+//         }
+//       }
+//     } catch (e) {
+//       print('Error deleting Resume Data $e');
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     print(widget.ResumeData);
+//     return Card(
+//       elevation: 2,
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.circular(12),
+//       ),
+//       child: Padding(
+//         padding: EdgeInsets.all(16),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Row(
+//               children: [
+//                 Icon(
+//                   Icons.data_thresholding_outlined,
+//                   color: Color(0xFFFCA34D),
+//                 ),
+//                 SizedBox(width: 20),
+//                 Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     Text(
+//                       widget.label,
+//                       style: TextStyle(
+//                         fontSize: 18,
+//                         fontWeight: FontWeight.bold,
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//                 Spacer(),
+//                 IconButton(
+//                   icon: Icon(
+//                     Icons.add_circle_outline_outlined,
+//                     color: Color(0xFFFCA34D),
+//                   ),
+//                   onPressed: widget.onPressed,
+//                 ),
+//               ],
+//             ),
+//             for (var i = 0; i < widget.ResumeData.length; i++)
+//               Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Divider(
+//                     color: Color.fromARGB(255, 221, 220, 220),
+//                     thickness: 1,
+//                   ),
+//                   SizedBox(height: 10),
+//                   Text(
+//                     widget.ResumeData[i]['FileName'] ?? '',
+//                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+//                   ),
+//                   Row(
+//                     children: [
+//                       Text(
+//                         widget.ResumeData[i]['FileSize'] ?? '',
+//                         style: TextStyle(fontSize: 16),
+//                       ),
+//                       Spacer(),
+//                       IconButton(
+//                         icon: Icon(
+//                           Icons.delete,
+//                           color: Colors.deepOrange,
+//                         ),
+//                         onPressed: () {
+//                           deleteResumeDataAtIndex(i);
+//                         },
+//                       ),
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+class Resume extends StatefulWidget {
   final String label;
   final List<Map<String, dynamic>> ResumeData;
   final VoidCallback? onPressed;
-
+  final String useremail;
+  final String imageUrl;
   const Resume({
+    Key? key,
     required this.label,
     required this.ResumeData,
     this.onPressed,
-  });
+    required this.useremail,
+    required this.imageUrl,
+  }) : super(key: key);
+
+  @override
+  State<Resume> createState() => _ResumeState();
+}
+
+class _ResumeState extends State<Resume> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void deleteResumeDataAtIndex(int index) async {
+    try {
+      final CollectionReference usersCollection =
+          FirebaseFirestore.instance.collection('users');
+
+      // Fetch the document
+      DocumentSnapshot docSnapshot =
+          await usersCollection.doc(widget.useremail).get();
+
+      if (docSnapshot.exists) {
+        final userData = docSnapshot.data() as Map<String, dynamic>?;
+
+        if (userData != null) {
+          List<dynamic>? resumeData = userData['Resume'] as List<dynamic>?;
+
+          if (resumeData != null) {
+            // Remove the entry at the specified index
+            resumeData.removeAt(index);
+
+            // Update the document in Firestore
+            await usersCollection
+                .doc(widget.useremail)
+                .update({'Resume': resumeData});
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ProfilePage(
+                        currentUserEmail: widget.useremail,
+                        imageUrl: widget.imageUrl)));
+          }
+        }
+      }
+    } catch (e) {
+      print('Error deleting Resume Data $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    print(ResumeData);
+    print(widget.ResumeData);
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -1151,7 +1452,7 @@ class Resume extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      label,
+                      widget.label,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -1165,11 +1466,11 @@ class Resume extends StatelessWidget {
                     Icons.add_circle_outline_outlined,
                     color: Color(0xFFFCA34D),
                   ),
-                  onPressed: onPressed,
+                  onPressed: widget.onPressed,
                 ),
               ],
             ),
-            for (var i = 0; i < ResumeData.length; i++)
+            for (var i = 0; i < widget.ResumeData.length; i++)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1179,40 +1480,28 @@ class Resume extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    ResumeData[i]['FileName'] ?? '',
+                    widget.ResumeData[i]['FileName'] ?? '',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   Row(
                     children: [
                       Text(
-                        ResumeData[i]['FileSize'] ?? '',
+                        widget.ResumeData[i]['FileSize'] ?? '',
                         style: TextStyle(fontSize: 16),
                       ),
                       Spacer(),
                       IconButton(
                         icon: Icon(
                           Icons.delete,
-                          color: Colors.deepOrange, // Orange edit icon color
+                          color: Colors.deepOrange,
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          deleteResumeDataAtIndex(i);
+                          print('Resume deleted');
+                        },
                       ),
                     ],
                   ),
-                  // Row(
-                  //   children: [
-                  //     // Text(
-                  //     //   AppreciationData[i]['startDate'] ?? '',
-                  //     //   style: TextStyle(fontSize: 14),
-                  //     // ),
-                  //     // SizedBox(width: 5),
-                  //     // Text('--'),
-                  //     // SizedBox(width: 5),
-                  //     // Text(
-                  //     //   ResumeData[i]['endDate'] ?? '',
-                  //     //   style: TextStyle(fontSize: 14),
-                  //     // ),
-                  //   ],
-                  // ),
                 ],
               ),
           ],

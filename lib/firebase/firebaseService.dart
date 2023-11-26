@@ -140,6 +140,47 @@ Future<void> addEducation(String userId, Map<String, dynamic> education) async {
     }
   }
 
+  
+
+  Future<void> deleteResumeData(String userId, int indexToDelete) async {
+  try {
+    await _firestore.runTransaction((transaction) async {
+      DocumentSnapshot userSnapshot = await _firestore.collection('users').doc(userId).get();
+
+      if (!userSnapshot.exists) {
+        // Handle case where user document does not exist
+        print('User document does not exist.');
+        return;
+      }
+
+      Map<String, dynamic>? userData = userSnapshot.data() as Map<String, dynamic>?;
+
+      if (userData != null) {
+        List<dynamic> resumeArray = userData['Resume'] ?? [];
+
+        if (indexToDelete >= 0 && indexToDelete < resumeArray.length) {
+          resumeArray.removeAt(indexToDelete);
+
+          await transaction.update(
+            _firestore.collection('users').doc(userId),
+            {'Resume': resumeArray},
+          );
+        } else {
+          // Handle case where the index is out of bounds
+          print('Index out of bounds.');
+        }
+      } else {
+        // Handle case where userData is null
+        print('User data is null.');
+      }
+    });
+  } catch (e) {
+    // Handle error
+    print('Error deleting Resume at index $indexToDelete: $e');
+  }
+}
+
+
 
 
 }

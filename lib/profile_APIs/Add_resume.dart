@@ -7,12 +7,15 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 import 'package:gigs/firebase/firebaseService.dart';
+import 'package:gigs/view/Porfile/Profile_page.dart';
 
 class UploadCVWidget extends StatefulWidget {
   final String email;
+  final String imageUrl;
   const UploadCVWidget({
     Key? key,
     required this.email,
+    required this.imageUrl,
   }) : super(key: key);
   @override
   _UploadCVWidgetState createState() => _UploadCVWidgetState();
@@ -75,24 +78,28 @@ class _UploadCVWidgetState extends State<UploadCVWidget> {
 
     // Store the download URL in a collection named 'user_cvs'
     // and associate it with the user's email
-      try {
-                      final resumeData = {
-                        'URL': downloadURL,
-                        'FileName': selectedFileName,
-                        'FileSize':'${selectedFile!.lengthSync() ~/ 1024}kb',
-                      };
-              
-                      await FirestoreService()
-                          .addResumeData( userEmail,resumeData);
-                      // Navigator.pop(context);
-                    } catch (e) {
-                      print('Error adding Resume Data: $e');
-                      // Handle the error as needed
-                    }
+    try {
+      final resumeData = {
+        'URL': downloadURL,
+        'FileName': selectedFileName,
+        'FileSize': '${selectedFile!.lengthSync() ~/ 1024}kb',
+      };
+
+      await FirestoreService().addResumeData(userEmail, resumeData);
+      // Navigator.pop(context);
+    } catch (e) {
+      print('Error adding Resume Data: $e');
+      // Handle the error as needed
+    }
 
     // Clear the selected file
     clearSelectedFile();
     Navigator.pop(context);
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ProfilePage(
+                currentUserEmail: widget.email, imageUrl: widget.imageUrl)));
   }
 
   @override

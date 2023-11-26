@@ -43,6 +43,7 @@ class _AddEducationPageState extends State<AddEducationPage> {
           },
         ),
       ),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -180,6 +181,7 @@ class _AddEducationPageState extends State<AddEducationPage> {
           ),
         ),
       ),
+    
     );
   }
 
