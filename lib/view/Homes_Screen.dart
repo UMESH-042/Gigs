@@ -7,7 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:gigs/view/Add_Jobs.dart';
-import 'package:gigs/view/Chats.dart';
+import 'package:gigs/view/UsersList.dart';
 import 'package:gigs/view/Display_Jobs.dart';
 import 'package:gigs/view/Network.dart';
 import 'package:gigs/view/Porfile/Profile_page.dart';
@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
       DisplayJobs(),
       Network(),
       AddJobs(),
-      Chats(),
+      ChatScreen(currentUserEmail: widget.currentUserEmail,),
       Saved(),
     ];
     _loadUserData();
