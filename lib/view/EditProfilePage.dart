@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -16,18 +18,20 @@ class EditProfilePage extends StatefulWidget {
   State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
-
-
 class _EditProfilePageState extends State<EditProfilePage> {
   TextEditingController _fullnameController = TextEditingController();
   TextEditingController _DOBController = TextEditingController();
-  TextEditingController _GenderController = TextEditingController();
- String selectedGender = '';
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _phoneNumberController = TextEditingController();
+  TextEditingController _locationController = TextEditingController();
+  String selectedGender = '';
+  String selectedCountryCode = '+1';
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
+      // backgroundColor: Color.fromARGB(255, 251, 251, 249),
       appBar: PreferredSize(
         preferredSize:
             Size.fromHeight(220), // Set the desired height of the app bar
@@ -136,12 +140,30 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         const SizedBox(
                           height: 12,
                         ),
-                        //add male
-                        male(controller: _GenderController, onSelected: (value){
-                          setState(() {
-                            selectedGender=value;
-                          });
-                        })
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          height: 55,
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Row(
+                            children: [
+                              Radio(
+                                activeColor: Colors.orange,
+                                value: 'male',
+                                groupValue: selectedGender,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedGender = value.toString();
+                                  });
+                                },
+                              ),
+                              Text('Male'),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -154,21 +176,69 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         const SizedBox(
                           height: 12,
                         ),
-                        // add female
-                       female(controller: _GenderController, onSelected: (value){
-                        setState(() {
-                          selectedGender = value;
-                        });
-                       })
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          // decoration: BoxDecoration(
+                          //   border: Border.all(
+                          //     color: selectedGender == 'female'
+                          //         ? Colors
+                          //             .pink // Change color based on selection
+                          //         : Colors.grey,
+                          //   ),
+                          //   borderRadius: BorderRadius.circular(8),
+                          // ),
+                          height: 55,
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Row(
+                            children: [
+                              Radio(
+                                activeColor: Colors.orange,
+                                value: 'female',
+                                groupValue: selectedGender,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedGender = value.toString();
+                                  });
+                                },
+                              ),
+                              Text('Female'),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
+              SizedBox(height: 20),
+              label('Email'),
+              const SizedBox(
+                height: 12,
+              ),
+              email(),
               SizedBox(
                 height: 20,
               ),
-              SizedBox(height: 20),
+              label('Phone Number'),
+              const SizedBox(
+                height: 12,
+              ),
+              mobile(),
+              SizedBox(
+                height: 20,
+              ),
+              label('Location'),
+              const SizedBox(
+                height: 12,
+              ),
+              location(),
+              SizedBox(
+                height: 20,
+              ),
               Center(
                 child: ElevatedButton(
                   onPressed: () async {},
@@ -178,7 +248,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    minimumSize: Size(160, 48),
+                    minimumSize: Size(195, 55),
                   ),
                   child: Text(
                     'Save',
@@ -286,76 +356,126 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-
-  Widget male({
-  required TextEditingController controller,
-  required ValueChanged<String> onSelected,
-}) {
-  bool isSelected = controller.text.isNotEmpty;
-
-  return GestureDetector(
-    onTap: () {
-      onSelected('Male');
-    },
-    child: Container(
-      height: 55,
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.blue : Colors.white,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Center(
+  Widget email() {
+    return GestureDetector(
+      onTap: () {},
+      child: Container(
+        height: 55,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+        ),
         child: TextFormField(
-          controller: controller,
+          controller: _emailController,
           style: const TextStyle(
             color: Colors.black,
             fontSize: 17,
           ),
           decoration: InputDecoration(
             border: InputBorder.none,
-            hintText: 'Male',
+            hintText: "",
             hintStyle: TextStyle(color: Colors.grey[500], fontSize: 17),
-            contentPadding: EdgeInsets.symmetric(horizontal: 20),
+            contentPadding: EdgeInsets.only(left: 20, right: 20),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-  Widget female({
-  required TextEditingController controller,
-  required ValueChanged<String> onSelected,
-}) {
-  bool isSelected = controller.text.isNotEmpty;
+  Widget mobile() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            // Country code dropdown
+            Container(
+              padding: EdgeInsets.all(8),
+              height: 55,
+              width: MediaQuery.of(context).size.width * 0.3,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: DropdownButton<String>(
+                value: selectedCountryCode,
+                icon: Icon(Icons.arrow_drop_down),
+                iconSize: 24,
+                elevation: 16,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedCountryCode = newValue!;
+                  });
+                },
+                items: [
+                  '+1',
+                  '+91',
+                  '+44',
+                  '+81'
+                ] // Add more country codes as needed
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            ),
+            SizedBox(width: 16.0),
 
-  return GestureDetector(
-    onTap: () {
-      onSelected('Female');
-    },
-    child: Container(
-      height: 55,
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.blue : Colors.white,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Center(
+            // Mobile number input field
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.all(8),
+                height: 55,
+                width: MediaQuery.of(context).size.width * 0.7,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: TextFormField(
+                  controller: _phoneNumberController,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    hintText: 'Mobile Number',
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget location() {
+    return GestureDetector(
+      onTap: () {},
+      child: Container(
+        height: 55,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+        ),
         child: TextFormField(
-          controller: controller,
+          controller: _locationController,
           style: const TextStyle(
             color: Colors.black,
             fontSize: 17,
           ),
           decoration: InputDecoration(
             border: InputBorder.none,
-            hintText: 'Female',
+            hintText: "",
             hintStyle: TextStyle(color: Colors.grey[500], fontSize: 17),
-            contentPadding: EdgeInsets.symmetric(horizontal: 20),
+            contentPadding: EdgeInsets.only(left: 20, right: 20),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget label(String label) {
     return Text(
