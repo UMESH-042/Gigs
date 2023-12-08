@@ -1,13 +1,18 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:gigs/view/Porfile/Profile_page.dart';
 import 'package:intl/intl.dart';
+
+import 'package:gigs/view/Porfile/Profile_page.dart';
+
 import '../firebase/firebaseService.dart';
 
 class AppreciationScreen extends StatefulWidget {
   final String userEmail;
+  final String imageUrl;
   const AppreciationScreen({
     Key? key,
     required this.userEmail,
+    required this.imageUrl,
   }) : super(key: key);
 
   @override
@@ -128,6 +133,13 @@ class _AppreciationScreenState extends State<AppreciationScreen> {
                       await FirestoreService()
                           .addAppreciation(widget.userEmail, Appreciation);
                       Navigator.pop(context);
+
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ProfilePage(
+                                  currentUserEmail: widget.userEmail,
+                                  imageUrl: widget.imageUrl)));
                     } catch (e) {
                       print('Error adding work experience: $e');
                       // Handle the error as needed

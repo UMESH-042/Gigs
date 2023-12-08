@@ -1,12 +1,21 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
-import 'package:gigs/firebase/firebaseService.dart';
-import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+import 'package:gigs/firebase/firebaseService.dart';
+import 'package:gigs/view/Porfile/Profile_page.dart';
 
 class SkillSearchScreen extends StatefulWidget {
   final String userEmail;
+  final String imageUrl;
 
-  const SkillSearchScreen({super.key, required this.userEmail});
+  const SkillSearchScreen({
+    Key? key,
+    required this.userEmail,
+    required this.imageUrl,
+  }) : super(key: key);
   @override
   _SkillSearchScreenState createState() => _SkillSearchScreenState();
 }
@@ -144,7 +153,8 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
                   },
                   // Highlight selected skills
                   // tileColor: isSelected ? Colors.blue.withOpacity(0.3) : null,
-                  tileColor: isSelected?Color(0xFF130160).withOpacity(0.3):null,
+                  tileColor:
+                      isSelected ? Color(0xFF130160).withOpacity(0.3) : null,
                   trailing: isSelected
                       ? Icon(Icons.check)
                       : null, // Checkmark for selected skills
@@ -178,10 +188,17 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
                   final firestoreService = FirestoreService();
 
                   // Add the selected skills to Firestore
-                  await firestoreService.addSkills(widget.userEmail, selectedSkills);
+                  await firestoreService.addSkills(
+                      widget.userEmail, selectedSkills);
 
                   // Navigate back to the previous screen
                   Navigator.pop(context);
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ProfilePage(
+                              currentUserEmail: widget.userEmail,
+                              imageUrl: widget.imageUrl)));
                 }
               },
               style: ElevatedButton.styleFrom(

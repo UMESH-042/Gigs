@@ -1,16 +1,18 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:gigs/view/Porfile/Profile_page.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../firebase/firebaseService.dart';
 
-
 class AddWorkExperiencePage extends StatefulWidget {
   final String email;
+  final String imageUrl;
   const AddWorkExperiencePage({
     Key? key,
     required this.email,
+    required this.imageUrl,
   }) : super(key: key);
 
   @override
@@ -242,35 +244,35 @@ class _AddWorkExperiencePageState extends State<AddWorkExperiencePage> {
                   // ),
                   // SizedBox(width: 16.0),
                   ElevatedButton(
-             onPressed: () async {
-                                    try {
-                                      // Create a map for the work experience entry
-                                      final workExperienceEntry = {
-                                        'jobTitle': _jobtitleController.text,
-                                        'company': _companyController.text,
-                                        'startDate': _startDateController.text,
-                                        'endDate': _endDateController.text,
-                                        'isCurrent': isCurrentPosition,
-                                        'description':
-                                            _descriptionController.text,
-                                      };
+                    onPressed: () async {
+                      try {
+                        // Create a map for the work experience entry
+                        final workExperienceEntry = {
+                          'jobTitle': _jobtitleController.text,
+                          'company': _companyController.text,
+                          'startDate': _startDateController.text,
+                          'endDate': _endDateController.text,
+                          'isCurrent': isCurrentPosition,
+                          'description': _descriptionController.text,
+                        };
 
-                                      // Replace 'userId' with the actual user ID of the current user
-                                  
+                        // Replace 'userId' with the actual user ID of the current user
 
-                                      // Add the work experience entry to Firestore
-                                      await FirestoreService()
-                                          .addWorkExperience(
-                                              widget.email, workExperienceEntry);
+                        // Add the work experience entry to Firestore
+                        await FirestoreService().addWorkExperience(
+                            widget.email, workExperienceEntry);
 
-                                      // Close the bottom sheet
-                                      Navigator.pop(context);
-                                  
-
-                                    } catch (e) {
-                                      print('Error adding work experience: $e');
-                                      // Handle the error as needed
-                                    }
+                        // Close the bottom sheet
+                        Navigator.pop(context);
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ProfilePage(
+                currentUserEmail: widget.email, imageUrl: widget.imageUrl)));
+                      } catch (e) {
+                        print('Error adding work experience: $e');
+                        // Handle the error as needed
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                         primary: Color(0xFF130160),
@@ -538,9 +540,3 @@ class _AddWorkExperiencePageState extends State<AddWorkExperiencePage> {
     );
   }
 }
-
-
-
-
-
-

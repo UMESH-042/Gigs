@@ -1,6 +1,9 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:gigs/APIs/Institution_name.dart';
 import 'package:intl/intl.dart';
+
+import 'package:gigs/APIs/Institution_name.dart';
+import 'package:gigs/view/Porfile/Profile_page.dart';
 
 import '../APIs/Field_of_Study.dart';
 import '../APIs/level_of_education_API.dart';
@@ -8,9 +11,11 @@ import '../firebase/firebaseService.dart';
 
 class AddEducationPage extends StatefulWidget {
   final String email;
+  final String imageUrl;
   const AddEducationPage({
     Key? key,
     required this.email,
+    required this.imageUrl,
   }) : super(key: key);
 
   @override
@@ -43,7 +48,6 @@ class _AddEducationPageState extends State<AddEducationPage> {
           },
         ),
       ),
-
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -148,13 +152,20 @@ class _AddEducationPageState extends State<AddEducationPage> {
                         'startDate': _educationStartDateController.text,
                         'endDate': _educationEndDateController.text,
                         'isCurrent': isCurrentPosition,
-                        'fieldOfStudy':_fieldOfStudyController.text,
+                        'fieldOfStudy': _fieldOfStudyController.text,
                         'description': _educationDescriptionController.text,
                       };
-              
+
                       await FirestoreService()
                           .addEducation(widget.email, Education);
                       Navigator.pop(context);
+
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ProfilePage(
+                                  currentUserEmail: widget.email,
+                                  imageUrl: widget.imageUrl)));
                     } catch (e) {
                       print('Error adding work experience: $e');
                       // Handle the error as needed
@@ -181,7 +192,6 @@ class _AddEducationPageState extends State<AddEducationPage> {
           ),
         ),
       ),
-    
     );
   }
 

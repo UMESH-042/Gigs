@@ -1,40 +1,44 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+
+import 'package:gigs/view/Porfile/Profile_page.dart';
 
 import '../firebase/firebaseService.dart';
 
 class AddAboutMe extends StatefulWidget {
-   final String userId;
+  final String userId;
+  final String imageUrl;
 
-  const AddAboutMe({super.key, required this.userId});
+  const AddAboutMe({
+    Key? key,
+    required this.userId,
+    required this.imageUrl,
+  }) : super(key: key);
   @override
   _AddAboutMeState createState() => _AddAboutMeState();
 }
 
 class _AddAboutMeState extends State<AddAboutMe> {
+  FirestoreService _firestoreService = FirestoreService();
 
-FirestoreService _firestoreService = FirestoreService();
-
-
-   
-    final TextEditingController _aboutmeController = TextEditingController();
+  final TextEditingController _aboutmeController = TextEditingController();
   String Aboutme = ''; // To store entered job description
 
   void addAboutme() {
-  String newAboutMe = _aboutmeController.text;
+    String newAboutMe = _aboutmeController.text;
 
-  if (Aboutme != newAboutMe) {
-    setState(() {
-      Aboutme = newAboutMe;
-      _aboutmeController.clear();
-    });
+    if (Aboutme != newAboutMe) {
+      setState(() {
+        Aboutme = newAboutMe;
+        _aboutmeController.clear();
+      });
 
-     _firestoreService.addAboutMe(widget.userId, Aboutme);
+      _firestoreService.addAboutMe(widget.userId, Aboutme);
+    }
+
+    Navigator.pop(context, Aboutme); // Close the bottom sheet
   }
-
-  Navigator.pop(context, Aboutme); // Close the bottom sheet
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -166,6 +170,12 @@ FirestoreService _firestoreService = FirestoreService();
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ProfilePage(
+                                    currentUserEmail: widget.userId,
+                                    imageUrl: widget.imageUrl)));
                       },
                       style: ElevatedButton.styleFrom(
                         primary: Color(0xFF130160),
@@ -193,8 +203,7 @@ FirestoreService _firestoreService = FirestoreService();
                       onPressed: () {
                         addAboutme();
                         Navigator.pop(context, Aboutme);
-                         _firestoreService.updateAboutMe(widget.userId, Aboutme);
-                     
+                        _firestoreService.updateAboutMe(widget.userId, Aboutme);
                       },
                       style: ElevatedButton.styleFrom(
                         primary: Color(0xFFD6CDFE),
@@ -241,7 +250,3 @@ FirestoreService _firestoreService = FirestoreService();
     super.dispose();
   }
 }
-
-
-
-

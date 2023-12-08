@@ -6,7 +6,7 @@ class FirestoreService {
 
   Future<void> addAboutMe(String userId, String aboutMe) async {
     try {
-      await _firestore.collection('users').doc(userId).set({
+      await _firestore.collection('usersProfile').doc(userId).set({
         'aboutMe': aboutMe,
       }, SetOptions(merge: true));
     } catch (e) {
@@ -17,7 +17,7 @@ class FirestoreService {
 
   Future<void> updateAboutMe(String userId, String aboutMe) async {
     try {
-      await _firestore.collection('users').doc(userId).update({
+      await _firestore.collection('usersProfile').doc(userId).update({
         'aboutMe': aboutMe,
       });
     } catch (e) {
@@ -29,7 +29,7 @@ class FirestoreService {
 
   Future<void> addWorkExperience(String userId, Map<String, dynamic> workExperience) async {
     try {
-      await _firestore.collection('users').doc(userId).update({
+      await _firestore.collection('usersProfile').doc(userId).update({
         'workExperience': FieldValue.arrayUnion([workExperience]),
       });
     } catch (e) {
@@ -40,7 +40,7 @@ class FirestoreService {
 
   Future<void> updateWorkExperience(String userId, int index, Map<String, dynamic> updatedWorkExperience) async {
     try {
-      await _firestore.collection('users').doc(userId).update({
+      await _firestore.collection('usersProfile').doc(userId).update({
         'workExperience.$index': updatedWorkExperience,
       });
     } catch (e) {
@@ -50,7 +50,7 @@ class FirestoreService {
   }
 Future<void> addEducation(String userId, Map<String, dynamic> education) async {
     try {
-      await _firestore.collection('users').doc(userId).set({
+      await _firestore.collection('usersProfile').doc(userId).set({
         'education': FieldValue.arrayUnion([education]),
       }, SetOptions(merge: true));
     } catch (e) {
@@ -61,7 +61,7 @@ Future<void> addEducation(String userId, Map<String, dynamic> education) async {
 
   Future<void> updateEducation(String userId, int index, Map<String, dynamic> updatedEducation) async {
     try {
-      await _firestore.collection('users').doc(userId).update({
+      await _firestore.collection('usersProfile').doc(userId).update({
         'education.$index': updatedEducation,
       });
     } catch (e) {
@@ -72,7 +72,7 @@ Future<void> addEducation(String userId, Map<String, dynamic> education) async {
 
   Future<void> addSkills(String userId, List<String> skills) async {
   try {
-    await _firestore.collection('users').doc(userId).update({
+    await _firestore.collection('usersProfile').doc(userId).update({
       'skills': FieldValue.arrayUnion(skills),
     });
   } catch (e) {
@@ -85,7 +85,7 @@ Future<void> addEducation(String userId, Map<String, dynamic> education) async {
 
  Future<void> addLanguages(String userId, List<String> languages) async {
     try {
-      await _firestore.collection('users').doc(userId).update({
+      await _firestore.collection('usersProfile').doc(userId).update({
         'languages': FieldValue.arrayUnion(languages),
       });
     } catch (e) {
@@ -96,7 +96,7 @@ Future<void> addEducation(String userId, Map<String, dynamic> education) async {
 
   Future<void> updateLanguages(String userId, List<String> languages) async {
     try {
-      await _firestore.collection('users').doc(userId).update({
+      await _firestore.collection('usersProfile').doc(userId).update({
         'languages': languages,
       });
     } catch (e) {
@@ -108,7 +108,7 @@ Future<void> addEducation(String userId, Map<String, dynamic> education) async {
 
   Future<void> addAppreciation(String userId, Map<String, dynamic> appreciation) async {
     try {
-      await _firestore.collection('users').doc(userId).set({
+      await _firestore.collection('usersProfile').doc(userId).set({
         'appreciation': FieldValue.arrayUnion([appreciation]),
       }, SetOptions(merge: true));
     } catch (e) {
@@ -119,7 +119,7 @@ Future<void> addEducation(String userId, Map<String, dynamic> education) async {
 
   Future<void> updateAppreciation(String userId, int index, Map<String, dynamic> updatedAppreciation) async {
     try {
-      await _firestore.collection('users').doc(userId).update({
+      await _firestore.collection('usersProfile').doc(userId).update({
         'appreciation.$index': updatedAppreciation,
       });
     } catch (e) {
@@ -131,7 +131,7 @@ Future<void> addEducation(String userId, Map<String, dynamic> education) async {
 
   Future<void> addResumeData(String userId, Map<String, dynamic> ResumeData) async {
     try {
-      await _firestore.collection('users').doc(userId).set({
+      await _firestore.collection('usersProfile').doc(userId).set({
         'Resume': FieldValue.arrayUnion([ResumeData]),
       }, SetOptions(merge: true));
     } catch (e) {
@@ -145,7 +145,7 @@ Future<void> addEducation(String userId, Map<String, dynamic> education) async {
   Future<void> deleteResumeData(String userId, int indexToDelete) async {
   try {
     await _firestore.runTransaction((transaction) async {
-      DocumentSnapshot userSnapshot = await _firestore.collection('users').doc(userId).get();
+      DocumentSnapshot userSnapshot = await _firestore.collection('usersProfile').doc(userId).get();
 
       if (!userSnapshot.exists) {
         // Handle case where user document does not exist
@@ -162,7 +162,7 @@ Future<void> addEducation(String userId, Map<String, dynamic> education) async {
           resumeArray.removeAt(indexToDelete);
 
           await transaction.update(
-            _firestore.collection('users').doc(userId),
+            _firestore.collection('usersProfile').doc(userId),
             {'Resume': resumeArray},
           );
         } else {

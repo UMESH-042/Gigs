@@ -5,6 +5,8 @@ import 'package:easy_pdf_viewer/easy_pdf_viewer.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:gigs/notifications/notification_service.dart';
+import 'package:gigs/view/Porfile/Profile_page.dart';
+import 'package:gigs/view/Porfile/userProfile.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -141,75 +143,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     }
   }
 
-  // sendNotification(String title, String token) async {
-  //   final data = {
-  //     'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-  //     'id': '1',
-  //     'status': 'done',
-  //     'message': title,
-  //   };
-
-  //   try {
-  //     http.Response response =
-  //         await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
-  //             headers: <String, String>{
-  //               'Content-Type': 'application/json',
-  //               'Authorization':
-  //                   'key=AAAA6msbZ3E:APA91bHFliFq8amgNOiLnltmuo2AxFHnxfLoFk6uVeSf1LEH7jti-i7l-jtiuFZN61koUeAC94Wa_ckPSE5Ao8xFfK_fiDxtV4sArdob_scjxoVcqXnBTulJ_SH6tE48u0RJGiZyEV_p'
-  //             },
-  //             body: jsonEncode(<String, dynamic>{
-  //               'notification': <String, dynamic>{
-  //                 'title': title,
-  //                 'body': 'You are followed by someone'
-  //               },
-  //               'priority': 'high',
-  //               'data': data,
-  //               'to': '$token'
-  //             }));
-
-  //     if (response.statusCode == 200) {
-  //       print("Yeh notificatin is sended");
-  //     } else {
-  //       print("Error");
-  //     }
-  //   } catch (e) {}
-  // }
-//   sendNotification(String userName, String message, String token) async {
-//   final data = {
-//     'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-//     'id': '1',
-//     'status': 'done',
-//     'message': message,
-//   };
-
-//   try {
-//     http.Response response =
-//         await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
-//             headers: <String, String>{
-//               'Content-Type': 'application/json',
-//               'Authorization':
-//                   'key=AAAA6msbZ3E:APA91bHFliFq8amgNOiLnltmuo2AxFHnxfLoFk6uVeSf1LEH7jti-i7l-jtiuFZN61koUeAC94Wa_ckPSE5Ao8xFfK_fiDxtV4sArdob_scjxoVcqXnBTulJ_SH6tE48u0RJGiZyEV_p'
-//             },
-//             body: jsonEncode(<String, dynamic>{
-//               'notification': <String, dynamic>{
-//                 'title': userName,
-//                 'body': message,
-//               },
-//               'priority': 'high',
-//               'data': data,
-//               'to': '$token',
-//             }));
-
-//     if (response.statusCode == 200) {
-//       print("Notification sent successfully");
-//     } else {
-//       print("Error sending notification");
-//     }
-//   } catch (e) {
-//     print("Error: $e");
-//   }
-// }
-
   sendNotification(String userName, String message, String token) async {
     final data = {
       'click_action': 'FLUTTER_NOTIFICATION_CLICK',
@@ -224,7 +157,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         Uri.parse('https://fcm.googleapis.com/fcm/send'),
         headers: <String, String>{
           'Content-Type': 'application/json',
-          'Authorization':'key=AAAAGNLlsWY:APA91bHic5VqqER8euXs_uxxqwar5VHmAxw_2rVMaTH6QYaD2MG3TTGh6W_xxMfqyHzbvPHrvkDqyFUvk6J8sNy0W7CaowxSGP23x-VZmAVFNAV59xZoF74SLpK4L6E8mM6bVETHKSTm'
+          'Authorization':
+              'key=AAAAGNLlsWY:APA91bHic5VqqER8euXs_uxxqwar5VHmAxw_2rVMaTH6QYaD2MG3TTGh6W_xxMfqyHzbvPHrvkDqyFUvk6J8sNy0W7CaowxSGP23x-VZmAVFNAV59xZoF74SLpK4L6E8mM6bVETHKSTm'
         },
         body: jsonEncode(<String, dynamic>{
           'notification': <String, dynamic>{
@@ -329,11 +263,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
               return GestureDetector(
                 onTap: () {
-                  // Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //         builder: (context) =>
-                  //             ProfileScreen(useremail: userId)));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ProfilePage(
+                              currentUserEmail: widget.currentUserEmail,
+                              imageUrl: imageUrl)));
                 },
                 child: Container(
                   child: Row(
@@ -379,21 +314,11 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         ),
 
         actions: [
-          // IconButton(
-          //   onPressed: () async {
-          //     String? recipientToken =
-          //         await getNotificationTokenForUser(widget.otherUserEmail);
-          //     // Navigator.push(
-          //     //     context,
-          //     //     MaterialPageRoute(
-          //     //         builder: (context) => CallIDPage(
-          //     //               recipientToken: recipientToken,
-          //     //               userName: _auth.currentUser?.displayName ?? '',
-          //     //             )));
-          //   },
-          //   icon: Icon(Icons.phone),
-          //   color: Colors.black,
-          // )
+          IconButton(
+            onPressed: () async {},
+            icon: Icon(Icons.search),
+            color: Colors.black,
+          )
         ],
       ),
       body: Column(
@@ -415,7 +340,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                     if (snapshot.data != null) {
                       final messages = snapshot.data!.docs;
                       return ListView.builder(
-                         padding: EdgeInsets.all(8),
+                        padding: EdgeInsets.all(8),
                         itemCount: messages.length,
                         itemBuilder: (context, index) {
                           final message =

@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 // import 'package:flutter/material.dart';
 
 // class LanguageSearchScreen extends StatefulWidget {
@@ -239,12 +240,19 @@
 // }
 
 import 'package:flutter/material.dart';
+
 import 'package:gigs/firebase/firebaseService.dart';
+import 'package:gigs/view/Porfile/Profile_page.dart';
 
 class LanguageSearchScreen extends StatefulWidget {
   final String userEmail;
+  final String imageUrl;
 
-  const LanguageSearchScreen({super.key, required this.userEmail});
+  const LanguageSearchScreen({
+    Key? key,
+    required this.userEmail,
+    required this.imageUrl,
+  }) : super(key: key);
 
   @override
   _LanguageSearchScreenState createState() => _LanguageSearchScreenState();
@@ -486,7 +494,8 @@ class _LanguageSearchScreenState extends State<LanguageSearchScreen> {
                   },
                   // Highlight selected languages
                   // tileColor: isSelected ? Colors.blue.withOpacity(0.3) : null,
-                  tileColor: isSelected?Color(0xFF130160).withOpacity(0.3):null,
+                  tileColor:
+                      isSelected ? Color(0xFF130160).withOpacity(0.3) : null,
                   trailing: isSelected
                       ? Icon(Icons.check)
                       : null, // Checkmark for selected languages
@@ -521,6 +530,13 @@ class _LanguageSearchScreenState extends State<LanguageSearchScreen> {
                       widget.userEmail, selectedLanguages);
                   // Navigate back to the previous screen
                   Navigator.pop(context);
+
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ProfilePage(
+                              currentUserEmail: widget.userEmail,
+                              imageUrl: widget.imageUrl)));
                 }
               },
               style: ElevatedButton.styleFrom(

@@ -53,7 +53,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void fetchWorkExperienceData() async {
     try {
       final docSnapshot = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('usersProfile')
           .doc(widget.currentUserEmail)
           .get();
 
@@ -80,7 +80,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void fetchEducationData() async {
     try {
       final docSnapshot = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('usersProfile')
           .doc(widget.currentUserEmail)
           .get();
 
@@ -107,7 +107,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void fetchAppreciationData() async {
     try {
       final docSnapshot = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('usersProfile')
           .doc(widget.currentUserEmail)
           .get();
 
@@ -134,7 +134,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void fetchSkillsData() async {
     try {
       final docSnapshot = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('usersProfile')
           .doc(widget.currentUserEmail)
           .get();
 
@@ -161,7 +161,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void fetchLanguagesData() async {
     try {
       final docSnapshot = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('usersProfile')
           .doc(widget.currentUserEmail)
           .get();
 
@@ -188,7 +188,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void fetchResumeData() async {
     try {
       final docSnapshot = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('usersProfile')
           .doc(widget.currentUserEmail)
           .get();
 
@@ -229,7 +229,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void fetchAboutMeContent() async {
     try {
       final docSnapshot = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('usersProfile')
           .doc(widget.currentUserEmail)
           .get();
 
@@ -407,6 +407,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       MaterialPageRoute(
                         builder: (context) => AddAboutMe(
                           userId: widget.currentUserEmail,
+                          imageUrl: widget.imageUrl,
                         ),
                       ),
                     );
@@ -426,7 +427,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => AddWorkExperiencePage(
-                          email: widget.currentUserEmail,
+                          email: widget.currentUserEmail, imageUrl: widget.imageUrl,
                         ),
                       ),
                     );
@@ -443,7 +444,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => AddEducationPage(
-                                email: widget.currentUserEmail)));
+                                email: widget.currentUserEmail,imageUrl: widget.imageUrl,)));
                   },
                 ),
                 SizedBox(
@@ -457,7 +458,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => SkillSearchScreen(
-                                  userEmail: widget.currentUserEmail,
+                                  userEmail: widget.currentUserEmail, imageUrl: widget.imageUrl,
                                 )));
                   },
                 ),
@@ -472,7 +473,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => LanguageSearchScreen(
-                                  userEmail: widget.currentUserEmail,
+                                  userEmail: widget.currentUserEmail,imageUrl: widget.imageUrl,
                                 )));
                   },
                 ),
@@ -488,6 +489,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         MaterialPageRoute(
                             builder: (context) => AppreciationScreen(
                                   userEmail: widget.currentUserEmail,
+          imageUrl: widget.imageUrl,
+
                                 )));
                   },
                 ),
@@ -1394,7 +1397,7 @@ class _ResumeState extends State<Resume> {
   void deleteResumeDataAtIndex(int index) async {
     try {
       final CollectionReference usersCollection =
-          FirebaseFirestore.instance.collection('users');
+          FirebaseFirestore.instance.collection('usersProfile');
 
       // Fetch the document
       DocumentSnapshot docSnapshot =
