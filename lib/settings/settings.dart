@@ -8,9 +8,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool _notificationValue = true; // Initial notification value
-  bool _darkModeValue = true; // Initial dark mode value
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,31 +36,21 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
             SizedBox(height: 15),
-            SettingsCard(
-              title: 'Notifications',
-              description: 'Enable or disable notifications',
-              initialValue: _notificationValue,
-              onChanged: (value) {
-                // Handle notification toggle change
-                setState(() {
-                  _notificationValue = value;
-                });
-              },
-            ),
+            // SettingsCard(
+            //   title: 'Notifications',
+            //   description: 'Enable or disable notifications',
+            //   initialValue: _notificationValue,
+            //   onChanged: (value) {
+            //     // Handle notification toggle change
+            //     setState(() {
+            //       _notificationValue = value;
+            //     });
+            //   },
+            // ),
             SizedBox(height: 16),
             SettingsCard(
               title: 'Dark Mode',
               description: 'Switch between light and dark themes',
-              initialValue: _darkModeValue,
-              onChanged: (value) {
-                // Handle dark mode toggle change
-                final provider =
-                    Provider.of<ThemeProvider>(context, listen: false);
-                provider.toggleTheme(value);
-                setState(() {
-                  _darkModeValue = value;
-                });
-              },
             ),
             // ... other settings cards
           ],
@@ -76,15 +63,11 @@ class _SettingsPageState extends State<SettingsPage> {
 class SettingsCard extends StatefulWidget {
   final String title;
   final String description;
-  final bool initialValue; // Initial value for the toggle button
-  final Function(bool) onChanged;
 
   const SettingsCard({
     Key? key,
     required this.title,
     required this.description,
-    required this.initialValue,
-    required this.onChanged,
   }) : super(key: key);
 
   @override
@@ -92,28 +75,27 @@ class SettingsCard extends StatefulWidget {
 }
 
 class _SettingsCardState extends State<SettingsCard> {
-  late bool _value;
 
   @override
   void initState() {
     super.initState();
-    _value = widget.initialValue;
   }
 
   @override
   Widget build(BuildContext context) {
+    final themeprovider = Provider.of<ThemeProvider>(context);
+
     return Card(
       elevation: 2,
       child: ListTile(
         title: Text(widget.title),
         subtitle: Text(widget.description),
         trailing: Switch(
-          value: _value,
-          onChanged: (newValue) {
-            setState(() {
-              _value = newValue;
-            });
-            widget.onChanged(newValue);
+          value: themeprovider.isDarkMode,
+          onChanged: (value) {
+  
+            final provider = Provider.of<ThemeProvider>(context, listen: false);
+            provider.toggleTheme(value);
           },
           activeColor: Colors.green, // Color when the switch is ON
           inactiveThumbColor:
@@ -125,3 +107,6 @@ class _SettingsCardState extends State<SettingsCard> {
     );
   }
 }
+
+
+
