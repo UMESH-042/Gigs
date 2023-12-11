@@ -278,7 +278,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       ),
                       SizedBox(width: 8),
                       Expanded(
-                        child: FittedBox(
+                        child: FittedBox( 
                           fit: BoxFit.scaleDown,
                           alignment: Alignment.centerLeft,
                           child: Column(

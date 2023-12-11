@@ -1,9 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:io';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gigs/settings/settings.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:file_picker/file_picker.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String currentUserEmail;
@@ -26,6 +30,79 @@ class _EditProfilePageState extends State<EditProfilePage> {
   TextEditingController _locationController = TextEditingController();
   String selectedGender = '';
   String selectedCountryCode = '+1';
+
+  // Future<void> _changeImage() async {
+  //   FilePickerResult? result = await FilePicker.platform.pickFiles(
+  //     type: FileType.image,
+  //     allowMultiple: false,
+  //   );
+
+  //   if (result != null && result.files.isNotEmpty) {
+  //     PlatformFile file = result.files.first;
+
+  //     // Assuming you are using Firebase to store user data
+  //     // Update the 'imageUrl' in the 'users' collection
+  //     await FirebaseFirestore.instance
+  //         .collection('users')
+  //         .where('email', isEqualTo: widget.currentUserEmail)
+  //         .get()
+  //         .then((QuerySnapshot<Map<String, dynamic>> snapshot) {
+  //       if (snapshot.docs.isNotEmpty) {
+  //         final DocumentReference<Map<String, dynamic>> documentReference =
+  //             snapshot.docs.first.reference;
+  //         documentReference.update({'imageUrl': file.path});
+  //       }
+  //     });
+
+  //     // Update the local 'imageUrl' to reflect the change
+  //     Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(
+  //             builder: (context) => EditProfilePage(
+  //                 currentUserEmail: widget.currentUserEmail,
+  //                 imageUrl: widget.imageUrl)));
+  //   }
+  // }
+  Future<void> _changeImage() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowMultiple: false,
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      PlatformFile file = result.files.first;
+
+      // Upload the selected image to Firebase Storage
+      String storagePath =
+          'user_images/${widget.currentUserEmail}/${DateTime.now().millisecondsSinceEpoch}';
+      firebase_storage.Reference storageReference =
+          firebase_storage.FirebaseStorage.instance.ref(storagePath);
+      await storageReference.putFile(File(file.path!));
+
+      // Get the download URL of the uploaded image
+      String imageUrl = await storageReference.getDownloadURL();
+
+      // Update the 'imageUrl' in the 'users' collection
+      await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: widget.currentUserEmail)
+          .get()
+          .then((QuerySnapshot<Map<String, dynamic>> snapshot) {
+        if (snapshot.docs.isNotEmpty) {
+          final DocumentReference<Map<String, dynamic>> documentReference =
+              snapshot.docs.first.reference;
+          documentReference.update({'imageUrl': imageUrl});
+        }
+      });
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => EditProfilePage(
+                  currentUserEmail: widget.currentUserEmail,
+                  imageUrl: widget.imageUrl)));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -97,11 +174,36 @@ class _EditProfilePageState extends State<EditProfilePage> {
               actions: [
                 IconButton(
                   onPressed: () {
-                    // Implement the action for the Settings button here
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SettingsPage()));
                   },
                   icon: Icon(Icons.settings),
                 ),
               ],
+            ),
+            Positioned(
+              bottom: screenHeight * 0.031,
+              left: screenWidth * 0.08,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  _changeImage();
+                },
+                icon: Icon(Icons.edit),
+                label: Text(
+                  "Change Image",
+                  style: TextStyle(fontSize: 16),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: Color.fromARGB(255, 69, 41, 191),
+                  onPrimary: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -243,7 +345,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 child: ElevatedButton(
                   onPressed: () async {},
                   style: ElevatedButton.styleFrom(
-                    primary: Color(0xFF130160),
+                    primary: Color(0xFF130160), 
                     onPrimary: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
