@@ -8,6 +8,7 @@ import 'package:gigs/profile_APIs/Add_appreciation.dart';
 import 'package:gigs/profile_APIs/Add_language.dart';
 import 'package:gigs/profile_APIs/Add_resume.dart';
 import 'package:gigs/profile_APIs/Add_skills.dart';
+import 'package:gigs/settings/settings.dart';
 import 'package:gigs/view/EditProfilePage.dart';
 
 import '../../profile_APIs/Add_work_experience.dart';
@@ -315,7 +316,10 @@ class _ProfilePageState extends State<ProfilePage> {
               actions: [
                 IconButton(
                   onPressed: () {
-                    // Implement the action for the Settings button here
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SettingsPage()));
                   },
                   icon: Icon(Icons.settings),
                 ),

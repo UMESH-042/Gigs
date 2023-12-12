@@ -59,12 +59,12 @@ class _HomePageState extends State<HomePage> {
     storeNotificationToken();
     _screens = [
       DisplayJobs(),
-      Network(),
+      ViewPostsPage(),
       AddJobs(),
       ChatScreen(currentUserEmail: widget.currentUserEmail,),
       Saved(),
     ];
-    _loadUserData();
+    _loadUserData();  
     _requestNotificationPermissions();
   }
 

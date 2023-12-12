@@ -1,6 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gigs/Screens/login_screen.dart';
+import 'package:gigs/Screens/methods.dart';
 
 import 'package:gigs/view/Add_Jobs.dart';
 
@@ -400,6 +403,126 @@ class RadioOption extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class bottomSheetForLogout extends StatefulWidget {
+  const bottomSheetForLogout({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<bottomSheetForLogout> createState() => _bottomSheetForLogoutState();
+}
+
+class _bottomSheetForLogoutState extends State<bottomSheetForLogout> {
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return Container(
+      height: 375,
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min, // To adjust the height of the content
+        children: [
+          Container(
+            width: 40,
+            height: 3,
+            color: Color(0xFF130160),
+          ),
+          SizedBox(
+            height: 70,
+          ),
+          Text(
+            "Log Out",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 23,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 16),
+          Text(
+            "Are you sure you want to leave?",
+            style: TextStyle(
+              fontSize: 16,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 40),
+          customYes(size),
+          SizedBox(height: 10),
+          customNo(size),
+        ],
+      ),
+    );
+  }
+
+  Widget customNo(Size size) {
+    return SizedBox(
+      height: size.height / 15,
+      width: size.width / 1.2,
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        style: ElevatedButton.styleFrom(
+          primary: Color(0xFFD6CDFE),
+          onPrimary: Colors.black,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+        ),
+        child: Text(
+          'CANCEL',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _logout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      // After successful logout, navigate to the login screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    } catch (e) {
+      print("Error occurred during logout: $e");
+      // Handle any error that occurred during logout (if any).
+    }
+  }
+
+  Widget customYes(Size size) {
+    return SizedBox(
+      height: size.height / 15,
+      width: size.width / 1.2,
+      child: ElevatedButton(
+        onPressed: () {
+          _logout();
+        },
+        style: ElevatedButton.styleFrom(
+          primary: Color(0xFF130160),
+          onPrimary: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+        ),
+        child: Text(
+          'YES',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
