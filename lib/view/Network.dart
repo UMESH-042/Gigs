@@ -15,10 +15,9 @@ class ViewPostsPage extends StatefulWidget {
 class _ViewPostsPageState extends State<ViewPostsPage> {
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-   backgroundColor: Color.fromARGB(255, 241, 241, 241),
-     appBar: AppBar(
+      backgroundColor: Color.fromARGB(255, 241, 241, 241),
+      appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.black),
@@ -30,7 +29,10 @@ class _ViewPostsPageState extends State<ViewPostsPage> {
         ),
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('posts').orderBy('timestamp',descending: true).snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('posts')
+            .orderBy('timestamp', descending: true)
+            .snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (!snapshot.hasData) {
             return Center(
@@ -60,17 +62,32 @@ class PostCard extends StatefulWidget {
   _PostCardState createState() => _PostCardState();
 }
 
-class _PostCardState extends State<PostCard> {
+class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
   int likesCount = 0;
   int commentsCount = 0;
   bool isLiked = false;
 
+  late AnimationController _likeAnimationController;
+  late Animation<double> _likeAnimation;
+
   @override
   void initState() {
     super.initState();
+    _likeAnimationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 350),
+    );
+
+    _likeAnimation = Tween<double>(begin: 24, end: 30).animate(
+      CurvedAnimation(
+        parent: _likeAnimationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
     _getLikesCount();
     _getCommentsCount();
-     _checkIfLiked();
+    _checkIfLiked();
   }
 
   Future<void> _getLikesCount() async {
@@ -95,7 +112,7 @@ class _PostCardState extends State<PostCard> {
     });
   }
 
-Future<void> _checkIfLiked() async {
+  Future<void> _checkIfLiked() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User user = auth.currentUser!;
     final uid = user.uid;
@@ -109,6 +126,12 @@ Future<void> _checkIfLiked() async {
     setState(() {
       isLiked = existingLikes.docs.isNotEmpty;
     });
+  }
+
+  @override
+  void dispose() {
+    _likeAnimationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -149,7 +172,8 @@ Future<void> _checkIfLiked() async {
                 ],
               ),
               leading: CircleAvatar(
-                backgroundImage: NetworkImage(widget.post['userImageUrl'] ?? ''),
+                backgroundImage:
+                    NetworkImage(widget.post['userImageUrl'] ?? ''),
               ),
             ),
             Padding(
@@ -216,12 +240,25 @@ Future<void> _checkIfLiked() async {
                   //   onTap: _likePost,
                   //   isLiked: isLiked,
                   // ),
-                  IconButton(
-                    icon: Icon(
-                      isLiked ? Icons.favorite : Icons.favorite_border,
-                      color: isLiked ? Colors.red : Colors.grey,
+                  // IconButton(
+                  //   icon: Icon(
+                  //     isLiked ? Icons.favorite : Icons.favorite_border,
+                  //     color: isLiked ? Colors.red : Colors.grey,
+                  //   ),
+                  //   onPressed: _likePost,
+                  // ),
+                  GestureDetector(
+                    onTap: _likePost,
+                    child: AnimatedBuilder(
+                      animation: _likeAnimation,
+                      builder: (context, child) {
+                        return Icon(
+                          isLiked ? Icons.favorite : Icons.favorite_border,
+                          color: isLiked ? Colors.red : Colors.grey,
+                          size: _likeAnimation.value,
+                        );
+                      },
                     ),
-                    onPressed: _likePost,
                   ),
                   Text(likesCount.toString()),
                   IconButton(
@@ -253,39 +290,44 @@ Future<void> _checkIfLiked() async {
   }
 
   Future<void> _likePost() async {
-  final FirebaseAuth auth = FirebaseAuth.instance;
-  final User user = auth.currentUser!;
-  final uid = user.uid;
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User user = auth.currentUser!;
+    final uid = user.uid;
 
-  QuerySnapshot existingLikes = await FirebaseFirestore.instance
-      .collection('likes')
-      .where('postId', isEqualTo: widget.post.id)
-      .where('userId', isEqualTo: uid)
-      .get();
-
-  if (existingLikes.docs.isEmpty) {
-    // If the user hasn't liked the post, add a new like
-    await FirebaseFirestore.instance.collection('likes').add({
-      'postId': widget.post.id,
-      'userId': uid,
-    });
-  } else {
-    // If the user has already liked the post, remove the like
-    await FirebaseFirestore.instance
+    QuerySnapshot existingLikes = await FirebaseFirestore.instance
         .collection('likes')
-        .doc(existingLikes.docs.first.id)
-        .delete();
+        .where('postId', isEqualTo: widget.post.id)
+        .where('userId', isEqualTo: uid)
+        .get();
+
+    if (existingLikes.docs.isEmpty) {
+      // If the user hasn't liked the post, add a new like
+      await FirebaseFirestore.instance.collection('likes').add({
+        'postId': widget.post.id,
+        'userId': uid,
+      });
+    } else {
+      // If the user has already liked the post, remove the like
+      await FirebaseFirestore.instance
+          .collection('likes')
+          .doc(existingLikes.docs.first.id)
+          .delete();
+    }
+
+    // Update the liked state and refresh likes count
+    setState(() {
+      isLiked = !isLiked;
+      _getLikesCount();
+    });
+    _likeAnimationController.forward(from: 0);
+    _likeAnimationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        // _likeAnimationController..reset()..forward();
+        _likeAnimationController.reset();
+      }
+    });
   }
-
-  // Update the liked state and refresh likes count
-  setState(() {
-    isLiked = !isLiked;
-    _getLikesCount();
-  });
 }
-
-}
-
 
 class FullScreenImage extends StatelessWidget {
   final String imageUrl;
