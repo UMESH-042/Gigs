@@ -236,17 +236,6 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  // LikeButtonAnimation(
-                  //   onTap: _likePost,
-                  //   isLiked: isLiked,
-                  // ),
-                  // IconButton(
-                  //   icon: Icon(
-                  //     isLiked ? Icons.favorite : Icons.favorite_border,
-                  //     color: isLiked ? Colors.red : Colors.grey,
-                  //   ),
-                  //   onPressed: _likePost,
-                  // ),
                   GestureDetector(
                     onTap: _likePost,
                     child: AnimatedBuilder(
