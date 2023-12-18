@@ -2,7 +2,6 @@ name: Flutter Workflow
 
 on: [push, workflow_dispatch]
 
-
 jobs:
   build:
     runs-on: windows-latest
@@ -42,6 +41,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: List Contents of Directory
+        run: |
+          ls -R ./release-apk  # Adjust the path accordingly
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -58,6 +61,6 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/app/outputs/apk/release/app-release.apk
+          asset_path: ./release-apk/app-release.apk  # Adjust the path accordingly
           asset_name: app-release.apk
           asset_content_type: application/octet-stream
