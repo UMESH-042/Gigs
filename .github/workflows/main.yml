@@ -1,18 +1,27 @@
 name: Flutter Workflow
 
 on: [push, workflow_dispatch]
+
 jobs:
   build:
     runs-on: windows-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'  # Set to the desired Java version
 
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.13.6'
           channel: 'stable'
+
       - run: flutter build apk
 
       - name: Install dependencies
