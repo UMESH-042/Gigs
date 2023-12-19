@@ -278,6 +278,46 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     );
   }
 
+//   Future<void> _likePost() async {
+//     final FirebaseAuth auth = FirebaseAuth.instance;
+//     final User user = auth.currentUser!;
+//     final uid = user.uid;
+
+//     QuerySnapshot existingLikes = await FirebaseFirestore.instance
+//         .collection('likes')
+//         .where('postId', isEqualTo: widget.post.id)
+//         .where('userId', isEqualTo: uid)
+//         .get();
+
+//     if (existingLikes.docs.isEmpty) {
+//       // If the user hasn't liked the post, add a new like
+//       await FirebaseFirestore.instance.collection('likes').add({
+//         'postId': widget.post.id,
+//         'userId': uid,
+//       });
+//     } else {
+//       // If the user has already liked the post, remove the like
+//       await FirebaseFirestore.instance
+//           .collection('likes')
+//           .doc(existingLikes.docs.first.id)
+//           .delete();
+//     }
+
+//     // Update the liked state and refresh likes count
+//     setState(() {
+//       isLiked = !isLiked;
+//       _getLikesCount();
+//     });
+  //   _likeAnimationController.forward(from: 0);
+  //   _likeAnimationController.addStatusListener((status) {
+  //     if (status == AnimationStatus.completed) {
+  //       // _likeAnimationController..reset()..forward();
+  //       _likeAnimationController.reset();
+  //     }
+  //   });
+  // }
+// }
+
   Future<void> _likePost() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User user = auth.currentUser!;
@@ -304,10 +344,14 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     }
 
     // Update the liked state and refresh likes count
+
+    // Toggle the like state
     setState(() {
+    _getLikesCount();
       isLiked = !isLiked;
-      _getLikesCount();
     });
+
+    // Play the like animation
     _likeAnimationController.forward(from: 0);
     _likeAnimationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -315,6 +359,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
         _likeAnimationController.reset();
       }
     });
+
   }
 }
 

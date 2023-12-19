@@ -111,46 +111,87 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: _currentIndex == 0
+      //     ? AppBar(
+      //         backgroundColor: Colors.transparent,
+      //         elevation: 0,
+      //         actions: [
+      //           IconButton(
+      //             icon: Icon(Icons.exit_to_app,
+      //                 color: Colors.black), // Set the color to black
+      //             onPressed: () {
+      //               _logout(); // Call the logout function
+      //             },
+      //           ),
+      //           SizedBox(width: 275,),
+      //           Row(
+      //             children: [
+      //               Container(
+      //                 margin: EdgeInsets.only(right: 17),
+      //                 child: IconButton(
+      //                   padding: EdgeInsets.all(0),
+      //                   icon: CircleAvatar(
+      //                     // backgroundColor: Color.fromARGB(255, 76, 175, 142),
+      //                     backgroundImage: NetworkImage(_userImageUrl),
+      //                   ),
+      //                   onPressed: () {
+      //                     Navigator.push(
+      //                         context,
+      //                         MaterialPageRoute(
+      //                             builder: (context) => ProfilePage(
+      //                                   currentUserEmail:
+      //                                       widget.currentUserEmail,
+      //                                   imageUrl: _userImageUrl,
+      //                                 )));
+      //                   },
+      //                 ),
+      //               ),
+      //             ],
+      //           ),
+      //         ],
+      //       )
+      //     : null,
       appBar: _currentIndex == 0
-          ? AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              actions: [
-                IconButton(
-                  icon: Icon(Icons.exit_to_app,
-                      color: Colors.black), // Set the color to black
-                  onPressed: () {
-                    _logout(); // Call the logout function
-                  },
-                ),
-                SizedBox(width: 275,),
-                Row(
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(right: 17),
-                      child: IconButton(
-                        padding: EdgeInsets.all(0),
-                        icon: CircleAvatar(
-                          // backgroundColor: Color.fromARGB(255, 76, 175, 142),
-                          backgroundImage: NetworkImage(_userImageUrl),
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ProfilePage(
-                                        currentUserEmail:
-                                            widget.currentUserEmail,
-                                        imageUrl: _userImageUrl,
-                                      )));
-                        },
-                      ),
+    ? AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.exit_to_app, color: Colors.black),
+            onPressed: () {
+              _logout();
+            },
+          ),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(right: 17),
+                  child: IconButton(
+                    padding: EdgeInsets.all(0),
+                    icon: CircleAvatar(
+                      backgroundImage: NetworkImage(_userImageUrl),
                     ),
-                  ],
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProfilePage(
+                            currentUserEmail: widget.currentUserEmail,
+                            imageUrl: _userImageUrl,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ],
-            )
-          : null,
+            ),
+          ),
+        ],
+      )
+    : null,
       body: Column(
         children: [
           Expanded(
