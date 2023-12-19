@@ -9,7 +9,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:gigs/view/Add_Jobs.dart';
 import 'package:gigs/view/UsersList.dart';
 import 'package:gigs/view/Display_Jobs.dart';
-import 'package:gigs/view/Network.dart';
+import 'package:gigs/view/Network/Network.dart';
 import 'package:gigs/view/Porfile/Profile_page.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../Screens/login_screen.dart';

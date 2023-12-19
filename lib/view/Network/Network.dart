@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gigs/Animation/Like_animation.dart';
+import 'package:gigs/view/Network/comments.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -69,6 +70,18 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
 
   late AnimationController _likeAnimationController;
   late Animation<double> _likeAnimation;
+  void _listenToComments() {
+  FirebaseFirestore.instance
+      .collection('comments')
+      .where('postId', isEqualTo: widget.post.id)
+      .snapshots()
+      .listen((QuerySnapshot snapshot) {
+    setState(() {
+      commentsCount = snapshot.size;
+    });
+  });
+}
+
 
   @override
   void initState() {
@@ -86,8 +99,9 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     );
 
     _getLikesCount();
-    _getCommentsCount();
+    // _getCommentsCount();
     _checkIfLiked();
+      _listenToComments();
   }
 
   Future<void> _getLikesCount() async {
@@ -127,6 +141,16 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
       isLiked = existingLikes.docs.isNotEmpty;
     });
   }
+
+  void _showCommentBottomSheet() {
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return CommentBottomSheet(postId: widget.post.id);
+    },
+  );
+}
+
 
   @override
   void dispose() {
@@ -253,13 +277,14 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                   IconButton(
                     icon: Icon(Icons.comment),
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              CommentsPage(postId: widget.post.id),
-                        ),
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) =>
+                      //         CommentsPage(postId: widget.post.id),
+                      //   ),
+                      // );
+                      _showCommentBottomSheet();
                     },
                   ),
                   Text(commentsCount.toString()),
@@ -359,7 +384,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
         _likeAnimationController.reset();
       }
     });
-
+  
   }
 }
 
@@ -389,6 +414,7 @@ class FullScreenImage extends StatelessWidget {
     );
   }
 }
+
 
 class CommentsPage extends StatefulWidget {
   final String postId;
@@ -433,3 +459,5 @@ class _CommentsPageState extends State<CommentsPage> {
     );
   }
 }
+
+
