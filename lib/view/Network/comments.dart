@@ -197,9 +197,12 @@
 // }
 
 
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class CommentBottomSheet extends StatefulWidget {
   final String postId;
@@ -264,7 +267,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
       maxLines: 3,
     );
   }
-  
+
   Widget _buildCommentSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -306,34 +309,69 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
     );
   }
 
-  Widget _buildCommentList() {
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection('comments')
-          .where('postId', isEqualTo: widget.postId)
-          .orderBy('timestamp', descending: false)
-          .snapshots(),
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData) {
-          return Text('Loading...');
-        }
+Color _generateRandomColor(String input) {
+  final random = Random(input.hashCode);
 
-        var comments = snapshot.data!.docs;
+  // Generate dark color with a minimum brightness
+  Color generateDarkColor() {
+    return Color.fromARGB(
+      255,
+      random.nextInt(100) + 50, // Adjust the minimum brightness here
+      random.nextInt(100) + 50, // Adjust the minimum brightness here
+      random.nextInt(100) + 50, // Adjust the minimum brightness here
+    );
+  }
 
-        return ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: comments.length,
-          itemBuilder: (context, index) {
-            var comment = comments[index];
-            var commentText = comment['text'];
-            var commentUser = comment['userId'];
+  return generateDarkColor();
+}
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Display username
-                FutureBuilder(
+Widget _buildCommentList() {
+  return StreamBuilder(
+    stream: FirebaseFirestore.instance
+        .collection('comments')
+        .where('postId', isEqualTo: widget.postId)
+        .orderBy('timestamp', descending: false)
+        .snapshots(),
+    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+      if (!snapshot.hasData) {
+        return Text('Loading...');
+      }
+
+      var comments = snapshot.data!.docs;
+
+      return ListView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: comments.length,
+        itemBuilder: (context, index) {
+          var comment = comments[index];
+          var commentText = comment['text'];
+          var commentUser = comment['userId'];
+          var timestamp = comment['timestamp'] as Timestamp;
+          Color randomColor = _generateRandomColor(commentUser);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ListTile(
+                leading: FutureBuilder(
+                  future: _getUsername(commentUser),
+                  builder: (context, AsyncSnapshot<String> usernameSnapshot) {
+                    if (usernameSnapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return CircleAvatar(child: Text(''));
+                    } else if (usernameSnapshot.hasError) {
+                      return CircleAvatar(child: Text(''));
+                    }
+
+                    var username = usernameSnapshot.data ?? 'Unknown User';
+
+                    return CircleAvatar(
+                      backgroundColor: randomColor,
+                      child: Text(username[0],style: TextStyle(color: Colors.white),),
+                    );
+                  },
+                ),
+                title: FutureBuilder(
                   future: _getUsername(commentUser),
                   builder: (context, AsyncSnapshot<String> usernameSnapshot) {
                     if (usernameSnapshot.connectionState ==
@@ -345,34 +383,43 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
 
                     var username = usernameSnapshot.data ?? 'Unknown User';
 
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Text(
-                        username,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                    return Text(
+                      username,
+                      style: TextStyle(fontSize: 14),
+                      // style: TextStyle(
+                      //   fontWeight: FontWeight.bold,
+                      // ),
                     );
                   },
                 ),
-                // Display comment text
-                Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(commentText),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(commentText,style: TextStyle(fontWeight: FontWeight.w900),),
+                  ],
                 ),
-                SizedBox(height: 8),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
+                trailing: Text(
+                  _formatTimestamp(timestamp),
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              Divider(thickness: 1, color: Colors.grey),
+              SizedBox(height: 8),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
+String _formatTimestamp(Timestamp timestamp) {
+  var timeAgo = timeago.format(
+    timestamp.toDate(),
+    allowFromNow: true,
+  );
+  return timeAgo;
+}
 
   Future<void> _postComment() async {
     final FirebaseAuth auth = FirebaseAuth.instance;

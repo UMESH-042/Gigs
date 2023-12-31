@@ -100,8 +100,6 @@ import 'login_screen.dart';
 //   }
 // }
 
-
-
 class LandingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
