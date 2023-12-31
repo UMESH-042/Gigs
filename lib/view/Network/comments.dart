@@ -264,7 +264,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
       maxLines: 3,
     );
   }
-
+  
   Widget _buildCommentSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -71,17 +71,16 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
   late AnimationController _likeAnimationController;
   late Animation<double> _likeAnimation;
   void _listenToComments() {
-  FirebaseFirestore.instance
-      .collection('comments')
-      .where('postId', isEqualTo: widget.post.id)
-      .snapshots()
-      .listen((QuerySnapshot snapshot) {
-    setState(() {
-      commentsCount = snapshot.size;
+    FirebaseFirestore.instance
+        .collection('comments')
+        .where('postId', isEqualTo: widget.post.id)
+        .snapshots()
+        .listen((QuerySnapshot snapshot) {
+      setState(() {
+        commentsCount = snapshot.size;
+      });
     });
-  });
-}
-
+  }
 
   @override
   void initState() {
@@ -101,7 +100,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     _getLikesCount();
     // _getCommentsCount();
     _checkIfLiked();
-      _listenToComments();
+    _listenToComments();
   }
 
   Future<void> _getLikesCount() async {
@@ -143,14 +142,13 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
   }
 
   void _showCommentBottomSheet() {
-  showModalBottomSheet(
-    context: context,
-    builder: (BuildContext context) {
-      return CommentBottomSheet(postId: widget.post.id);
-    },
-  );
-}
-
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return CommentBottomSheet(postId: widget.post.id);
+      },
+    );
+  }
 
   @override
   void dispose() {
@@ -171,7 +169,8 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
+            // color: Colors.grey.withOpacity(0.3),
+            color: Color(0xFFD6CDFE),
             spreadRadius: 2,
             blurRadius: 5,
             offset: Offset(0, 3),
@@ -251,7 +250,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
             Container(
               padding: EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.grey[200], // Set your desired color here
+                color: Color(0xFFD6CDFE), // Set your desired color here
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(20),
                   bottomRight: Radius.circular(20),
@@ -260,34 +259,45 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  GestureDetector(
-                    onTap: _likePost,
-                    child: AnimatedBuilder(
-                      animation: _likeAnimation,
-                      builder: (context, child) {
-                        return Icon(
-                          isLiked ? Icons.favorite : Icons.favorite_border,
-                          color: isLiked ? Colors.red : Colors.grey,
-                          size: _likeAnimation.value,
-                        );
-                      },
-                    ),
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: _likePost,
+                        child: AnimatedBuilder(
+                          animation: _likeAnimation,
+                          builder: (context, child) {
+                            return Icon(
+                              isLiked ? Icons.favorite : Icons.favorite_border,
+                              color: isLiked ? Colors.red : Colors.grey,
+                              size: _likeAnimation.value,
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(width: 4), // Adjust the spacing here
+                      Text(likesCount.toString()),
+                    ],
                   ),
-                  Text(likesCount.toString()),
-                  IconButton(
-                    icon: Icon(Icons.comment),
-                    onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) =>
-                      //         CommentsPage(postId: widget.post.id),
-                      //   ),
-                      // );
-                      _showCommentBottomSheet();
-                    },
+                  // Text(likesCount.toString()),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.mode_comment_outlined),
+                        onPressed: () {
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) =>
+                          //         CommentsPage(postId: widget.post.id),
+                          //   ),
+                          // );
+                          _showCommentBottomSheet();
+                        },
+                      ),
+                      SizedBox(width: 4), // Adjust the spacing here
+                      Text(commentsCount.toString()),
+                    ],
                   ),
-                  Text(commentsCount.toString()),
                   IconButton(
                     icon: Icon(Icons.share),
                     onPressed: () {
@@ -372,7 +382,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
 
     // Toggle the like state
     setState(() {
-    _getLikesCount();
+      _getLikesCount();
       isLiked = !isLiked;
     });
 
@@ -384,7 +394,6 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
         _likeAnimationController.reset();
       }
     });
-  
   }
 }
 
@@ -414,7 +423,6 @@ class FullScreenImage extends StatelessWidget {
     );
   }
 }
-
 
 class CommentsPage extends StatefulWidget {
   final String postId;
@@ -459,5 +467,3 @@ class _CommentsPageState extends State<CommentsPage> {
     );
   }
 }
-
-
