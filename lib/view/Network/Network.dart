@@ -87,7 +87,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     super.initState();
     _likeAnimationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 350),
+      duration: Duration(milliseconds: 5),
     );
 
     _likeAnimation = Tween<double>(begin: 24, end: 30).animate(
@@ -101,6 +101,23 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     // _getCommentsCount();
     _checkIfLiked();
     _listenToComments();
+    _listenToLikes();
+  }
+
+
+
+
+
+    Future<void> _listenToLikes() async {
+    FirebaseFirestore.instance
+        .collection('likes')
+        .where('postId', isEqualTo: widget.post.id)
+        .snapshots()
+        .listen((QuerySnapshot snapshot) {
+      setState(() {
+        likesCount = snapshot.size;
+      });
+    });
   }
 
   Future<void> _getLikesCount() async {
@@ -312,37 +329,40 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
       ),
     );
   }
+  // Future<void> _likePost() async {
+  //   final FirebaseAuth auth = FirebaseAuth.instance;
+  //   final User user = auth.currentUser!;
+  //   final uid = user.uid;
 
-//   Future<void> _likePost() async {
-//     final FirebaseAuth auth = FirebaseAuth.instance;
-//     final User user = auth.currentUser!;
-//     final uid = user.uid;
+  //   QuerySnapshot existingLikes = await FirebaseFirestore.instance
+  //       .collection('likes')
+  //       .where('postId', isEqualTo: widget.post.id)
+  //       .where('userId', isEqualTo: uid)
+  //       .get();
 
-//     QuerySnapshot existingLikes = await FirebaseFirestore.instance
-//         .collection('likes')
-//         .where('postId', isEqualTo: widget.post.id)
-//         .where('userId', isEqualTo: uid)
-//         .get();
+  //   if (existingLikes.docs.isEmpty) {
+  //     // If the user hasn't liked the post, add a new like
+  //     await FirebaseFirestore.instance.collection('likes').add({
+  //       'postId': widget.post.id,
+  //       'userId': uid,
+  //     });
+  //   } else {
+  //     // If the user has already liked the post, remove the like
+  //     await FirebaseFirestore.instance
+  //         .collection('likes')
+  //         .doc(existingLikes.docs.first.id)
+  //         .delete();
+  //   }
 
-//     if (existingLikes.docs.isEmpty) {
-//       // If the user hasn't liked the post, add a new like
-//       await FirebaseFirestore.instance.collection('likes').add({
-//         'postId': widget.post.id,
-//         'userId': uid,
-//       });
-//     } else {
-//       // If the user has already liked the post, remove the like
-//       await FirebaseFirestore.instance
-//           .collection('likes')
-//           .doc(existingLikes.docs.first.id)
-//           .delete();
-//     }
+  //   // Update the liked state and refresh likes count
 
-//     // Update the liked state and refresh likes count
-//     setState(() {
-//       isLiked = !isLiked;
-//       _getLikesCount();
-//     });
+  //   // Toggle the like state
+  //   setState(() {
+  //     _getLikesCount();
+  //     isLiked = !isLiked;
+  //   });
+
+  //   // Play the like animation
   //   _likeAnimationController.forward(from: 0);
   //   _likeAnimationController.addStatusListener((status) {
   //     if (status == AnimationStatus.completed) {
@@ -351,9 +371,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
   //     }
   //   });
   // }
-// }
-
-  Future<void> _likePost() async {
+   Future<void> _likePost() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User user = auth.currentUser!;
     final uid = user.uid;
@@ -365,32 +383,26 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
         .get();
 
     if (existingLikes.docs.isEmpty) {
-      // If the user hasn't liked the post, add a new like
       await FirebaseFirestore.instance.collection('likes').add({
         'postId': widget.post.id,
         'userId': uid,
       });
     } else {
-      // If the user has already liked the post, remove the like
       await FirebaseFirestore.instance
           .collection('likes')
           .doc(existingLikes.docs.first.id)
           .delete();
     }
 
-    // Update the liked state and refresh likes count
+    // No need to manually update likesCount, it will be updated in real-time
 
-    // Toggle the like state
     setState(() {
-      _getLikesCount();
       isLiked = !isLiked;
     });
 
-    // Play the like animation
     _likeAnimationController.forward(from: 0);
     _likeAnimationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        // _likeAnimationController..reset()..forward();
         _likeAnimationController.reset();
       }
     });

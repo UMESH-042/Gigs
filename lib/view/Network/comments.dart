@@ -137,7 +137,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
       stream: FirebaseFirestore.instance
           .collection('comments')
           .where('postId', isEqualTo: widget.postId)
-          .orderBy('timestamp', descending: false)
+          .orderBy('timestamp', descending: true)
           .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) {
@@ -207,7 +207,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                     children: [
                       Text(
                         commentText,
-                        style: TextStyle(fontWeight: FontWeight.w900),
+                        style: TextStyle(fontWeight: FontWeight.w800,fontSize: 17),
                       ),
                     ],
                   ),
