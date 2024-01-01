@@ -329,6 +329,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
       ),
     );
   }
+  
   // Future<void> _likePost() async {
   //   final FirebaseAuth auth = FirebaseAuth.instance;
   //   final User user = auth.currentUser!;

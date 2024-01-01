@@ -28,11 +28,13 @@ class _CompanySearchScreenState extends State<CompanySearchScreen> {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final companies = data['companies'] as List<dynamic>;
-
+      print(companies);
       setState(() {
         searchResults = companies;
       });
-    } else {}
+    } else {
+      print("error");
+    }
   }
 
   @override
