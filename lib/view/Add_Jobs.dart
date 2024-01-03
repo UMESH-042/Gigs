@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gigs/APIs/Add_Job_Description.dart';
 import 'package:gigs/APIs/Job_position_API.dart';
 import 'package:gigs/APIs/Places_API.dart';
 import 'package:gigs/APIs/companies_API.dart';
+import 'package:gigs/view/Homes_Screen.dart';
 
 import 'bottomSheet.dart';
 
@@ -22,6 +24,23 @@ class _AddJobsState extends State<AddJobs> {
   String selectedEmploymentType = '';
   String selectedJobPosition = '';
   String JobDescription = '';
+  String currentUserEmail = '';
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUserEmail().then((email) {
+      setState(() {
+        currentUserEmail =
+            email ?? ''; // Set to an empty string if email is null
+      });
+    });
+  }
+
+  Future<String?> getCurrentUserEmail() async {
+    final user = FirebaseAuth.instance.currentUser;
+    return user?.email;
+  }
 
   void onJobPositionAdded(String position) {
     setState(() {
@@ -58,7 +77,7 @@ class _AddJobsState extends State<AddJobs> {
     try {
       final CollectionReference jobsCollection =
           FirebaseFirestore.instance.collection('jobs');
-
+      final currentUserEmail = await getCurrentUserEmail();
       await jobsCollection.add({
         'jobPosition': jobPosition,
         'jobLocation': jobLocation,
@@ -66,6 +85,7 @@ class _AddJobsState extends State<AddJobs> {
         'company': company,
         'employmentType': employmentType,
         'jobDescription': jobDescription,
+        'postedBy': currentUserEmail,
         'timestamp': FieldValue.serverTimestamp(), // Add a timestamp
       });
 
@@ -77,12 +97,19 @@ class _AddJobsState extends State<AddJobs> {
 
   @override
   Widget build(BuildContext context) {
+    // getCurrentUserEmail().then((email) {
+    //   setState(() {
+    //     currentUserEmail =
+    //         email ?? ''; // Set to an empty string if email is null
+    //   });
+    // });
     print(selectedJobLocation);
     print(selectedWorkplace);
     print(selectedCompany);
     print(selectedEmploymentType);
     print(selectedJobPosition);
     print(JobDescription);
+    print(currentUserEmail);
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 241, 241, 241),
       appBar: AppBar(
@@ -116,6 +143,13 @@ class _AddJobsState extends State<AddJobs> {
                 JobDescription,
               );
               Navigator.pop(context);
+              Navigator.pop(context);
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HomePage(
+                          currentUserEmail: currentUserEmail,
+                          requiresProfileSetup: true)));
               // Handle any other necessary actions after posting the job
             },
             child: Text(

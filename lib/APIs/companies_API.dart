@@ -22,7 +22,7 @@ class _CompanySearchScreenState extends State<CompanySearchScreen> {
 
     final response = await http.get(
       Uri.parse(
-          'https://api-private.thecompaniesapi.com/v1/companies?search=$query&simplified=true&size=5'),
+          'https://api.thecompaniesapi.com/v1/companies?search=$query&simplified=true&size=5'),
     );
 
     if (response.statusCode == 200) {

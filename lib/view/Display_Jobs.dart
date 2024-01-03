@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
+
+import 'package:gigs/view/newpage.dart';
 
 class DisplayJobs extends StatefulWidget {
   const DisplayJobs({super.key});
@@ -15,10 +18,30 @@ class _DisplayJobsState extends State<DisplayJobs> {
   int employmentTypeFTCount = 0;
   int employmentTypePTCount = 0;
 
+  late StreamController<bool> _updateController;
+
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    _updateController = StreamController<bool>();
+    _setupFirestoreListener();
+  }
+
+  void _setupFirestoreListener() {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser != null) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .snapshots()
+          .listen((userDoc) {
+        if (userDoc.exists) {
+          _loadUserData();
+        }
+      });
+    }
   }
 
   Future<void> _loadUserData() async {
@@ -70,6 +93,12 @@ class _DisplayJobsState extends State<DisplayJobs> {
     } catch (e) {
       print("Error occurred while loading user data: $e");
     }
+  }
+
+  @override
+  void dispose() {
+    _updateController.close();
+    super.dispose();
   }
 
   @override
@@ -139,6 +168,54 @@ class _DisplayJobsState extends State<DisplayJobs> {
                   ),
                 ],
               ),
+              // SizedBox(height: 24),
+              SizedBox(height: 16),
+              Text(
+                'Recent Job List',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              ),
+              SizedBox(height: 16),
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream:
+                      FirebaseFirestore.instance.collection('jobs').snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return CircularProgressIndicator();
+                    }
+
+                    var jobs = snapshot.data!.docs;
+                    return ListView.builder(
+                      itemCount: jobs.length,
+                      itemBuilder: (context, index) {
+                        var job = jobs[index].data() as Map<String, dynamic>;
+
+                        return GestureDetector(
+                          onVerticalDragEnd: (details) {
+                            // Check if the user has scrolled down
+                            if (details.primaryVelocity! < 0) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      NewPage(), // Replace NewPage with your new page widget
+                                ),
+                              );
+                            }
+                          },
+                          child: _buildJobDisplayCard(
+                            job['jobPosition'],
+                            job['company'],
+                            job['jobLocation'],
+                            job['employmentType'],
+                            job['jobDescription'],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ),
@@ -149,7 +226,7 @@ class _DisplayJobsState extends State<DisplayJobs> {
   Widget _buildJobCard(String label) {
     return Container(
       width: 175, // Adjust the width as needed
-      height: 198, // Adjust the height as needed
+      height: 188, // Adjust the height as needed
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 176, 221, 243), // Change color as needed
         borderRadius: BorderRadius.circular(10),
@@ -170,7 +247,7 @@ class _DisplayJobsState extends State<DisplayJobs> {
   Widget _buildJobCardforFT(String label) {
     return Container(
       width: 175, // Adjust the width as needed
-      height: 95, // Adjust the height as needed
+      height: 90, // Adjust the height as needed
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 193, 168, 236), // Change color as needed
         borderRadius: BorderRadius.circular(10),
@@ -191,7 +268,7 @@ class _DisplayJobsState extends State<DisplayJobs> {
   Widget _buildJobCardforPT(String label) {
     return Container(
       width: 175, // Adjust the width as needed
-      height: 95, // Adjust the height as needed
+      height: 90, // Adjust the height as needed
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 238, 200, 144), // Change color as needed
         borderRadius: BorderRadius.circular(10),
@@ -208,4 +285,116 @@ class _DisplayJobsState extends State<DisplayJobs> {
       ),
     );
   }
+
+  Widget _buildJobDisplayCard(
+  String jobPosition,
+  String companyName,
+  String jobLocation,
+  String employmentType,
+  String jobDescription,
+) {
+
+  List<String> locationParts = jobLocation.split(',');
+
+  String firstWordBeforeComma = locationParts.length > 1
+      ? locationParts[0].trim().split(' ')[0]
+      : jobLocation.trim().split(' ')[0];
+
+  String lastWord = locationParts.last.trim();
+
+  String shortenedLocation = '$firstWordBeforeComma, $lastWord';
+  print(shortenedLocation);
+
+  return Container(
+    margin: EdgeInsets.only(bottom: 16),
+    padding: EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(10),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.5),
+          spreadRadius: 2,
+          blurRadius: 5,
+          offset: Offset(0, 2),
+        ),
+      ],
+    ),
+    child: Stack(
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  // backgroundImage: NetworkImage(companyLogoUrl), // Use company logo URL
+                  radius: 30,
+                ),
+                SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      jobPosition,
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    Text(companyName),
+                    Text(shortenedLocation),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
+            Row(
+              children: [
+                SizedBox(width: 8),
+                Chip(label: Text(jobPosition)),
+                SizedBox(width: 8),
+                Chip(label: Text(employmentType)),
+                SizedBox(width: 8),
+                Container(
+                  height: 35,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.orange, // Set the background color to orange
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Add apply button functionality
+                      // You may want to implement a method to handle job application
+                      // E.g., _applyToJob(jobPosition, companyName);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.transparent, // Set the button background to transparent
+                      elevation: 0, // Remove the button shadow
+                    ),
+                    child: Text(
+                      'Apply',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8),
+              ],
+            ),
+            SizedBox(height: 12),
+            Text(jobDescription),
+          ],
+        ),
+        Positioned(
+          top: 8,
+          right: 8,
+          child: Icon(
+            Icons.bookmark_border_outlined,
+            // color: Colors.grey,
+            size: 30,
+            
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 }
