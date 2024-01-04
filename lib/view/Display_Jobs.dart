@@ -107,6 +107,7 @@ class _DisplayJobsState extends State<DisplayJobs> {
     print(employmentTypeFTCount);
     print(employmentTypePTCount);
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 243, 240, 240),
       body: Container(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16),
@@ -286,115 +287,122 @@ class _DisplayJobsState extends State<DisplayJobs> {
     );
   }
 
+  
+
   Widget _buildJobDisplayCard(
-  String jobPosition,
-  String companyName,
-  String jobLocation,
-  String employmentType,
-  String jobDescription,
-) {
+    String jobPosition,
+    String companyName,
+    String jobLocation,
+    String employmentType,
+    String jobDescription,
+  ) {
 
-  List<String> locationParts = jobLocation.split(',');
+    
+    List<String> locationParts = jobLocation.split(',');
 
-  String firstWordBeforeComma = locationParts.length > 1
-      ? locationParts[0].trim().split(' ')[0]
-      : jobLocation.trim().split(' ')[0];
+    String firstWordBeforeComma = locationParts.length > 1
+        ? locationParts[0].trim().split(' ')[0]
+        : jobLocation.trim().split(' ')[0];
 
-  String lastWord = locationParts.last.trim();
+    String lastWord = locationParts.last.trim();
 
-  String shortenedLocation = '$firstWordBeforeComma, $lastWord';
-  print(shortenedLocation);
+    String shortenedLocation = '$firstWordBeforeComma, $lastWord';
+    print(shortenedLocation);
 
-  return Container(
-    margin: EdgeInsets.only(bottom: 16),
-    padding: EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(10),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.withOpacity(0.5),
-          spreadRadius: 2,
-          blurRadius: 5,
-          offset: Offset(0, 2),
-        ),
-      ],
-    ),
-    child: Stack(
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  // backgroundImage: NetworkImage(companyLogoUrl), // Use company logo URL
-                  radius: 30,
-                ),
-                SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      jobPosition,
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    Text(companyName),
-                    Text(shortenedLocation),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 12),
-            Row(
-              children: [
-                SizedBox(width: 8),
-                Chip(label: Text(jobPosition)),
-                SizedBox(width: 8),
-                Chip(label: Text(employmentType)),
-                SizedBox(width: 8),
-                Container(
-                  height: 35,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.orange, // Set the background color to orange
-                  ),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Add apply button functionality
-                      // You may want to implement a method to handle job application
-                      // E.g., _applyToJob(jobPosition, companyName);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.transparent, // Set the button background to transparent
-                      elevation: 0, // Remove the button shadow
-                    ),
-                    child: Text(
-                      'Apply',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8),
-              ],
-            ),
-            SizedBox(height: 12),
-            Text(jobDescription),
-          ],
-        ),
-        Positioned(
-          top: 8,
-          right: 8,
-          child: Icon(
-            Icons.bookmark_border_outlined,
-            // color: Colors.grey,
-            size: 30,
-            
+    var domain = companyName.toLowerCase();
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 2),
           ),
-        ),
-      ],
-    ),
-  );
-}
-
+        ],
+      ),
+      child: Stack(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(
+                        'https://poweredwith.nyc3.cdn.digitaloceanspaces.com/images/domains/$domain.com.jpg'), // Use company logo URL
+                    radius: 30,
+                  ),
+                  SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        jobPosition,
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      Text(companyName),
+                      Text(shortenedLocation),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 12),
+              Row(
+                children: [
+                  SizedBox(width: 8),
+                  Chip(label: Text(jobPosition)),
+                  SizedBox(width: 8),
+                  Chip(label: Text(employmentType)),
+                  SizedBox(width: 8),
+                  Container(
+                    height: 35,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color:
+                          Colors.orange, // Set the background color to orange
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Add apply button functionality
+                        // You may want to implement a method to handle job application
+                        // E.g., _applyToJob(jobPosition, companyName);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors
+                            .transparent, // Set the button background to transparent
+                        elevation: 0, // Remove the button shadow
+                      ),
+                      child: Text(
+                        'Apply',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                ],
+              ),
+              SizedBox(height: 12),
+              Text(jobDescription),
+            ],
+          ),
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Icon(
+              Icons.bookmark_border_outlined,
+              // color: Colors.grey,
+              size: 30,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

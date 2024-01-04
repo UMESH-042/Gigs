@@ -153,7 +153,8 @@ class _HomePageState extends State<HomePage> {
       //     : null,
       appBar: _currentIndex == 0
     ? AppBar(
-        backgroundColor: Colors.transparent,
+        // backgroundColor: Colors.transparent,
+        backgroundColor: const Color.fromARGB(255, 243, 240, 240),
         elevation: 0,
         actions: [
           IconButton(
