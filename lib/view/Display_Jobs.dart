@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 
-import 'package:gigs/view/newpage.dart';
+import 'package:gigs/view/FilterPageList.dart';
 
 class DisplayJobs extends StatefulWidget {
   const DisplayJobs({super.key});
@@ -199,7 +199,7 @@ class _DisplayJobsState extends State<DisplayJobs> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      NewPage(), // Replace NewPage with your new page widget
+                                      FilterPage(), // Replace NewPage with your new page widget
                                 ),
                               );
                             }
@@ -287,8 +287,6 @@ class _DisplayJobsState extends State<DisplayJobs> {
     );
   }
 
-  
-
   Widget _buildJobDisplayCard(
     String jobPosition,
     String companyName,
@@ -296,8 +294,6 @@ class _DisplayJobsState extends State<DisplayJobs> {
     String employmentType,
     String jobDescription,
   ) {
-
-    
     List<String> locationParts = jobLocation.split(',');
 
     String firstWordBeforeComma = locationParts.length > 1
@@ -354,6 +350,40 @@ class _DisplayJobsState extends State<DisplayJobs> {
                 ],
               ),
               SizedBox(height: 12),
+              // Row(
+              //   children: [
+              //     SizedBox(width: 8),
+              //     Chip(label: Text(jobPosition)),
+              //     SizedBox(width: 8),
+              //     Chip(label: Text(employmentType)),
+              //     SizedBox(width: 8),
+              //     Container(
+              //       height: 35,
+              //       decoration: BoxDecoration(
+              //         borderRadius: BorderRadius.circular(15),
+              //         color:
+              //             Colors.orange, // Set the background color to orange
+              //       ),
+              //       child: ElevatedButton(
+              //         onPressed: () {
+              //           // Add apply button functionality
+              //           // You may want to implement a method to handle job application
+              //           // E.g., _applyToJob(jobPosition, companyName);
+              //         },
+              //         style: ElevatedButton.styleFrom(
+              //           primary: Colors
+              //               .transparent, // Set the button background to transparent
+              //           elevation: 0, // Remove the button shadow
+              //         ),
+              //         child: Text(
+              //           'Apply',
+              //           style: TextStyle(color: Colors.white),
+              //         ),
+              //       ),
+              //     ),
+              //     SizedBox(width: 8),
+              //   ],
+              // ),
               Row(
                 children: [
                   SizedBox(width: 8),
@@ -361,33 +391,34 @@ class _DisplayJobsState extends State<DisplayJobs> {
                   SizedBox(width: 8),
                   Chip(label: Text(employmentType)),
                   SizedBox(width: 8),
-                  Container(
-                    height: 35,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color:
-                          Colors.orange, // Set the background color to orange
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Add apply button functionality
-                        // You may want to implement a method to handle job application
-                        // E.g., _applyToJob(jobPosition, companyName);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors
-                            .transparent, // Set the button background to transparent
-                        elevation: 0, // Remove the button shadow
+                  Expanded(
+                    child: Container(
+                      height: 35,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: Colors.orange,
                       ),
-                      child: Text(
-                        'Apply',
-                        style: TextStyle(color: Colors.white),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Add apply button functionality
+                          // You may want to implement a method to handle job application
+                          // E.g., _applyToJob(jobPosition, companyName);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.transparent,
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Apply',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ),
                   ),
                   SizedBox(width: 8),
                 ],
               ),
+
               SizedBox(height: 12),
               Text(jobDescription),
             ],

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gigs/APIs/Add_Job_Description.dart';
 import 'package:gigs/APIs/Job_position_API.dart';
 import 'package:gigs/APIs/Places_API.dart';
+import 'package:gigs/APIs/Salary.dart';
 import 'package:gigs/APIs/companies_API.dart';
 import 'package:gigs/view/Homes_Screen.dart';
 
@@ -25,6 +26,7 @@ class _AddJobsState extends State<AddJobs> {
   String selectedJobPosition = '';
   String JobDescription = '';
   String currentUserEmail = '';
+  String selectedSalary = '';
 
   @override
   void initState() {
@@ -40,6 +42,12 @@ class _AddJobsState extends State<AddJobs> {
   Future<String?> getCurrentUserEmail() async {
     final user = FirebaseAuth.instance.currentUser;
     return user?.email;
+  }
+
+  void onSalaryAdded(String salary) {
+    setState(() {
+      selectedSalary = salary;
+    });
   }
 
   void onJobPositionAdded(String position) {
@@ -73,6 +81,7 @@ class _AddJobsState extends State<AddJobs> {
     String company,
     String employmentType,
     String jobDescription,
+    String salary,
   ) async {
     try {
       final CollectionReference jobsCollection =
@@ -85,6 +94,7 @@ class _AddJobsState extends State<AddJobs> {
         'company': company,
         'employmentType': employmentType,
         'jobDescription': jobDescription,
+        'salary':salary,
         'postedBy': currentUserEmail,
         'timestamp': FieldValue.serverTimestamp(), // Add a timestamp
       });
@@ -141,6 +151,7 @@ class _AddJobsState extends State<AddJobs> {
                 selectedCompany,
                 selectedEmploymentType,
                 JobDescription,
+                selectedSalary
               );
               Navigator.pop(context);
               Navigator.pop(context);
@@ -283,7 +294,25 @@ class _AddJobsState extends State<AddJobs> {
                     onJobDescriptionAdded(AddedJobDescription);
                   }
                 },
-              )
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              Salary(
+                label: "Salary",
+                content: selectedSalary,
+                onPressed: () async {
+                  final addedSalary = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SalaryEntryScreen(),
+                    ),
+                  );
+                  if (addedSalary != null) {
+                    onSalaryAdded(addedSalary);
+                  }
+                },
+              ),
             ],
           ),
         ),
@@ -585,6 +614,55 @@ class EmploymentType extends StatelessWidget {
             Text(
               selectedEmploymentType, // Display selected workplace as subtitle
               style: TextStyle(fontSize: 16, color: Colors.black),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Salary extends StatelessWidget {
+  final String label;
+  final String? content;
+  final VoidCallback? onPressed;
+
+  const Salary({required this.label, this.content, this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8),
+                  if (content != null)
+                    Text(
+                      '\$$content',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: Icon(
+                content == '' ? Icons.add_circle_outline_outlined : Icons.edit,
+                color: Color(0xFFFCA34D),
+              ),
+              onPressed: onPressed,
             ),
           ],
         ),
