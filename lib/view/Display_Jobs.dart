@@ -339,7 +339,7 @@ class _DisplayJobsState extends State<DisplayJobs> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        jobPosition,
+                        toTitleCase(jobPosition),
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
@@ -387,7 +387,7 @@ class _DisplayJobsState extends State<DisplayJobs> {
               Row(
                 children: [
                   SizedBox(width: 8),
-                  Chip(label: Text(jobPosition)),
+                  Chip(label: Text(toTitleCase(jobPosition))),
                   SizedBox(width: 8),
                   Chip(label: Text(employmentType)),
                   SizedBox(width: 8),
@@ -434,6 +434,12 @@ class _DisplayJobsState extends State<DisplayJobs> {
           ),
         ],
       ),
+    );
+  }
+   String toTitleCase(String text) {
+    return text.replaceAllMapped(
+      RegExp(r'\b\w'),
+      (match) => match.group(0)!.toUpperCase(),
     );
   }
 }
