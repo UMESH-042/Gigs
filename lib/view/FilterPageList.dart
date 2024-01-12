@@ -10,8 +10,48 @@ class FilterPage extends StatefulWidget {
 }
 
 class _FilterPageState extends State<FilterPage> {
+  late List<String> jobPositions = [];
+  late List<String> employmentTypes = [];
+  late List<String> categories = [];
+  String selectedJobPosition = '';
+  String selectedEmploymentType = '';
+  String selectedCategory = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchFilterOptions();
+  }
+
+  Future<void> fetchFilterOptions() async {
+    jobPositions = await getDistinctValues('jobPosition');
+    employmentTypes = await getDistinctValues('employmentType');
+    categories = await getDistinctValues('category');
+
+    setState(() {});
+  }
+
+  Future<List<String>> getDistinctValues(String fieldName) async {
+    // Fetch distinct values for the specified field from the 'jobs' collection
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('jobs').get();
+    List<String> distinctValues = [];
+
+    querySnapshot.docs.forEach((doc) {
+      var value = doc['$fieldName'];
+      if (value != null && !distinctValues.contains(value)) {
+        distinctValues.add(value);
+      }
+    });
+
+    return distinctValues;
+  }
+
   @override
   Widget build(BuildContext context) {
+    print(categories);
+    print(employmentTypes);
+    print(jobPositions);
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(220),
@@ -91,46 +131,171 @@ class _FilterPageState extends State<FilterPage> {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance.collection('jobs').snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
-              }
+      body: Column(
+        children: [
 
-              if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              }
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Container(
+              height: 48,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                   SizedBox(width: 12), 
+                  Container(
+                    width: 49,
+                    height: 45,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 31, 11, 118),
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.filter_list,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        // Implement your filter logic here
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  ChoiceChip(
+                    label: Container(
+                      padding:
+                          EdgeInsets.all(6.0), // Adjust the padding as needed
+                      child: Text(
+                        'All',
+                        style: TextStyle(
+                            fontSize: 16.0), // Adjust the font size as needed
+                      ),
+                    ),
+                    selected: selectedJobPosition.isEmpty,
+                    onSelected: (_) {
+                      setState(() {
+                        selectedJobPosition = '';
+                        selectedEmploymentType = '';
+                        selectedCategory = '';
+                      });
+                    },
+                    selectedColor: Color(0xFFFCA34D),
+                    labelStyle: TextStyle(
+                      color: selectedJobPosition.isEmpty
+                          ? Colors.white
+                          : Colors.black,
+                    ),
+                  ),
+                  buildRowChips(
+                      'Job Positions', jobPositions, selectedJobPosition,
+                      (value) {
+                    setState(() {
+                      selectedJobPosition = value;
+                    });
+                  }),
+                  buildRowChips('Employment Types', employmentTypes,
+                      selectedEmploymentType, (value) {
+                    setState(() {
+                      selectedEmploymentType = value;
+                    });
+                  }),
+                  buildRowChips('Categories', categories, selectedCategory,
+                      (value) {
+                    setState(() {
+                      selectedCategory = value;
+                    });
+                  }),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: StreamBuilder<QuerySnapshot>(
+                stream:
+                    FirebaseFirestore.instance.collection('jobs').snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
 
-              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return Center(child: Text('No jobs available.'));
-              }
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
 
-              var jobs = snapshot.data!.docs;
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Center(child: Text('No jobs available.'));
+                  }
 
-              return ListView.builder(
-                itemCount: jobs.length,
-                itemBuilder: (context, index) {
-                  var job = jobs[index].data() as Map<String, dynamic>;
+                  var jobs = snapshot.data!.docs.where((job) {
+                    var jobData = job.data() as Map<String, dynamic>;
 
-                  return _buildJobDisplayCard(
-                    job['jobPosition'],
-                    job['company'],
-                    job['jobLocation'],
-                    job['employmentType'],
-                    job['jobDescription'],
-                    job['category'],
-                    job['timestamp'],
-                    job['salary'],
+                    return (selectedJobPosition.isEmpty ||
+                            jobData['jobPosition'] == selectedJobPosition) &&
+                        (selectedEmploymentType.isEmpty ||
+                            jobData['employmentType'] ==
+                                selectedEmploymentType) &&
+                        (selectedCategory.isEmpty ||
+                            jobData['category'] == selectedCategory);
+                  }).toList();
+
+                  return ListView.builder(
+                    itemCount: jobs.length,
+                    itemBuilder: (context, index) {
+                      var job = jobs[index].data() as Map<String, dynamic>;
+
+                      return _buildJobDisplayCard(
+                        job['jobPosition'],
+                        job['company'],
+                        job['jobLocation'],
+                        job['employmentType'],
+                        job['jobDescription'],
+                        job['category'],
+                        job['timestamp'],
+                        job['salary'],
+                      );
+                    },
                   );
                 },
-              );
-            },
+              ),
+            ),
           ),
-        ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildRowChips(String label, List<String> values, String selectedValue,
+      Function(String) onSelected) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 8.0,
+            children: values.map((value) {
+              return ChoiceChip(
+                label: Container(
+                  padding: EdgeInsets.all(6.0), // Adjust the padding as needed
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                        fontSize: 16.0), // Adjust the font size as needed
+                  ),
+                ),
+                selected: selectedValue == value,
+                onSelected: (bool selected) {
+                  onSelected(selected ? value : '');
+                },
+                selectedColor: Color(0xFFFCA34D),
+                labelStyle: TextStyle(
+                  color: selectedValue == value ? Colors.white : Colors.black,
+                ),
+              );
+            }).toList(),
+          ),
+        ],
       ),
     );
   }
@@ -224,7 +389,8 @@ class _FilterPageState extends State<FilterPage> {
                   Text(
                     timeAgo, // Display time ago
                     style: TextStyle(
-                        color: const Color.fromARGB(255, 118, 117, 117),fontSize: 13),
+                        color: const Color.fromARGB(255, 118, 117, 117),
+                        fontSize: 13),
                   ),
                   Text(
                     formattedSalary, // Display formatted salary
