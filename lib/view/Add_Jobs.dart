@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gigs/APIs/Add_Job_Description.dart';
+import 'package:gigs/APIs/Job_Category_API.dart';
 import 'package:gigs/APIs/Job_position_API.dart';
 import 'package:gigs/APIs/Places_API.dart';
 import 'package:gigs/APIs/Salary.dart';
@@ -27,6 +28,7 @@ class _AddJobsState extends State<AddJobs> {
   String JobDescription = '';
   String currentUserEmail = '';
   String selectedSalary = '';
+  String selectedCategory = '';
 
   @override
   void initState() {
@@ -56,6 +58,12 @@ class _AddJobsState extends State<AddJobs> {
     });
   }
 
+  void onJobCategoryAdded(String category) {
+    setState(() {
+      selectedCategory = category;
+    });
+  }
+
   void onJobLocationAdded(String location) {
     setState(() {
       selectedJobLocation = location;
@@ -75,14 +83,14 @@ class _AddJobsState extends State<AddJobs> {
   }
 
   Future<void> addJobToFirestore(
-    String jobPosition,
-    String jobLocation,
-    String workplaceType,
-    String company,
-    String employmentType,
-    String jobDescription,
-    String salary,
-  ) async {
+      String jobPosition,
+      String jobLocation,
+      String workplaceType,
+      String company,
+      String employmentType,
+      String jobDescription,
+      String salary,
+      String category) async {
     try {
       final CollectionReference jobsCollection =
           FirebaseFirestore.instance.collection('jobs');
@@ -94,7 +102,8 @@ class _AddJobsState extends State<AddJobs> {
         'company': company,
         'employmentType': employmentType,
         'jobDescription': jobDescription,
-        'salary':salary,
+        'salary': salary,
+        'category': category,
         'postedBy': currentUserEmail,
         'timestamp': FieldValue.serverTimestamp(), // Add a timestamp
       });
@@ -120,6 +129,7 @@ class _AddJobsState extends State<AddJobs> {
     print(selectedJobPosition);
     print(JobDescription);
     print(currentUserEmail);
+    print(selectedCategory);
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 241, 241, 241),
       appBar: AppBar(
@@ -145,14 +155,13 @@ class _AddJobsState extends State<AddJobs> {
           TextButton(
             onPressed: () {
               addJobToFirestore(
-                selectedJobPosition,
-                selectedJobLocation,
-                selectedWorkplace,
-                selectedCompany,
-                selectedEmploymentType,
-                JobDescription,
-                selectedSalary
-              );
+                  selectedJobPosition,
+                  selectedJobLocation,
+                  selectedWorkplace,
+                  selectedCompany,
+                  selectedEmploymentType,
+                  JobDescription,
+                  selectedSalary,selectedCategory);
               Navigator.pop(context);
               Navigator.pop(context);
               Navigator.pushReplacement(
@@ -313,6 +322,24 @@ class _AddJobsState extends State<AddJobs> {
                   }
                 },
               ),
+              SizedBox(
+                height: 8,
+              ),
+              JobCategory(
+                label: "Category",
+                content: selectedCategory,
+                                onPressed: () async {
+                  final addedCategory = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => JobCategoryScreen(),
+                    ),
+                  );
+                  if (addedCategory != null) {
+                   onJobCategoryAdded(addedCategory);
+                  }
+                },
+              )
             ],
           ),
         ),
@@ -652,6 +679,55 @@ class Salary extends StatelessWidget {
                   if (content != null)
                     Text(
                       '\$$content',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: Icon(
+                content == '' ? Icons.add_circle_outline_outlined : Icons.edit,
+                color: Color(0xFFFCA34D),
+              ),
+              onPressed: onPressed,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class JobCategory extends StatelessWidget {
+  final String label;
+  final String? content;
+  final VoidCallback? onPressed;
+
+  const JobCategory({required this.label, this.content, this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8), // Add some spacing
+                  if (content != null)
+                    Text(
+                      content!,
                       style: TextStyle(fontSize: 16),
                     ),
                 ],
