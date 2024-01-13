@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gigs/view/AdvancedFilter/Filter2.dart';
 
 class Ad1Filterpage extends StatefulWidget {
   const Ad1Filterpage({Key? key}) : super(key: key);
@@ -40,8 +41,8 @@ class _Ad1FilterpageState extends State<Ad1Filterpage> {
 
     // Initialize the categories list
     categories = distinctCategories
-        .map((categoryName) =>
-            Category(categoryName, false, getJobCount(categoryName, querySnapshot)))
+        .map((categoryName) => Category(
+            categoryName, false, getJobCount(categoryName, querySnapshot)))
         .toList();
 
     setState(() {});
@@ -104,7 +105,12 @@ class _Ad1FilterpageState extends State<Ad1Filterpage> {
                       Icons.filter_list,
                       color: Colors.white,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Ad2FilterPage()));
+                    },
                   ),
                 ),
               ],
@@ -162,9 +168,8 @@ class _Ad1FilterpageState extends State<Ad1Filterpage> {
                         // Replace with your desired icon or use a package like 'flutter_icons'
                         Icon(
                           Icons.category, // Placeholder icon for demonstration
-                          color: category.isSelected
-                              ? Colors.white
-                              : Colors.black,
+                          color:
+                              category.isSelected ? Colors.white : Colors.black,
                           size: 40,
                         ),
                         SizedBox(height: 8),
