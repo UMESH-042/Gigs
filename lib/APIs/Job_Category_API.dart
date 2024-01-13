@@ -8,7 +8,7 @@ class JobCategoryScreen extends StatefulWidget {
 class _JobCategoryScreenState extends State<JobCategoryScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<String> allJobCategory = [
-    " Information Technology (IT)",
+    "IT",
     "Health",
     "Finance",
     "Engineering",

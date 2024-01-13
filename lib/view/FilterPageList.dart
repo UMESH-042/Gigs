@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gigs/view/AdvancedFilter/Filter1.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class FilterPage extends StatefulWidget {
@@ -53,6 +54,7 @@ class _FilterPageState extends State<FilterPage> {
     print(employmentTypes);
     print(jobPositions);
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 243, 240, 240),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(220),
         child: Stack(
@@ -133,7 +135,6 @@ class _FilterPageState extends State<FilterPage> {
       ),
       body: Column(
         children: [
-
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Container(
@@ -141,7 +142,7 @@ class _FilterPageState extends State<FilterPage> {
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
-                   SizedBox(width: 12), 
+                  SizedBox(width: 13),
                   Container(
                     width: 49,
                     height: 45,
@@ -155,7 +156,10 @@ class _FilterPageState extends State<FilterPage> {
                         color: Colors.white,
                       ),
                       onPressed: () {
-                        // Implement your filter logic here
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Ad1Filterpage()));
                       },
                     ),
                   ),
