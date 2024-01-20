@@ -17,7 +17,7 @@ class _FilterPageState extends State<FilterPage> {
   String selectedJobPosition = '';
   String selectedEmploymentType = '';
   String selectedCategory = '';
-
+  String jobLocation = '';
   @override
   void initState() {
     super.initState();
@@ -155,11 +155,33 @@ class _FilterPageState extends State<FilterPage> {
                         Icons.filter_list,
                         color: Colors.white,
                       ),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => Ad1Filterpage()));
+                      onPressed: () async {
+                        Map<String, dynamic>? result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Ad1Filterpage(),
+                          ),
+                        );
+
+                        // Handle the result, which includes selected values and the selected category
+                        if (result != null) {
+                          print('Received result: $result');
+                          // Extract the selected values and category from the result
+                          Map<String, dynamic>? selectedValues =
+                              result['selectedValues'];
+                          String? selectedCategory = result['selectedCategory'];
+                          String? jobPositions = selectedValues!['subCategory'];
+                          String? employmentType = selectedValues!['jobTypes'];
+                          String? jobLocation = selectedValues!['location'];
+
+                          // Process the selected values and category as needed
+                          print('Selected Values: $selectedValues');
+                          print('Selected Category: $selectedCategory');
+                          print('jobPosition: $jobPositions');
+                          print('jobLocation: $jobLocation');
+                          print('employmentType: $employmentType');
+                          print('category: $selectedCategory');
+                        }
                       },
                     ),
                   ),
