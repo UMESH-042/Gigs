@@ -3,8 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:gigs/view/AdvancedFilter/Filter1.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+// class FilterPage extends StatefulWidget {
+//   const FilterPage({Key? key}) : super(key: key);
+
+//   @override
+//   State<FilterPage> createState() => _FilterPageState();
+// }
 class FilterPage extends StatefulWidget {
-  const FilterPage({Key? key}) : super(key: key);
+  final Map<String, dynamic>? combinedValues;
+
+  const FilterPage({Key? key, this.combinedValues}) : super(key: key);
 
   @override
   State<FilterPage> createState() => _FilterPageState();
@@ -18,10 +26,41 @@ class _FilterPageState extends State<FilterPage> {
   String selectedEmploymentType = '';
   String selectedCategory = '';
   String jobLocation = '';
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   fetchFilterOptions();
+  // }
+
   @override
   void initState() {
     super.initState();
-    fetchFilterOptions();
+
+    if (widget.combinedValues != null) {
+      _applyFilters(widget.combinedValues);
+    } else {
+      fetchFilterOptions();
+    }
+  }
+
+  void _applyFilters(Map<String, dynamic>? selectedValues) {
+    if (selectedValues != null) {
+      print('Received result: $selectedValues');
+
+      selectedJobPosition =
+          selectedValues['selectedValues']['subCategory'] ?? '';
+      selectedEmploymentType =
+          selectedValues['selectedValues']['jobTypes'][0] ?? '';
+      selectedCategory = selectedValues['selectedValues']['category'] ?? '';
+      jobLocation = selectedValues['selectedValues']['location'] ?? '';
+
+      print('selectedJobPosition: $selectedJobPosition');
+      print('selectedEmploymentType: $selectedEmploymentType');
+      print('selectedCategory: $selectedCategory');
+      print('jobLocation: $jobLocation');
+      // Fetch jobs based on the updated filtering criteria
+      setState(() {});
+    }
   }
 
   Future<void> fetchFilterOptions() async {
@@ -170,17 +209,16 @@ class _FilterPageState extends State<FilterPage> {
                           Map<String, dynamic>? selectedValues =
                               result['selectedValues'];
                           String? selectedCategory = result['selectedCategory'];
-                          String? jobPositions = selectedValues!['subCategory'];
-                          String? employmentType = selectedValues!['jobTypes'];
-                          String? jobLocation = selectedValues!['location'];
+                          String? Positions = selectedValues!['subCategory'];
+                          List<String?> empType = selectedValues!['jobTypes'];
+                          String? Location = selectedValues!['location'];
 
                           // Process the selected values and category as needed
                           print('Selected Values: $selectedValues');
                           print('Selected Category: $selectedCategory');
-                          print('jobPosition: $jobPositions');
-                          print('jobLocation: $jobLocation');
-                          print('employmentType: $employmentType');
-                          print('category: $selectedCategory');
+                          print('jobPosition: $Positions');
+                          print('employmentType: $empType');
+                          print('jobLocation: $Location');
                         }
                       },
                     ),
@@ -253,16 +291,22 @@ class _FilterPageState extends State<FilterPage> {
                     return Center(child: Text('No jobs available.'));
                   }
 
+                  // var jobs = snapshot.data!.docs.where((job) {
+                  //   var jobData = job.data() as Map<String, dynamic>;
+
+                  //   return (selectedJobPosition.isEmpty || jobData['jobPosition'] == selectedJobPosition) || (selectedEmploymentType.isEmpty ||jobData['employmentType'] == selectedEmploymentType) || (selectedCategory.isEmpty || jobData['category'] == selectedCategory);
+                  // }).toList();
                   var jobs = snapshot.data!.docs.where((job) {
                     var jobData = job.data() as Map<String, dynamic>;
 
-                    return (selectedJobPosition.isEmpty ||
-                            jobData['jobPosition'] == selectedJobPosition) &&
-                        (selectedEmploymentType.isEmpty ||
-                            jobData['employmentType'] ==
-                                selectedEmploymentType) &&
-                        (selectedCategory.isEmpty ||
-                            jobData['category'] == selectedCategory);
+                    return (selectedCategory.isEmpty ||
+                            jobData['category'] == selectedCategory) ||
+                        (selectedJobPosition.isEmpty ||
+                                jobData['jobPosition'] ==
+                                    selectedJobPosition) &&
+                            (selectedEmploymentType.isEmpty ||
+                                jobData['employmentType'] ==
+                                    selectedEmploymentType);
                   }).toList();
 
                   return ListView.builder(

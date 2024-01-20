@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gigs/view/AdvancedFilter/Filter2.dart';
 
+import '../FilterPageList.dart';
+
 class Ad1Filterpage extends StatefulWidget {
   const Ad1Filterpage({Key? key}) : super(key: key);
 
@@ -135,7 +137,14 @@ class _Ad1FilterpageState extends State<Ad1Filterpage> {
                         print(combinedValues);
                       }
 
-                       Navigator.pop(context, combinedValues);
+                      //  Navigator.pop(context, combinedValues);
+                      Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(
+    builder: (context) => FilterPage(combinedValues: combinedValues),
+  ),
+);
+
                     },
                   ),
                 ),
