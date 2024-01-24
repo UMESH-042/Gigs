@@ -22,6 +22,7 @@ class Category {
 class _Ad1FilterpageState extends State<Ad1Filterpage> {
   TextEditingController _searchController = TextEditingController();
   List<Category> categories = [];
+   List<Category> filteredCategories = [];
 
   @override
   void initState() {
@@ -47,6 +48,8 @@ class _Ad1FilterpageState extends State<Ad1Filterpage> {
             categoryName, false, getJobCount(categoryName, querySnapshot)))
         .toList();
 
+         filteredCategories = List.from(categories);
+
     setState(() {});
   }
 
@@ -55,6 +58,23 @@ class _Ad1FilterpageState extends State<Ad1Filterpage> {
         .where((doc) => doc['category'] == categoryName)
         .length;
   }
+
+
+void filterCategories(String query) {
+    // Filter categories based on the search query
+    if (query.isNotEmpty) {
+      filteredCategories = categories
+          .where((category) =>
+              category.name.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    } else {
+      // If there is no search query, display all categories
+      filteredCategories = List.from(categories);
+    }
+
+    setState(() {});
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +91,7 @@ class _Ad1FilterpageState extends State<Ad1Filterpage> {
           },
         ),
       ),
-      body: Column(
+      body:SingleChildScrollView(child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
@@ -81,7 +101,9 @@ class _Ad1FilterpageState extends State<Ad1Filterpage> {
                 Expanded(
                   child: TextField(
                     controller: _searchController,
-                    onChanged: (query) {},
+                    onChanged: (query) {
+                       filterCategories(query);
+                    },
                     decoration: InputDecoration(
                       hintText: 'Search...',
                       prefixIcon: Icon(Icons.search),
@@ -215,11 +237,11 @@ class _Ad1FilterpageState extends State<Ad1Filterpage> {
             child: Wrap(
               spacing: 16.0,
               runSpacing: 16.0,
-              children: categories.map((category) {
+              children: filteredCategories.map((category) {
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      categories.forEach((c) {
+                      filteredCategories.forEach((c) {
                         if (c.name != category.name) {
                           c.isSelected = false;
                         } else {
@@ -285,6 +307,7 @@ class _Ad1FilterpageState extends State<Ad1Filterpage> {
           ),
         ],
       ),
+    ),
     );
   }
 }

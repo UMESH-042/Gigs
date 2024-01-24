@@ -275,59 +275,108 @@ class _FilterPageState extends State<FilterPage> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
+              // child: StreamBuilder<QuerySnapshot>(
+              //   stream:
+              //       FirebaseFirestore.instance.collection('jobs').snapshots(),
+              //   builder: (context, snapshot) {
+              //     if (snapshot.connectionState == ConnectionState.waiting) {
+              //       return CircularProgressIndicator();
+              //     }
+
+              //     if (snapshot.hasError) {
+              //       return Center(child: Text('Error: ${snapshot.error}'));
+              //     }
+
+              //     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              //       return Center(child: Text('No jobs available.'));
+              //     }
+
+              //     // var jobs = snapshot.data!.docs.where((job) {
+              //     //   var jobData = job.data() as Map<String, dynamic>;
+
+              //     //   return (selectedJobPosition.isEmpty || jobData['jobPosition'] == selectedJobPosition) || (selectedEmploymentType.isEmpty ||jobData['employmentType'] == selectedEmploymentType) || (selectedCategory.isEmpty || jobData['category'] == selectedCategory);
+              //     // }).toList();
+              //     var jobs = snapshot.data!.docs.where((job) {
+              //       var jobData = job.data() as Map<String, dynamic>;
+
+              //       return (selectedCategory.isEmpty ||
+              //               jobData['category'] == selectedCategory) ||
+              //           (selectedJobPosition.isEmpty ||
+              //                   jobData['jobPosition'] ==
+              //                       selectedJobPosition) &&
+              //               (selectedEmploymentType.isEmpty ||
+              //                   jobData['employmentType'] ==
+              //                       selectedEmploymentType);
+              //     }).toList();
+
+              //     return ListView.builder(
+              //       itemCount: jobs.length,
+              //       itemBuilder: (context, index) {
+              //         var job = jobs[index].data() as Map<String, dynamic>;
+
+              //         return _buildJobDisplayCard(
+              //           job['jobPosition'],
+              //           job['company'],
+              //           job['jobLocation'],
+              //           job['employmentType'],
+              //           job['jobDescription'],
+              //           job['category'],
+              //           job['timestamp'],
+              //           job['salary'],
+              //         );
+              //       },
+              //     );
+              //   },
+              // ),
               child: StreamBuilder<QuerySnapshot>(
-                stream:
-                    FirebaseFirestore.instance.collection('jobs').snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
+  stream: FirebaseFirestore.instance.collection('jobs').snapshots(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return CircularProgressIndicator();
+    }
 
-                  if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  }
+    if (snapshot.hasError) {
+      return Center(child: Text('Error: ${snapshot.error}'));
+    }
 
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return Center(child: Text('No jobs available.'));
-                  }
+    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+      return Center(child: Text('No jobs available.'));
+    }
 
-                  // var jobs = snapshot.data!.docs.where((job) {
-                  //   var jobData = job.data() as Map<String, dynamic>;
+    var jobs = snapshot.data!.docs.where((job) {
+      var jobData = job.data() as Map<String, dynamic>;
 
-                  //   return (selectedJobPosition.isEmpty || jobData['jobPosition'] == selectedJobPosition) || (selectedEmploymentType.isEmpty ||jobData['employmentType'] == selectedEmploymentType) || (selectedCategory.isEmpty || jobData['category'] == selectedCategory);
-                  // }).toList();
-                  var jobs = snapshot.data!.docs.where((job) {
-                    var jobData = job.data() as Map<String, dynamic>;
+      return (selectedCategory.isEmpty ||
+              jobData['category'] == selectedCategory) &&
+          (selectedJobPosition.isEmpty ||
+              jobData['jobPosition'] == selectedJobPosition) &&
+          (selectedEmploymentType.isEmpty ||
+              jobData['employmentType'] == selectedEmploymentType) &&
+          // Check for row chips filters
+          (selectedJobPosition.isEmpty || jobData['jobPosition'] == selectedJobPosition) &&
+          (selectedEmploymentType.isEmpty || jobData['employmentType'] == selectedEmploymentType) &&
+          (selectedCategory.isEmpty || jobData['category'] == selectedCategory);
+    }).toList();
 
-                    return (selectedCategory.isEmpty ||
-                            jobData['category'] == selectedCategory) ||
-                        (selectedJobPosition.isEmpty ||
-                                jobData['jobPosition'] ==
-                                    selectedJobPosition) &&
-                            (selectedEmploymentType.isEmpty ||
-                                jobData['employmentType'] ==
-                                    selectedEmploymentType);
-                  }).toList();
+    return ListView.builder(
+      itemCount: jobs.length,
+      itemBuilder: (context, index) {
+        var job = jobs[index].data() as Map<String, dynamic>;
 
-                  return ListView.builder(
-                    itemCount: jobs.length,
-                    itemBuilder: (context, index) {
-                      var job = jobs[index].data() as Map<String, dynamic>;
-
-                      return _buildJobDisplayCard(
-                        job['jobPosition'],
-                        job['company'],
-                        job['jobLocation'],
-                        job['employmentType'],
-                        job['jobDescription'],
-                        job['category'],
-                        job['timestamp'],
-                        job['salary'],
-                      );
-                    },
-                  );
-                },
-              ),
+        return _buildJobDisplayCard(
+          job['jobPosition'],
+          job['company'],
+          job['jobLocation'],
+          job['employmentType'],
+          job['jobDescription'],
+          job['category'],
+          job['timestamp'],
+          job['salary'],
+        );
+      },
+    );
+  },
+),
             ),
           ),
         ],
