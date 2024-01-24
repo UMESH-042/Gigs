@@ -102,6 +102,52 @@ class _Ad1FilterpageState extends State<Ad1Filterpage> {
                     color: Color(0xFFFCA34D),
                     borderRadius: BorderRadius.circular(15.0),
                   ),
+                  // child: IconButton(
+                  //   icon: Icon(
+                  //     Icons.filter_list,
+                  //     color: Colors.white,
+                  //   ),
+                  //   onPressed: () async {
+                  //     // Use Navigator.push to navigate to Ad2FilterPage and wait for the result
+                  //     Map<String, dynamic>? selectedValues =
+                  //         await Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => Ad2FilterPage(),
+                  //       ),
+                  //     );
+
+                  //     // Handle the selected values as needed (e.g., update UI with the selected filters)
+                  //     if (selectedValues != null) {
+                  //       // Process the selected values
+                  //       print(selectedValues);
+                  //     }
+
+                  //     Map<String, dynamic> combinedValues = {
+                  //       'selectedValues': selectedValues,
+                  //       'selectedCategory': categories
+                  //           .firstWhere((category) => category.isSelected,
+                  //               orElse: () => Category('', false, 0))
+                  //           .name,
+                  //     };
+
+                  //     // Handle the combined values as needed (e.g., update UI with the selected filters)
+                  //     if (combinedValues['selectedValues'] != null ||
+                  //         combinedValues['selectedCategory'] != null) {
+                  //       // Process the selected values
+                  //       print(combinedValues);
+                  //     }
+
+                  //     //  Navigator.pop(context, combinedValues);
+                  //     Navigator.pushReplacement(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) =>
+                  //             FilterPage(combinedValues: combinedValues),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   child: IconButton(
                     icon: Icon(
                       Icons.filter_list,
@@ -117,34 +163,36 @@ class _Ad1FilterpageState extends State<Ad1Filterpage> {
                         ),
                       );
 
-                      // Handle the selected values as needed (e.g., update UI with the selected filters)
                       if (selectedValues != null) {
                         // Process the selected values
                         print(selectedValues);
-                      }
 
-                      Map<String, dynamic> combinedValues = {
-                        'selectedValues': selectedValues,
-                        'selectedCategory': categories
+                        String selectedCategory = categories
                             .firstWhere((category) => category.isSelected,
                                 orElse: () => Category('', false, 0))
-                            .name,
-                      };
+                            .name;
 
-                      // Handle the combined values as needed (e.g., update UI with the selected filters)
-                      if (combinedValues['selectedValues'] != null || combinedValues['selectedCategory']!=null) {
-                        // Process the selected values
+                        // Handle the selected values as needed (e.g., update UI with the selected filters)
+                        Map<String, dynamic> combinedValues = {
+                          'selectedValues': selectedValues,
+                          'selectedCategory': selectedCategory,
+                        };
+
+                        // Handle the combined values as needed (e.g., update UI with the selected filters)
                         print(combinedValues);
+
+                        // Replace the page
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                FilterPage(combinedValues: combinedValues),
+                          ),
+                        );
+                      } else {
+                        // Handle the case where selectedValues is null (if needed)
+                        print('Selected values are null');
                       }
-
-                      //  Navigator.pop(context, combinedValues);
-                      Navigator.pushReplacement(
-  context,
-  MaterialPageRoute(
-    builder: (context) => FilterPage(combinedValues: combinedValues),
-  ),
-);
-
                     },
                   ),
                 ),
