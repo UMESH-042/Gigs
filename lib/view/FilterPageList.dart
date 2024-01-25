@@ -1,14 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gigs/view/AdvancedFilter/Filter1.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-// class FilterPage extends StatefulWidget {
-//   const FilterPage({Key? key}) : super(key: key);
-
-//   @override
-//   State<FilterPage> createState() => _FilterPageState();
-// }
 class FilterPage extends StatefulWidget {
   final Map<String, dynamic>? combinedValues;
 
@@ -26,11 +21,6 @@ class _FilterPageState extends State<FilterPage> {
   String selectedEmploymentType = '';
   String selectedCategory = '';
   String jobLocation = '';
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   fetchFilterOptions();
-  // }
 
   @override
   void initState() {
@@ -85,6 +75,86 @@ class _FilterPageState extends State<FilterPage> {
     });
 
     return distinctValues;
+  }
+
+  String getCurrentUserId() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      return user.uid;
+    } else {
+      // Handle the case when the user is not signed in
+      return ''; // or throw an exception, return null, etc.
+    }
+  }
+
+  // void saveJob(Map<String, dynamic> jobDetails) async {
+  //   // Add the current user's ID to the job details
+  //   String currentUserId =
+  //       getCurrentUserId(); // Implement this function to get the current user's ID
+  //   jobDetails['userId'] = currentUserId;
+
+  //   // Save the job details in the "savedJobs" collection
+  //   await FirebaseFirestore.instance.collection('savedJobs').add(jobDetails);
+
+  //   // Notify the user that the job has been saved (you can use a Snackbar or any other method)
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Text('Job saved successfully!'),
+  //     ),
+  //   );
+  // }
+  void saveJob(Map<String, dynamic> jobDetails) async {
+    // Add the current user's ID to the job details
+    String currentUserId = getCurrentUserId();
+    jobDetails['userId'] = currentUserId;
+
+    // Generate a unique job ID for the saved job
+    String jobId = getUniqueJobId(jobDetails); // Implement this function
+
+    // Check if the job is already saved
+    if (await isJobSaved(currentUserId, jobId)) {
+      // Job is already saved, show a message to the user
+      showSnackbar('Job has already been saved!');
+    } else {
+      // Save the job details in the "savedJobs" collection
+      await FirebaseFirestore.instance
+          .collection('savedJobs')
+          .doc(jobId)
+          .set(jobDetails);
+
+      // Notify the user that the job has been saved
+      showSnackbar('Job saved successfully!');
+    }
+  }
+
+  Future<bool> isJobSaved(String userId, String jobId) async {
+    // Check if the job with the specified ID is already saved by the user
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection('savedJobs')
+        .doc(jobId)
+        .get();
+
+    return snapshot.exists && snapshot['userId'] == userId;
+  }
+
+  void showSnackbar(String message) {
+    // Display a Snackbar with the specified message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
+  String getUniqueJobId(Map<String, dynamic> jobDetails) {
+    // Create a unique job ID based on relevant fields
+    String jobPosition = jobDetails['jobPosition'];
+    String companyName = jobDetails['company'];
+    String uniqueKey = '$jobPosition-$companyName';
+
+    String jobId = uniqueKey.hashCode.toUnsigned(30).toString();
+
+    return jobId;
   }
 
   @override
@@ -275,108 +345,66 @@ class _FilterPageState extends State<FilterPage> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              // child: StreamBuilder<QuerySnapshot>(
-              //   stream:
-              //       FirebaseFirestore.instance.collection('jobs').snapshots(),
-              //   builder: (context, snapshot) {
-              //     if (snapshot.connectionState == ConnectionState.waiting) {
-              //       return CircularProgressIndicator();
-              //     }
-
-              //     if (snapshot.hasError) {
-              //       return Center(child: Text('Error: ${snapshot.error}'));
-              //     }
-
-              //     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              //       return Center(child: Text('No jobs available.'));
-              //     }
-
-              //     // var jobs = snapshot.data!.docs.where((job) {
-              //     //   var jobData = job.data() as Map<String, dynamic>;
-
-              //     //   return (selectedJobPosition.isEmpty || jobData['jobPosition'] == selectedJobPosition) || (selectedEmploymentType.isEmpty ||jobData['employmentType'] == selectedEmploymentType) || (selectedCategory.isEmpty || jobData['category'] == selectedCategory);
-              //     // }).toList();
-              //     var jobs = snapshot.data!.docs.where((job) {
-              //       var jobData = job.data() as Map<String, dynamic>;
-
-              //       return (selectedCategory.isEmpty ||
-              //               jobData['category'] == selectedCategory) ||
-              //           (selectedJobPosition.isEmpty ||
-              //                   jobData['jobPosition'] ==
-              //                       selectedJobPosition) &&
-              //               (selectedEmploymentType.isEmpty ||
-              //                   jobData['employmentType'] ==
-              //                       selectedEmploymentType);
-              //     }).toList();
-
-              //     return ListView.builder(
-              //       itemCount: jobs.length,
-              //       itemBuilder: (context, index) {
-              //         var job = jobs[index].data() as Map<String, dynamic>;
-
-              //         return _buildJobDisplayCard(
-              //           job['jobPosition'],
-              //           job['company'],
-              //           job['jobLocation'],
-              //           job['employmentType'],
-              //           job['jobDescription'],
-              //           job['category'],
-              //           job['timestamp'],
-              //           job['salary'],
-              //         );
-              //       },
-              //     );
-              //   },
-              // ),
               child: StreamBuilder<QuerySnapshot>(
-  stream: FirebaseFirestore.instance.collection('jobs').snapshots(),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return CircularProgressIndicator();
-    }
+                stream:
+                    FirebaseFirestore.instance.collection('jobs').snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
 
-    if (snapshot.hasError) {
-      return Center(child: Text('Error: ${snapshot.error}'));
-    }
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
 
-    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-      return Center(child: Text('No jobs available.'));
-    }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Center(child: Text('No jobs available.'));
+                  }
 
-    var jobs = snapshot.data!.docs.where((job) {
-      var jobData = job.data() as Map<String, dynamic>;
+                  var jobs = snapshot.data!.docs.where((job) {
+                    var jobData = job.data() as Map<String, dynamic>;
 
-      return (selectedCategory.isEmpty ||
-              jobData['category'] == selectedCategory) &&
-          (selectedJobPosition.isEmpty ||
-              jobData['jobPosition'] == selectedJobPosition) &&
-          (selectedEmploymentType.isEmpty ||
-              jobData['employmentType'] == selectedEmploymentType) &&
-          // Check for row chips filters
-          (selectedJobPosition.isEmpty || jobData['jobPosition'] == selectedJobPosition) &&
-          (selectedEmploymentType.isEmpty || jobData['employmentType'] == selectedEmploymentType) &&
-          (selectedCategory.isEmpty || jobData['category'] == selectedCategory);
-    }).toList();
+                    return (selectedCategory.isEmpty ||
+                            jobData['category'] == selectedCategory) &&
+                        (selectedJobPosition.isEmpty ||
+                            jobData['jobPosition'] == selectedJobPosition) &&
+                        (selectedEmploymentType.isEmpty ||
+                            jobData['employmentType'] ==
+                                selectedEmploymentType) &&
+                        // Check for row chips filters
+                        (selectedJobPosition.isEmpty ||
+                            jobData['jobPosition'] == selectedJobPosition) &&
+                        (selectedEmploymentType.isEmpty ||
+                            jobData['employmentType'] ==
+                                selectedEmploymentType) &&
+                        (selectedCategory.isEmpty ||
+                            jobData['category'] == selectedCategory);
+                  }).toList();
 
-    return ListView.builder(
-      itemCount: jobs.length,
-      itemBuilder: (context, index) {
-        var job = jobs[index].data() as Map<String, dynamic>;
+                  if (jobs.isEmpty) {
+                    return Center(child: Text('No Jobs Found.'));
+                  }
 
-        return _buildJobDisplayCard(
-          job['jobPosition'],
-          job['company'],
-          job['jobLocation'],
-          job['employmentType'],
-          job['jobDescription'],
-          job['category'],
-          job['timestamp'],
-          job['salary'],
-        );
-      },
-    );
-  },
-),
+                  return ListView.builder(
+                    itemCount: jobs.length,
+                    itemBuilder: (context, index) {
+                      var job = jobs[index].data() as Map<String, dynamic>;
+
+                      return _buildJobDisplayCard(
+                          job['jobPosition'],
+                          job['company'],
+                          job['jobLocation'],
+                          job['employmentType'],
+                          job['jobDescription'],
+                          job['category'],
+                          job['timestamp'],
+                          job['salary'], () {
+                        saveJob(job);
+                      });
+                    },
+                  );
+                },
+              ),
             ),
           ),
         ],
@@ -428,6 +456,7 @@ class _FilterPageState extends State<FilterPage> {
     String category,
     Timestamp timestamp,
     String salary,
+    Function() onSavePressed,
   ) {
     print(toTitleCase(jobPosition));
     List<String> locationParts = jobLocation.split(',');
@@ -523,9 +552,12 @@ class _FilterPageState extends State<FilterPage> {
           Positioned(
             top: 8,
             right: 8,
-            child: Icon(
-              Icons.bookmark_border_outlined,
-              size: 30,
+            child: GestureDetector(
+              onTap: onSavePressed,
+              child: Icon(
+                Icons.bookmark_border_outlined,
+                size: 30,
+              ),
             ),
           ),
         ],
