@@ -21,6 +21,7 @@ class _FilterPageState extends State<FilterPage> {
   String selectedEmploymentType = '';
   String selectedCategory = '';
   String jobLocation = '';
+  String searchQuery = '';
 
   @override
   void initState() {
@@ -87,22 +88,6 @@ class _FilterPageState extends State<FilterPage> {
     }
   }
 
-  // void saveJob(Map<String, dynamic> jobDetails) async {
-  //   // Add the current user's ID to the job details
-  //   String currentUserId =
-  //       getCurrentUserId(); // Implement this function to get the current user's ID
-  //   jobDetails['userId'] = currentUserId;
-
-  //   // Save the job details in the "savedJobs" collection
-  //   await FirebaseFirestore.instance.collection('savedJobs').add(jobDetails);
-
-  //   // Notify the user that the job has been saved (you can use a Snackbar or any other method)
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(
-  //       content: Text('Job saved successfully!'),
-  //     ),
-  //   );
-  // }
   void saveJob(Map<String, dynamic> jobDetails) async {
     // Add the current user's ID to the job details
     String currentUserId = getCurrentUserId();
@@ -196,6 +181,11 @@ class _FilterPageState extends State<FilterPage> {
                       borderRadius: BorderRadius.circular(15.0),
                     ),
                     child: TextField(
+                      onChanged: (value) {
+                        setState(() {
+                          searchQuery = value.toLowerCase();
+                        });
+                      },
                       decoration: InputDecoration(
                         hintText: 'Job Position',
                         border: InputBorder.none,
@@ -378,7 +368,8 @@ class _FilterPageState extends State<FilterPage> {
                             jobData['employmentType'] ==
                                 selectedEmploymentType) &&
                         (selectedCategory.isEmpty ||
-                            jobData['category'] == selectedCategory);
+                            jobData['category'] == selectedCategory)&& (searchQuery.isEmpty ||
+                                jobData['jobPosition'].toLowerCase().contains(searchQuery));
                   }).toList();
 
                   if (jobs.isEmpty) {
@@ -458,6 +449,7 @@ class _FilterPageState extends State<FilterPage> {
     String salary,
     Function() onSavePressed,
   ) {
+    bool isPressed = false;
     print(toTitleCase(jobPosition));
     List<String> locationParts = jobLocation.split(',');
 
