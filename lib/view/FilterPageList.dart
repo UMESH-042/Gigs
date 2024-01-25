@@ -368,8 +368,11 @@ class _FilterPageState extends State<FilterPage> {
                             jobData['employmentType'] ==
                                 selectedEmploymentType) &&
                         (selectedCategory.isEmpty ||
-                            jobData['category'] == selectedCategory)&& (searchQuery.isEmpty ||
-                                jobData['jobPosition'].toLowerCase().contains(searchQuery));
+                            jobData['category'] == selectedCategory) &&
+                        (searchQuery.isEmpty ||
+                            jobData['jobPosition']
+                                .toLowerCase()
+                                .contains(searchQuery));
                   }).toList();
 
                   if (jobs.isEmpty) {

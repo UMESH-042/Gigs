@@ -162,7 +162,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
           ),
         ),
       ),
-      body:isLoading? ShimmerEffect(): Column(
+      body:isLoading? ShimmerList(): Column(
         children: [
           SizedBox(height: 20),
           Expanded(
@@ -251,81 +251,104 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   }
 }
 
-class ShimmerEffect extends StatelessWidget {
+// class ShimmerEffect extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     final screenWidth = MediaQuery.of(context).size.width;
+//     final screenHeight = MediaQuery.of(context).size.height;
+
+//     return Container(
+//       width: screenWidth,
+//       height: screenHeight,
+//       child: Shimmer.fromColors(
+//         baseColor: Colors.grey,
+//         highlightColor: Colors.grey,
+//         child: SingleChildScrollView(
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.stretch,
+//             children: [
+//               SizedBox(height: 20),
+//               Container(
+//                 width: screenWidth * 0.8,
+//                 height: 40,
+//                 color: Colors.white,
+//               ),
+//               SizedBox(height: 10),
+//               Container(
+//                 width: screenWidth * 0.6,
+//                 height: 20,
+//                 color: Colors.white,
+//               ),
+//               SizedBox(height: 20),
+//               Container(
+//                 width: screenWidth * 0.9,
+//                 height: 150,
+//                 color: Colors.white,
+//               ),
+//               SizedBox(height: 20),
+//               Container(
+//                 width: screenWidth * 0.7,
+//                 height: 30,
+//                 color: Colors.white,
+//               ),
+//               SizedBox(height: 10),
+//               Container(
+//                 width: screenWidth * 0.5,
+//                 height: 20,
+//                 color: Colors.white,
+//               ),
+//               SizedBox(height: 20),
+//               Container(
+//                 width: screenWidth * 0.8,
+//                 height: 80,
+//                 color: Colors.white,
+//               ),
+//               SizedBox(height: 20),
+//               Container(
+//                 width: screenWidth * 0.7,
+//                 height: 30,
+//                 color: Colors.white,
+//               ),
+//               SizedBox(height: 10),
+//               Container(
+//                 width: screenWidth * 0.4,
+//                 height: 20,
+//                 color: Colors.white,
+//               ),
+//               SizedBox(height: 20),
+//               Container(
+//                 width: screenWidth * 0.9,
+//                 height: 120,
+//                 color: Colors.white,
+//               ),
+//               SizedBox(height: 20),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+class ShimmerList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    return Container(
-      width: screenWidth,
-      height: screenHeight,
-      child: Shimmer.fromColors(
-        baseColor: Colors.grey,
-        highlightColor: Colors.grey,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(height: 20),
-              Container(
-                width: screenWidth * 0.8,
-                height: 40,
-                color: Colors.white,
-              ),
-              SizedBox(height: 10),
-              Container(
-                width: screenWidth * 0.6,
-                height: 20,
-                color: Colors.white,
-              ),
-              SizedBox(height: 20),
-              Container(
-                width: screenWidth * 0.9,
-                height: 150,
-                color: Colors.white,
-              ),
-              SizedBox(height: 20),
-              Container(
-                width: screenWidth * 0.7,
-                height: 30,
-                color: Colors.white,
-              ),
-              SizedBox(height: 10),
-              Container(
-                width: screenWidth * 0.5,
-                height: 20,
-                color: Colors.white,
-              ),
-              SizedBox(height: 20),
-              Container(
-                width: screenWidth * 0.8,
-                height: 80,
-                color: Colors.white,
-              ),
-              SizedBox(height: 20),
-              Container(
-                width: screenWidth * 0.7,
-                height: 30,
-                color: Colors.white,
-              ),
-              SizedBox(height: 10),
-              Container(
-                width: screenWidth * 0.4,
-                height: 20,
-                color: Colors.white,
-              ),
-              SizedBox(height: 20),
-              Container(
-                width: screenWidth * 0.9,
-                height: 120,
-                color: Colors.white,
-              ),
-              SizedBox(height: 20),
-            ],
-          ),
-        ),
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: ListView.builder(
+        itemCount: 5,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              height: 120.0,
+              color: Colors.white,
+            ),
+          );
+        },
       ),
     );
   }
 }
+

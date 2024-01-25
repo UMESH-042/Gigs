@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage> {
       ViewPostsPage(),
       AddJobs(),
       ChatScreen(currentUserEmail: widget.currentUserEmail,),
-      Saved(),
+      SavedJobsPage(),
     ];
     _loadUserData();  
     _requestNotificationPermissions();
