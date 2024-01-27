@@ -264,11 +264,12 @@ class _AddWorkExperiencePageState extends State<AddWorkExperiencePage> {
 
                         // Close the bottom sheet
                         Navigator.pop(context);
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ProfilePage(
-                currentUserEmail: widget.email, imageUrl: widget.imageUrl)));
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ProfilePage(
+                                    currentUserEmail: widget.email,
+                                    imageUrl: widget.imageUrl)));
                       } catch (e) {
                         print('Error adding work experience: $e');
                         // Handle the error as needed
