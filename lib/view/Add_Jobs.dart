@@ -7,6 +7,7 @@ import 'package:gigs/APIs/Job_position_API.dart';
 import 'package:gigs/APIs/Places_API.dart';
 import 'package:gigs/APIs/Salary.dart';
 import 'package:gigs/APIs/companies_API.dart';
+import 'package:gigs/CompanyDetails/CompanyDetailsPage.dart';
 import 'package:gigs/view/Homes_Screen.dart';
 
 import 'bottomSheet.dart';
@@ -39,6 +40,34 @@ class _AddJobsState extends State<AddJobs> {
             email ?? ''; // Set to an empty string if email is null
       });
     });
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      _showInitialDialog();
+    });
+  }
+
+  void _showInitialDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Welcome to the Add Jobs Page'),
+          content: Text('Please add the company details.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CompanyDetailsPage()),
+                );
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<String?> getCurrentUserEmail() async {
@@ -161,7 +190,8 @@ class _AddJobsState extends State<AddJobs> {
                   selectedCompany,
                   selectedEmploymentType,
                   JobDescription,
-                  selectedSalary,selectedCategory);
+                  selectedSalary,
+                  selectedCategory);
               Navigator.pop(context);
               Navigator.pop(context);
               Navigator.pushReplacement(
@@ -328,7 +358,7 @@ class _AddJobsState extends State<AddJobs> {
               JobCategory(
                 label: "Category",
                 content: selectedCategory,
-                                onPressed: () async {
+                onPressed: () async {
                   final addedCategory = await Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -336,7 +366,7 @@ class _AddJobsState extends State<AddJobs> {
                     ),
                   );
                   if (addedCategory != null) {
-                   onJobCategoryAdded(addedCategory);
+                    onJobCategoryAdded(addedCategory);
                   }
                 },
               )
