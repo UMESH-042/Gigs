@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:gigs/firebase/firebaseService.dart';
+import 'package:gigs/view/Porfile/Profile_page.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:velocity_x/velocity_x.dart';
 
@@ -41,12 +43,13 @@ class ApplicationPage extends StatefulWidget {
 class _ApplicationPageState extends State<ApplicationPage> {
   bool showJobDetails = true;
   final TextEditingController _informationController = TextEditingController();
+  bool applicationSubmitted = false;
 
   File? selectedFile;
   String? selectedFileName;
   String? fileSizeError;
 
-// Function to handle the file selection
+  // Function to handle the file selection
   Future<void> _selectFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -70,12 +73,16 @@ class _ApplicationPageState extends State<ApplicationPage> {
     });
   }
 
-// Function to save the file to Firebase Storage and its URL to Firestore
-  Future<void> saveFileToFirestore(String userEmail) async {
+  // Function to save the file to Firebase Storage and its URL to Firestore
+  Future<void> saveFileToFirestore(
+    String userEmail,
+    Map<String, dynamic> applicationData,
+  ) async {
     if (selectedFile == null) {
       // Handle this case as needed (e.g., show an error message)
       return;
     }
+
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
     // Create a reference to Firebase Storage
@@ -106,8 +113,13 @@ class _ApplicationPageState extends State<ApplicationPage> {
         'FileSize': '${selectedFile!.lengthSync() ~/ 1024}kb',
       };
 
-      await FirestoreService().addResumeData(userEmail, resumeData);
-      // Navigator.pop(context);
+      // Combine applicationData and resumeData
+      Map<String, dynamic> combinedData = {
+        ...applicationData,
+        'resumeData': resumeData,
+      };
+
+      await FirestoreService().addApplicationData(combinedData);
     } catch (e) {
       print('Error adding Resume Data: $e');
       // Handle the error as needed
@@ -115,7 +127,7 @@ class _ApplicationPageState extends State<ApplicationPage> {
 
     // Clear the selected file
     clearSelectedFile();
-    Navigator.pop(context);
+    // Navigator.pop(context);
   }
 
   @override
@@ -410,38 +422,58 @@ class _ApplicationPageState extends State<ApplicationPage> {
                             children: [
                               _buildLabelAndContent("About Company",
                                   companyData?['aboutCompany']),
-                                  SizedBox(height: 10,),
+                              SizedBox(
+                                height: 10,
+                              ),
                               _buildLabelAndContent(
                                   "Website", companyData?['websiteLink']),
-                                  SizedBox(height: 10,),
+                              SizedBox(
+                                height: 10,
+                              ),
 
                               _buildLabelAndContent(
                                   "Industry", companyData?['industry']),
-                                  SizedBox(height: 10,),
+                              SizedBox(
+                                height: 10,
+                              ),
 
                               _buildLabelAndContent("Employee Size",
                                   companyData?['employeeSize']),
-                                  SizedBox(height: 10,),
+                              SizedBox(
+                                height: 10,
+                              ),
 
                               _buildLabelAndContent(
                                   "Head Office", companyData?['headOffice']),
-                                  SizedBox(height: 10,),
+                              SizedBox(
+                                height: 10,
+                              ),
 
                               _buildLabelAndContent(
                                   "Type", companyData?['companyType']),
-                                  SizedBox(height: 10,),
+                              SizedBox(
+                                height: 10,
+                              ),
 
                               _buildLabelAndContent(
                                   "Since", companyData?['since']),
-                                  SizedBox(height: 10,),
+                              SizedBox(
+                                height: 10,
+                              ),
 
                               _buildLabelAndContent("Specialization",
                                   companyData?['specialization']),
-                                  SizedBox(height: 10,),
-                            label("Company gallery"),
-                            SizedBox(height: 20,),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              label("Company gallery"),
+                              SizedBox(
+                                height: 20,
+                              ),
                               _buildImageGallery(imageUrls),
-                              SizedBox(height: 20,),
+                              SizedBox(
+                                height: 20,
+                              ),
                               // Text(
                               //     'Company Description: ${companyData?['aboutCompany']}'),
                               // Text(
@@ -467,20 +499,133 @@ class _ApplicationPageState extends State<ApplicationPage> {
                     height: 20,
                   ),
                   ElevatedButton(
-                    onPressed: () {},
+  onPressed: () async {
+    // Show the "Please wait" dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Please Wait'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text(
+                'Application is being submitted...',
+                style: TextStyle(fontSize: 18),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    try {
+      // Get the current user's email or user id (replace 'getUserEmail()' with your actual method)
+      String userEmail = await getUserEmail();
+
+      // Prepare the application details
+      Map<String, dynamic> applicationData = {
+        // Existing application data...
+      };
+
+      // Save the file to Firebase Storage and get the download URL
+      await saveFileToFirestore(userEmail, applicationData);
+
+      // Close the "Please wait" dialog
+      Navigator.pop(context);
+
+      // Show the success dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Container(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Successful',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Congratulations, your application has been sent',
+                    style: TextStyle(fontSize: 18),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Close the success dialog
+                      Navigator.pop(context); // Close the application page
+                    },
                     style: ElevatedButton.styleFrom(
                       primary: Color(0xFF130160),
                       onPrimary: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
-                      minimumSize: Size(275, 49),
+                      minimumSize: Size(200, 49),
                     ),
                     child: Text(
-                      'APPLY NOW',
+                      'Back to Home',
                       style: TextStyle(fontSize: 17.5),
                     ),
-                  ).centered(),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      // Handle errors, e.g., show an error dialog
+      print('Error submitting application: $e');
+      Navigator.pop(context); // Close the "Please wait" dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Failed to submit the application. Please try again.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  },
+  style: ElevatedButton.styleFrom(
+    primary: Color(0xFF130160),
+    onPrimary: Colors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8.0),
+    ),
+    minimumSize: Size(275, 49),
+  ),
+  child: Text(
+    'APPLY NOW',
+    style: TextStyle(fontSize: 17.5),
+  ),
+).centered(),
+
                 ],
               ),
             ),
@@ -488,6 +633,23 @@ class _ApplicationPageState extends State<ApplicationPage> {
         ),
       ),
     );
+  }
+
+  Future<String> getUserEmail() async {
+    try {
+      // Assume you are using Firebase Authentication
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // If the user is logged in, return the email
+        return user.email ?? '';
+      } else {
+        // Handle the case when the user is not logged in
+        throw Exception('User not logged in');
+      }
+    } catch (e) {
+      print('Error getting user email: $e');
+      throw e; // Propagate the error to the calling code
+    }
   }
 
   Widget _buildCircularButtonJobDetails({required VoidCallback onPressed}) {
@@ -627,4 +789,6 @@ class _ApplicationPageState extends State<ApplicationPage> {
       },
     );
   }
+
+
 }

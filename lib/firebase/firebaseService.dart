@@ -140,7 +140,6 @@ Future<void> addEducation(String userId, Map<String, dynamic> education) async {
     }
   }
 
-  
 
   Future<void> deleteResumeData(String userId, int indexToDelete) async {
   try {
@@ -180,6 +179,20 @@ Future<void> addEducation(String userId, Map<String, dynamic> education) async {
   }
 }
 
+
+ final CollectionReference applicationsCollection =
+      FirebaseFirestore.instance.collection('applicants');
+
+  Future<void> addApplicationData(Map<String, dynamic> applicationData) async {
+    try {
+      // Add the application data to the 'applicants' collection in Firestore
+      await applicationsCollection.add(applicationData);
+    } catch (e) {
+      print('Error adding application data: $e');
+      // Handle the error as needed
+      throw e; // You might want to throw the error to let the calling code handle it
+    }
+  }
 
 
 
