@@ -1,7 +1,5 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 import 'package:gigs/profile_APIs/Add_Education.dart';
 import 'package:gigs/profile_APIs/Add_about_me.dart';
 import 'package:gigs/profile_APIs/Add_appreciation.dart';
@@ -316,7 +314,7 @@ class _ProfilePageState extends State<ProfilePage> {
               actions: [
                 IconButton(
                   onPressed: () {
-                      Navigator.push(
+                    Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => SettingsPage()));
@@ -431,7 +429,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => AddWorkExperiencePage(
-                          email: widget.currentUserEmail, imageUrl: widget.imageUrl,
+                          email: widget.currentUserEmail,
+                          imageUrl: widget.imageUrl,
                         ),
                       ),
                     );
@@ -448,7 +447,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => AddEducationPage(
-                                email: widget.currentUserEmail,imageUrl: widget.imageUrl,)));
+                                  email: widget.currentUserEmail,
+                                  imageUrl: widget.imageUrl,
+                                )));
                   },
                 ),
                 SizedBox(
@@ -462,7 +463,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => SkillSearchScreen(
-                                  userEmail: widget.currentUserEmail, imageUrl: widget.imageUrl,
+                                  userEmail: widget.currentUserEmail,
+                                  imageUrl: widget.imageUrl,
                                 )));
                   },
                 ),
@@ -477,7 +479,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => LanguageSearchScreen(
-                                  userEmail: widget.currentUserEmail,imageUrl: widget.imageUrl,
+                                  userEmail: widget.currentUserEmail,
+                                  imageUrl: widget.imageUrl,
                                 )));
                   },
                 ),
@@ -493,8 +496,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         MaterialPageRoute(
                             builder: (context) => AppreciationScreen(
                                   userEmail: widget.currentUserEmail,
-          imageUrl: widget.imageUrl,
-
+                                  imageUrl: widget.imageUrl,
                                 )));
                   },
                 ),
@@ -506,9 +508,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => UploadCVWidget(
-                                email: widget.currentUserEmail,imageUrl: widget.imageUrl,)));
+                                  email: widget.currentUserEmail,
+                                  imageUrl: widget.imageUrl,
+                                )));
                   },
-                  useremail: widget.currentUserEmail,imageUrl: widget.imageUrl,
+                  useremail: widget.currentUserEmail,
+                  imageUrl: widget.imageUrl,
                 )
               ],
             ),
@@ -1133,7 +1138,6 @@ class Appreciation extends StatelessWidget {
     );
   }
 }
-
 
 class Resume extends StatefulWidget {
   final String label;
