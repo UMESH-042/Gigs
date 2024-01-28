@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 
 import 'package:gigs/view/FilterPageList.dart';
+import 'package:gigs/view/Porfile/Application_Page.dart';
 
 class DisplayJobs extends StatefulWidget {
   const DisplayJobs({super.key});
@@ -210,6 +211,11 @@ class _DisplayJobsState extends State<DisplayJobs> {
                             job['jobLocation'],
                             job['employmentType'],
                             job['jobDescription'],
+                            job['category'],
+                            job['postedBy'],
+                            job['salary'],
+                            job['workplaceType'],
+                            job['timestamp']
                           ),
                         );
                       },
@@ -293,6 +299,11 @@ class _DisplayJobsState extends State<DisplayJobs> {
     String jobLocation,
     String employmentType,
     String jobDescription,
+    String Category,
+    String postedBy,
+    String salary,
+    String workplaceType,
+    Timestamp timeStamp
   ) {
     List<String> locationParts = jobLocation.split(',');
 
@@ -350,40 +361,6 @@ class _DisplayJobsState extends State<DisplayJobs> {
                 ],
               ),
               SizedBox(height: 12),
-              // Row(
-              //   children: [
-              //     SizedBox(width: 8),
-              //     Chip(label: Text(jobPosition)),
-              //     SizedBox(width: 8),
-              //     Chip(label: Text(employmentType)),
-              //     SizedBox(width: 8),
-              //     Container(
-              //       height: 35,
-              //       decoration: BoxDecoration(
-              //         borderRadius: BorderRadius.circular(15),
-              //         color:
-              //             Colors.orange, // Set the background color to orange
-              //       ),
-              //       child: ElevatedButton(
-              //         onPressed: () {
-              //           // Add apply button functionality
-              //           // You may want to implement a method to handle job application
-              //           // E.g., _applyToJob(jobPosition, companyName);
-              //         },
-              //         style: ElevatedButton.styleFrom(
-              //           primary: Colors
-              //               .transparent, // Set the button background to transparent
-              //           elevation: 0, // Remove the button shadow
-              //         ),
-              //         child: Text(
-              //           'Apply',
-              //           style: TextStyle(color: Colors.white),
-              //         ),
-              //       ),
-              //     ),
-              //     SizedBox(width: 8),
-              //   ],
-              // ),
               Row(
                 children: [
                   SizedBox(width: 8),
@@ -400,9 +377,17 @@ class _DisplayJobsState extends State<DisplayJobs> {
                       ),
                       child: ElevatedButton(
                         onPressed: () {
-                          // Add apply button functionality
-                          // You may want to implement a method to handle job application
-                          // E.g., _applyToJob(jobPosition, companyName);
+                           Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ApplicationPage(
+                    jobPosition: jobPosition,
+                    companyName: companyName,
+                    jobDescription: jobDescription,
+                    employmentType: employmentType, category: Category, postedBy: postedBy, salary: salary, workplaceType: workplaceType,timestamp: timeStamp,
+                  ),
+                ),
+              );
                         },
                         style: ElevatedButton.styleFrom(
                           primary: Colors.transparent,
@@ -418,7 +403,6 @@ class _DisplayJobsState extends State<DisplayJobs> {
                   SizedBox(width: 8),
                 ],
               ),
-
               SizedBox(height: 12),
               Text(jobDescription),
             ],
@@ -436,7 +420,8 @@ class _DisplayJobsState extends State<DisplayJobs> {
       ),
     );
   }
-   String toTitleCase(String text) {
+
+  String toTitleCase(String text) {
     return text.replaceAllMapped(
       RegExp(r'\b\w'),
       (match) => match.group(0)!.toUpperCase(),
