@@ -172,6 +172,39 @@ class _ApplicationPageState extends State<ApplicationPage> {
     return parts.isNotEmpty ? parts.first : input;
   }
 
+  Future<bool> checkIfUserAlreadyApplied(String userEmail, String jobId) async {
+    try {
+      // Check if the user has already applied for the given job
+      QuerySnapshot<Map<String, dynamic>> applicationsSnapshot =
+          await FirebaseFirestore.instance
+              .collection('applicants')
+              .where('applicantEmail', isEqualTo: userEmail)
+              .where('jobId', isEqualTo: jobId)
+              .limit(1)
+              .get();
+
+      return applicationsSnapshot.docs.isNotEmpty;
+    } catch (e) {
+      // Handle any errors that might occur during the check
+      print("Error checking if user already applied: $e");
+      return false; // Return false in case of an error
+    }
+  }
+
+  String generateUniqueJobId(String jobPosition, String companyName,
+      String jobLocation, Timestamp timestamp) {
+    // Take the first character of each detail
+    String jobPositionFirstChar = jobPosition.isNotEmpty ? jobPosition[0] : '';
+    String companyNameFirstChar = companyName.isNotEmpty ? companyName[0] : '';
+    String jobLocationFirstChar = jobLocation.isNotEmpty ? jobLocation[0] : '';
+
+    // Concatenate the first characters and timestamp
+    String jobId =
+        '$jobPositionFirstChar$companyNameFirstChar$jobLocationFirstChar${timestamp.seconds}';
+
+    return jobId;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isFileSelected = selectedFile != null;
@@ -430,37 +463,31 @@ class _ApplicationPageState extends State<ApplicationPage> {
                               SizedBox(
                                 height: 10,
                               ),
-
                               _buildLabelAndContent(
                                   "Industry", companyData?['industry']),
                               SizedBox(
                                 height: 10,
                               ),
-
                               _buildLabelAndContent("Employee Size",
                                   companyData?['employeeSize']),
                               SizedBox(
                                 height: 10,
                               ),
-
                               _buildLabelAndContent(
                                   "Head Office", companyData?['headOffice']),
                               SizedBox(
                                 height: 10,
                               ),
-
                               _buildLabelAndContent(
                                   "Type", companyData?['companyType']),
                               SizedBox(
                                 height: 10,
                               ),
-
                               _buildLabelAndContent(
                                   "Since", companyData?['since']),
                               SizedBox(
                                 height: 10,
                               ),
-
                               _buildLabelAndContent("Specialization",
                                   companyData?['specialization']),
                               SizedBox(
@@ -474,22 +501,6 @@ class _ApplicationPageState extends State<ApplicationPage> {
                               SizedBox(
                                 height: 20,
                               ),
-                              // Text(
-                              //     'Company Description: ${companyData?['aboutCompany']}'),
-                              // Text(
-                              //     'Head Office Location: ${companyData?['headoffice']}'),
-                              // Text(
-                              //     'Company Type: ${companyData?['companyType']}'),
-                              // Text(
-                              //     'Employee Size: ${companyData?['employeeSize']}'),
-                              // Text('Industry: ${companyData?['industry']}'),
-                              // Text('Since: ${companyData?['since']} Years'),
-                              // Text(
-                              //     'Specialization: ${companyData?['specialization']}'),
-                              // Text(
-                              //     'Website Link : ${companyData?['websiteLink']}'),
-                              // Text('Image Urls: ${companyData?['imageUrls']}'),
-                              // Add other company details as needed
                             ],
                           );
                         }
@@ -499,76 +510,167 @@ class _ApplicationPageState extends State<ApplicationPage> {
                     height: 20,
                   ),
                   ElevatedButton(
-  onPressed: () async {
-    // Show the "Please wait" dialog
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Please Wait'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text(
-                'Application is being submitted...',
-                style: TextStyle(fontSize: 18),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        );
-      },
-    );
+                    onPressed: () async {
+                      String jobId = generateUniqueJobId(
+                        widget.jobPosition,
+                        widget.companyName,
+                        widget.jobLocation,
+                        widget.timestamp,
+                      );
+                      String userEmail = await getUserEmail();
+                      bool hasAlreadyApplied =
+                          await checkIfUserAlreadyApplied(userEmail, jobId);
+                      if (hasAlreadyApplied) {
+                        // Show a dialog indicating that the user has already applied
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Already Applied'),
+                              content: Text(
+                                  'You have already applied for this job.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text('OK'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        // Show the "Please wait" dialog
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Please Wait'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  CircularProgressIndicator(),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'Application is being submitted...',
+                                    style: TextStyle(fontSize: 18),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
 
-    try {
-      // Get the current user's email or user id (replace 'getUserEmail()' with your actual method)
-      String userEmail = await getUserEmail();
+                        try {
+                          // Get the current user's email or user id (replace 'getUserEmail()' with your actual method)
+                          String userEmail = await getUserEmail();
 
-      // Prepare the application details
-      Map<String, dynamic> applicationData = {
-        // Existing application data...
-      };
+                          // Prepare the application details
+                          Map<String, dynamic> applicationData = {
+                            'jobPosition': widget.jobPosition,
+                            'companyName': widget.companyName,
+                            'jobDescription': widget.jobDescription,
+                            'employmentType': widget.employmentType,
+                            'category': widget.category,
+                            'postedBy': widget.postedBy,
+                            'salary': widget.salary,
+                            'workplaceType': widget.workplaceType,
+                            'timestamp': Timestamp.now(),
+                            'jobLocation': widget.jobLocation,
+                            'applicantEmail': userEmail,
+                            'information': _informationController.text,
+                            'jobId': jobId,
+                          };
 
-      // Save the file to Firebase Storage and get the download URL
-      await saveFileToFirestore(userEmail, applicationData);
+                          // Save the file to Firebase Storage and get the download URL
+                          await saveFileToFirestore(userEmail, applicationData);
 
-      // Close the "Please wait" dialog
-      Navigator.pop(context);
+                          // Close the "Please wait" dialog
+                          Navigator.pop(context);
 
-      // Show the success dialog
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Container(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Successful',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Congratulations, your application has been sent',
-                    style: TextStyle(fontSize: 18),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Close the success dialog
-                      Navigator.pop(context); // Close the application page
+                          // Show the success dialog
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: Container(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        'Successful',
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(height: 16),
+                                      Text(
+                                        'Congratulations, your application has been sent',
+                                        style: TextStyle(fontSize: 18),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      SizedBox(height: 24),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pop(
+                                              context); // Close the success dialog
+                                          Navigator.pop(
+                                              context); // Close the application page
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          primary: Color(0xFF130160),
+                                          onPrimary: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                          ),
+                                          minimumSize: Size(200, 49),
+                                        ),
+                                        child: Text(
+                                          'Back to Home',
+                                          style: TextStyle(fontSize: 17.5),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        } catch (e) {
+                          // Handle errors, e.g., show an error dialog
+                          print('Error submitting application: $e');
+                          Navigator.pop(
+                              context); // Close the "Please wait" dialog
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Error'),
+                                content: Text(
+                                    'Failed to submit the application. Please try again.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       primary: Color(0xFF130160),
@@ -576,56 +678,13 @@ class _ApplicationPageState extends State<ApplicationPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
-                      minimumSize: Size(200, 49),
+                      minimumSize: Size(275, 49),
                     ),
                     child: Text(
-                      'Back to Home',
+                      'APPLY NOW',
                       style: TextStyle(fontSize: 17.5),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      );
-    } catch (e) {
-      // Handle errors, e.g., show an error dialog
-      print('Error submitting application: $e');
-      Navigator.pop(context); // Close the "Please wait" dialog
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('Failed to submit the application. Please try again.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  },
-  style: ElevatedButton.styleFrom(
-    primary: Color(0xFF130160),
-    onPrimary: Colors.white,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8.0),
-    ),
-    minimumSize: Size(275, 49),
-  ),
-  child: Text(
-    'APPLY NOW',
-    style: TextStyle(fontSize: 17.5),
-  ),
-).centered(),
-
+                  ).centered(),
                 ],
               ),
             ),
@@ -789,6 +848,4 @@ class _ApplicationPageState extends State<ApplicationPage> {
       },
     );
   }
-
-
 }
