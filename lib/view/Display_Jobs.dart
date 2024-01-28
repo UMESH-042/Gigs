@@ -102,6 +102,70 @@ class _DisplayJobsState extends State<DisplayJobs> {
     super.dispose();
   }
 
+  String getCurrentUserId() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      return user.uid;
+    } else {
+      // Handle the case when the user is not signed in
+      return ''; // or throw an exception, return null, etc.
+    }
+  }
+
+  void saveJob(Map<String, dynamic> jobDetails) async {
+    // Add the current user's ID to the job details
+    String currentUserId = getCurrentUserId();
+    jobDetails['userId'] = currentUserId;
+
+    // Generate a unique job ID for the saved job
+    String jobId = getUniqueJobId(jobDetails); // Implement this function
+
+    // Check if the job is already saved
+    if (await isJobSaved(currentUserId, jobId)) {
+      // Job is already saved, show a message to the user
+      showSnackbar('Job has already been saved!');
+    } else {
+      // Save the job details in the "savedJobs" collection
+      await FirebaseFirestore.instance
+          .collection('savedJobs')
+          .doc(jobId)
+          .set(jobDetails);
+
+      // Notify the user that the job has been saved
+      showSnackbar('Job saved successfully!');
+    }
+  }
+
+  void showSnackbar(String message) {
+    // Display a Snackbar with the specified message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
+  String getUniqueJobId(Map<String, dynamic> jobDetails) {
+    // Create a unique job ID based on relevant fields
+    String jobPosition = jobDetails['jobPosition'];
+    String companyName = jobDetails['company'];
+    String uniqueKey = '$jobPosition-$companyName';
+
+    String jobId = uniqueKey.hashCode.toUnsigned(30).toString();
+
+    return jobId;
+  }
+
+  Future<bool> isJobSaved(String userId, String jobId) async {
+    // Check if the job with the specified ID is already saved by the user
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection('savedJobs')
+        .doc(jobId)
+        .get();
+
+    return snapshot.exists && snapshot['userId'] == userId;
+  }
+
   @override
   Widget build(BuildContext context) {
     print(remoteJobCount);
@@ -206,17 +270,18 @@ class _DisplayJobsState extends State<DisplayJobs> {
                             }
                           },
                           child: _buildJobDisplayCard(
-                            job['jobPosition'],
-                            job['company'],
-                            job['jobLocation'],
-                            job['employmentType'],
-                            job['jobDescription'],
-                            job['category'],
-                            job['postedBy'],
-                            job['salary'],
-                            job['workplaceType'],
-                            job['timestamp'],
-                          ),
+                              job['jobPosition'],
+                              job['company'],
+                              job['jobLocation'],
+                              job['employmentType'],
+                              job['jobDescription'],
+                              job['category'],
+                              job['postedBy'],
+                              job['salary'],
+                              job['workplaceType'],
+                              job['timestamp'], () {
+                            saveJob(job);
+                          }),
                         );
                       },
                     );
@@ -304,6 +369,7 @@ class _DisplayJobsState extends State<DisplayJobs> {
     String salary,
     String workplaceType,
     Timestamp timeStamp,
+    Function() onSavePressed,
   ) {
     List<String> locationParts = jobLocation.split(',');
 
@@ -377,17 +443,23 @@ class _DisplayJobsState extends State<DisplayJobs> {
                       ),
                       child: ElevatedButton(
                         onPressed: () {
-                           Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ApplicationPage(
-                    jobPosition: jobPosition,
-                    companyName: companyName,
-                    jobDescription: jobDescription,
-                    employmentType: employmentType, category: Category, postedBy: postedBy, salary: salary, workplaceType: workplaceType,timestamp: timeStamp,jobLocation: jobLocation,
-                  ),
-                ),
-              );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ApplicationPage(
+                                jobPosition: jobPosition,
+                                companyName: companyName,
+                                jobDescription: jobDescription,
+                                employmentType: employmentType,
+                                category: Category,
+                                postedBy: postedBy,
+                                salary: salary,
+                                workplaceType: workplaceType,
+                                timestamp: timeStamp,
+                                jobLocation: jobLocation,
+                              ),
+                            ),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           primary: Colors.transparent,
@@ -410,10 +482,12 @@ class _DisplayJobsState extends State<DisplayJobs> {
           Positioned(
             top: 8,
             right: 8,
-            child: Icon(
-              Icons.bookmark_border_outlined,
-              // color: Colors.grey,
-              size: 30,
+            child: GestureDetector(
+              onTap: onSavePressed,
+              child: Icon(
+                Icons.bookmark_border_outlined,
+                size: 30,
+              ),
             ),
           ),
         ],
@@ -427,6 +501,4 @@ class _DisplayJobsState extends State<DisplayJobs> {
       (match) => match.group(0)!.toUpperCase(),
     );
   }
-
-  
 }
