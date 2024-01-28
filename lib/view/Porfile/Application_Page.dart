@@ -1,10 +1,8 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-import 'package:gigs/view/Add_Jobs.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class ApplicationPage extends StatefulWidget {
   final String jobPosition;
@@ -16,6 +14,7 @@ class ApplicationPage extends StatefulWidget {
   final String salary;
   final String workplaceType;
   final Timestamp timestamp;
+  final String jobLocation;
 
   ApplicationPage({
     Key? key,
@@ -28,6 +27,7 @@ class ApplicationPage extends StatefulWidget {
     required this.salary,
     required this.workplaceType,
     required this.timestamp,
+    required this.jobLocation,
   }) : super(key: key);
 
   @override
@@ -36,6 +36,13 @@ class ApplicationPage extends StatefulWidget {
 
 class _ApplicationPageState extends State<ApplicationPage> {
   bool showJobDetails = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize timeago
+    timeago.setLocaleMessages('en', timeago.EnMessages());
+  }
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getCompanyDetails() async {
     try {
@@ -60,42 +67,95 @@ class _ApplicationPageState extends State<ApplicationPage> {
     }
   }
 
+  String getTimeAgo(Timestamp timestamp) {
+    DateTime dateTime = timestamp.toDate();
+    Duration timeAgo = DateTime.now().difference(dateTime);
+    return timeago.format(DateTime.now().subtract(timeAgo), locale: 'en');
+  }
+
+  String getFirstWordBeforeComma(String input) {
+    // Extract and return the first word before the comma in the input string
+    var parts = input.split(',');
+    return parts.isNotEmpty ? parts.first : input;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Apply for ${widget.jobPosition} at ${widget.companyName}'),
-      ),
       body: Column(
         children: [
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildCircularButtonJobDetails(
-                  onPressed: () {
-                    setState(() {
-                      showJobDetails = true;
-                    });
-                  },
-                ),
-                _buildCircularButtonCompanyDetails(
-                  onPressed: () {
-                    setState(() {
-                      showJobDetails = false;
-                    });
-                  },
-                ),
-              ],
-            ),
+          SizedBox(
+            height: 35,
           ),
           Expanded(
             child: Padding(
               padding: EdgeInsets.all(16.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(
+                      'https://poweredwith.nyc3.cdn.digitaloceanspaces.com/images/domains/${widget.companyName.toLowerCase()}.com.jpg',
+                    ),
+                    radius: 50,
+                  ),
+
+                  Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          widget.companyName,
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          '  •  ',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          getFirstWordBeforeComma(widget.jobLocation),
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          '  •  ',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          '${getTimeAgo(widget.timestamp)}',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildCircularButtonJobDetails(
+                          onPressed: () {
+                            setState(() {
+                              showJobDetails = true;
+                            });
+                          },
+                        ),
+                        _buildCircularButtonCompanyDetails(
+                          onPressed: () {
+                            setState(() {
+                              showJobDetails = false;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 16),
                   Text(
                     showJobDetails ? 'Job Details' : 'Company Details',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -110,7 +170,6 @@ class _ApplicationPageState extends State<ApplicationPage> {
                     Text('Salary: \$${widget.salary}'),
                     Text('Workplace Type: ${widget.workplaceType}'),
                     Text('Job Posted By: ${widget.postedBy}'),
-          
                   ] else
                     FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                       future: getCompanyDetails(),

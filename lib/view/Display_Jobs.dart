@@ -215,7 +215,7 @@ class _DisplayJobsState extends State<DisplayJobs> {
                             job['postedBy'],
                             job['salary'],
                             job['workplaceType'],
-                            job['timestamp']
+                            job['timestamp'],
                           ),
                         );
                       },
@@ -303,7 +303,7 @@ class _DisplayJobsState extends State<DisplayJobs> {
     String postedBy,
     String salary,
     String workplaceType,
-    Timestamp timeStamp
+    Timestamp timeStamp,
   ) {
     List<String> locationParts = jobLocation.split(',');
 
@@ -384,7 +384,7 @@ class _DisplayJobsState extends State<DisplayJobs> {
                     jobPosition: jobPosition,
                     companyName: companyName,
                     jobDescription: jobDescription,
-                    employmentType: employmentType, category: Category, postedBy: postedBy, salary: salary, workplaceType: workplaceType,timestamp: timeStamp,
+                    employmentType: employmentType, category: Category, postedBy: postedBy, salary: salary, workplaceType: workplaceType,timestamp: timeStamp,jobLocation: jobLocation,
                   ),
                 ),
               );
@@ -427,4 +427,6 @@ class _DisplayJobsState extends State<DisplayJobs> {
       (match) => match.group(0)!.toUpperCase(),
     );
   }
+
+  
 }
