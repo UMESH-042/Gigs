@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -88,14 +87,15 @@ class _ApplicationPageState extends State<ApplicationPage> {
         selectedFileName!;
 
     // Upload the file to Firebase Storage
-    UploadTask task = storage.ref('user_cvs/$fileName').putFile(selectedFile!);
+    UploadTask task =
+        storage.ref('applicants_cvs/$fileName').putFile(selectedFile!);
 
     // Wait for the upload to complete
     await task;
 
     // Get the URL of the uploaded file
     String downloadURL =
-        await storage.ref('user_cvs/$fileName').getDownloadURL();
+        await storage.ref('applicants_cvs/$fileName').getDownloadURL();
 
     // Store the download URL in a collection named 'user_cvs'
     // and associate it with the user's email
@@ -387,7 +387,9 @@ class _ApplicationPageState extends State<ApplicationPage> {
                       height: 20,
                     ),
                     label("Information"),
-                   const SizedBox(height: 12,),
+                    const SizedBox(
+                      height: 12,
+                    ),
                     Information(),
                   ] else
                     FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
@@ -401,31 +403,84 @@ class _ApplicationPageState extends State<ApplicationPage> {
                         } else {
                           // Display company details
                           var companyData = snapshot.data!.data();
+                          List<String> imageUrls =
+                              List.from(companyData?['imageUrls'] ?? []);
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                  'Company Description: ${companyData?['aboutCompany']}'),
-                              Text(
-                                  'Head Office Location: ${companyData?['headoffice']}'),
-                              Text(
-                                  'Company Type: ${companyData?['companyType']}'),
-                              Text(
-                                  'Employee Size: ${companyData?['employeeSize']}'),
-                              Text('Industry: ${companyData?['industry']}'),
-                              Text('Since: ${companyData?['since']} Years'),
-                              Text(
-                                  'Specialization: ${companyData?['specialization']}'),
-                              Text(
-                                  'Website Link : ${companyData?['websiteLink']}'),
-                              Text('Image Urls: ${companyData?['imageUrls']}'),
+                              _buildLabelAndContent("About Company",
+                                  companyData?['aboutCompany']),
+                                  SizedBox(height: 10,),
+                              _buildLabelAndContent(
+                                  "Website", companyData?['websiteLink']),
+                                  SizedBox(height: 10,),
+
+                              _buildLabelAndContent(
+                                  "Industry", companyData?['industry']),
+                                  SizedBox(height: 10,),
+
+                              _buildLabelAndContent("Employee Size",
+                                  companyData?['employeeSize']),
+                                  SizedBox(height: 10,),
+
+                              _buildLabelAndContent(
+                                  "Head Office", companyData?['headOffice']),
+                                  SizedBox(height: 10,),
+
+                              _buildLabelAndContent(
+                                  "Type", companyData?['companyType']),
+                                  SizedBox(height: 10,),
+
+                              _buildLabelAndContent(
+                                  "Since", companyData?['since']),
+                                  SizedBox(height: 10,),
+
+                              _buildLabelAndContent("Specialization",
+                                  companyData?['specialization']),
+                                  SizedBox(height: 10,),
+                            label("Company gallery"),
+                            SizedBox(height: 20,),
+                              _buildImageGallery(imageUrls),
+                              SizedBox(height: 20,),
+                              // Text(
+                              //     'Company Description: ${companyData?['aboutCompany']}'),
+                              // Text(
+                              //     'Head Office Location: ${companyData?['headoffice']}'),
+                              // Text(
+                              //     'Company Type: ${companyData?['companyType']}'),
+                              // Text(
+                              //     'Employee Size: ${companyData?['employeeSize']}'),
+                              // Text('Industry: ${companyData?['industry']}'),
+                              // Text('Since: ${companyData?['since']} Years'),
+                              // Text(
+                              //     'Specialization: ${companyData?['specialization']}'),
+                              // Text(
+                              //     'Website Link : ${companyData?['websiteLink']}'),
+                              // Text('Image Urls: ${companyData?['imageUrls']}'),
                               // Add other company details as needed
                             ],
                           );
                         }
                       },
                     ),
-                  // Add your application form widgets here
+                  SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      primary: Color(0xFF130160),
+                      onPrimary: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      minimumSize: Size(275, 49),
+                    ),
+                    child: Text(
+                      'APPLY NOW',
+                      style: TextStyle(fontSize: 17.5),
+                    ),
+                  ).centered(),
                 ],
               ),
             ),
@@ -527,5 +582,49 @@ class _ApplicationPageState extends State<ApplicationPage> {
         ),
       ),
     ).py12();
+  }
+
+  Widget _buildImageGallery(List<String> imageUrls) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 8.0,
+        mainAxisSpacing: 8.0,
+      ),
+      itemCount: imageUrls.length,
+      itemBuilder: (context, index) {
+        return GestureDetector(
+          onTap: () {
+            // Implement logic to view the tapped image in a larger size
+            // You can use a dialog or navigate to a new screen to show the full image
+            _viewImage(imageUrls[index]);
+          },
+          child: Image.network(
+            imageUrls[index],
+            fit: BoxFit.cover,
+          ),
+        );
+      },
+    );
+  }
+
+  // Function to view the image in a larger size
+  void _viewImage(String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: Container(
+            padding: EdgeInsets.all(8.0),
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.contain,
+            ),
+          ),
+        );
+      },
+    );
   }
 }
