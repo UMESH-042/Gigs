@@ -1,10 +1,7 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import 'package:gigs/APIs/Institution_name.dart';
 import 'package:gigs/view/Porfile/Profile_page.dart';
-
 import '../APIs/Field_of_Study.dart';
 import '../APIs/level_of_education_API.dart';
 import '../firebase/firebaseService.dart';
