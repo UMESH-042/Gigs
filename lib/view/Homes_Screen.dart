@@ -31,8 +31,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String _userImageUrl = ""; // Initialize the user's profile image URL
+  String _userName = "";
   int _currentIndex = 0;
   List<Widget> _screens = [];
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<void> storeNotificationToken() async {
     String? token = await FirebaseMessaging.instance.getToken();
@@ -61,10 +63,12 @@ class _HomePageState extends State<HomePage> {
       DisplayJobs(),
       ViewPostsPage(),
       AddJobs(),
-      ChatScreen(currentUserEmail: widget.currentUserEmail,),
+      ChatScreen(
+        currentUserEmail: widget.currentUserEmail,
+      ),
       SavedJobsPage(),
     ];
-    _loadUserData();  
+    _loadUserData();
     _requestNotificationPermissions();
   }
 
@@ -97,9 +101,11 @@ class _HomePageState extends State<HomePage> {
           // Get name and imageUrl from the document
           String userImageUrl = userDoc['imageUrl'] ??
               ""; // Default to empty if no image URL is set
+          String userName = userDoc['name'] ?? "";
 
           setState(() {
             _userImageUrl = userImageUrl;
+            _userName = userName;
           });
         }
       }
@@ -110,89 +116,118 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print(_userName);
+    print(_userImageUrl);
     return Scaffold(
-      // appBar: _currentIndex == 0
-      //     ? AppBar(
-      //         backgroundColor: Colors.transparent,
-      //         elevation: 0,
-      //         actions: [
-      //           IconButton(
-      //             icon: Icon(Icons.exit_to_app,
-      //                 color: Colors.black), // Set the color to black
-      //             onPressed: () {
-      //               _logout(); // Call the logout function
-      //             },
-      //           ),
-      //           SizedBox(width: 275,),
-      //           Row(
-      //             children: [
-      //               Container(
-      //                 margin: EdgeInsets.only(right: 17),
-      //                 child: IconButton(
-      //                   padding: EdgeInsets.all(0),
-      //                   icon: CircleAvatar(
-      //                     // backgroundColor: Color.fromARGB(255, 76, 175, 142),
-      //                     backgroundImage: NetworkImage(_userImageUrl),
-      //                   ),
-      //                   onPressed: () {
-      //                     Navigator.push(
-      //                         context,
-      //                         MaterialPageRoute(
-      //                             builder: (context) => ProfilePage(
-      //                                   currentUserEmail:
-      //                                       widget.currentUserEmail,
-      //                                   imageUrl: _userImageUrl,
-      //                                 )));
-      //                   },
-      //                 ),
-      //               ),
-      //             ],
-      //           ),
-      //         ],
-      //       )
-      //     : null,
+      key: _scaffoldKey,
       appBar: _currentIndex == 0
-    ? AppBar(
-        // backgroundColor: Colors.transparent,
-        backgroundColor: const Color.fromARGB(255, 243, 240, 240),
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.exit_to_app, color: Colors.black),
-            onPressed: () {
-              _logout();
-            },
-          ),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                  margin: EdgeInsets.only(right: 17),
-                  child: IconButton(
-                    padding: EdgeInsets.all(0),
-                    icon: CircleAvatar(
-                      backgroundImage: NetworkImage(_userImageUrl),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ProfilePage(
-                            currentUserEmail: widget.currentUserEmail,
-                            imageUrl: _userImageUrl,
+          ? AppBar(
+              backgroundColor: const Color.fromARGB(255, 243, 240, 240),
+              elevation: 0,
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.menu_outlined, color: Colors.black),
+                  onPressed: () {
+                    // _logout();
+                    _scaffoldKey.currentState?.openDrawer();
+                  },
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(right: 17),
+                        child: IconButton(
+                          padding: EdgeInsets.all(0),
+                          icon: CircleAvatar(
+                            backgroundImage: NetworkImage(_userImageUrl),
                           ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProfilePage(
+                                  currentUserEmail: widget.currentUserEmail,
+                                  imageUrl: _userImageUrl,
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
                 ),
               ],
+            )
+          : null,
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Color(0xFF130160),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(_userImageUrl),
+                    radius: 40,
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    _userName, // Replace with the actual user name
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                ],
+              ),
             ),
-          ),
-        ],
-      )
-    : null,
+            ListTile(
+              leading: Icon(Icons.apps),
+              title: Text(
+                'My Applications',
+                style: TextStyle(fontSize: 16),
+              ),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                // Add your navigation logic here
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.people),
+              title: Text(
+                'Applicants List',
+                style: TextStyle(fontSize: 16),
+              ),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                // Add your navigation logic here
+              },
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.exit_to_app),
+              title: Text(
+                'Logout',
+                style: TextStyle(fontSize: 16),
+              ),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                _logout(); // Add your logout logic here
+              },
+            ),
+          ],
+        ),
+      ),
       body: Column(
         children: [
           Expanded(
@@ -205,7 +240,6 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: CurvedNavigationBar(
         color: Colors.white,
         buttonBackgroundColor: Colors.white,
-        // backgroundColor: Color(0xFF130160),
         animationCurve: Curves.fastOutSlowIn,
         index: _currentIndex,
         items: [
@@ -237,10 +271,10 @@ class _HomePageState extends State<HomePage> {
         ],
         onTap: (index) {
           if (index == 2) {
-            // Check if "Add" button is tapped
             showModalBottomSheet(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25.0)),
+                borderRadius: BorderRadius.circular(25.0),
+              ),
               context: context,
               isScrollControlled: true,
               builder: (context) => AddBottomSheet(
