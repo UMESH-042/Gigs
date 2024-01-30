@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gigs/view/AdvancedFilter/Filter1.dart';
+import 'package:gigs/view/Porfile/Application_Page.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class FilterPage extends StatefulWidget {
@@ -392,7 +393,10 @@ class _FilterPageState extends State<FilterPage> {
                           job['jobDescription'],
                           job['category'],
                           job['timestamp'],
-                          job['salary'], () {
+                          job['salary'],
+                          job['postedBy'],
+                          job['workplaceType'],
+                          job['timestamp'], () {
                         saveJob(job);
                       });
                     },
@@ -450,6 +454,9 @@ class _FilterPageState extends State<FilterPage> {
     String category,
     Timestamp timestamp,
     String salary,
+    String postedBy,
+    String workplaceType,
+    Timestamp timeStamp,
     Function() onSavePressed,
   ) {
     bool isPressed = false;
@@ -472,92 +479,112 @@ class _FilterPageState extends State<FilterPage> {
         ? '\$${(salaryValue / 1000).toString()} K/Mo'
         : '${salaryValue.toInt()}';
 
-    return Container(
-      margin: EdgeInsets.only(bottom: 16),
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(0, 2),
+    return GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ApplicationPage(
+                jobPosition: jobPosition,
+                companyName: companyName,
+                jobDescription: jobDescription,
+                employmentType: employmentType,
+                category: category,
+                postedBy: postedBy,
+                salary: salary,
+                workplaceType: workplaceType,
+                timestamp: timeStamp,
+                jobLocation: jobLocation,
+              ),
+            ),
+          );
+        },
+        child: Container(
+          margin: EdgeInsets.only(bottom: 16),
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Stack(
             children: [
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(
-                        'https://poweredwith.nyc3.cdn.digitaloceanspaces.com/images/domains/$domain.com.jpg'), // Use company logo URL
-                    radius: 30,
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(
+                            'https://poweredwith.nyc3.cdn.digitaloceanspaces.com/images/domains/$domain.com.jpg'), // Use company logo URL
+                        radius: 30,
+                      ),
+                      SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            toTitleCase(jobPosition),
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          Text(companyName),
+                          Text(shortenedLocation),
+                        ],
+                      ),
+                    ],
                   ),
-                  SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8.0,
+                    children: [
+                      SizedBox(width: 4.0),
+                      Chip(label: Text(toTitleCase(jobPosition))),
+                      Chip(label: Text(employmentType)),
+                      Chip(label: Text(category)),
+                      SizedBox(width: 4.0)
+                    ],
+                  ),
+                  SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        toTitleCase(jobPosition),
+                        timeAgo, // Display time ago
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                            color: const Color.fromARGB(255, 118, 117, 117),
+                            fontSize: 13),
                       ),
-                      Text(companyName),
-                      Text(shortenedLocation),
+                      Text(
+                        formattedSalary, // Display formatted salary
+                        style: TextStyle(
+                            color: const Color.fromARGB(255, 16, 16, 16)),
+                      ),
                     ],
                   ),
                 ],
               ),
-              SizedBox(height: 16),
-              Wrap(
-                spacing: 8.0,
-                children: [
-                  SizedBox(width: 4.0),
-                  Chip(label: Text(toTitleCase(jobPosition))),
-                  Chip(label: Text(employmentType)),
-                  Chip(label: Text(category)),
-                  SizedBox(width: 4.0)
-                ],
-              ),
-              SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    timeAgo, // Display time ago
-                    style: TextStyle(
-                        color: const Color.fromARGB(255, 118, 117, 117),
-                        fontSize: 13),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: GestureDetector(
+                  onTap: onSavePressed,
+                  child: Icon(
+                    Icons.bookmark_border_outlined,
+                    size: 30,
                   ),
-                  Text(
-                    formattedSalary, // Display formatted salary
-                    style:
-                        TextStyle(color: const Color.fromARGB(255, 16, 16, 16)),
-                  ),
-                ],
+                ),
               ),
             ],
           ),
-          Positioned(
-            top: 8,
-            right: 8,
-            child: GestureDetector(
-              onTap: onSavePressed,
-              child: Icon(
-                Icons.bookmark_border_outlined,
-                size: 30,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 
   String getTimeAgo(DateTime dateTime) {

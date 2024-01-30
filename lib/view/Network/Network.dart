@@ -14,6 +14,8 @@ class ViewPostsPage extends StatefulWidget {
 }
 
 class _ViewPostsPageState extends State<ViewPostsPage> {
+  bool showPosts = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,30 +31,107 @@ class _ViewPostsPageState extends State<ViewPostsPage> {
           },
         ),
       ),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection('posts')
-            .orderBy('timestamp', descending: true)
-            .snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          return ListView.builder(
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              DocumentSnapshot post = snapshot.data!.docs[index];
-              return PostCard(post: post);
-            },
-          );
-        },
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildPostsButton(),
+                _buildConnectionsButton(),
+              ],
+            ),
+          ),
+          SizedBox(
+              height:
+                  10), // Adjust the spacing between buttons and posts/connections
+          Expanded(
+            child: showPosts ? _buildPosts() : _buildConnections(),
+          ),
+        ],
       ),
     );
   }
+
+  
+  Widget _buildPostsButton() {
+    return Container(
+      width: 165,
+      height: 48,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(11),
+        color: Color(0xFF130160), // You can change the color as needed
+      ),
+      child: TextButton(
+          onPressed: () {
+            setState(() {
+              showPosts = true;
+            });
+          },
+          child: Center(
+              child: Text(
+            'Posts',
+            style: TextStyle(color: Colors.white),
+          ))),
+    );
+  }
+
+
+  Widget _buildConnectionsButton() {
+    return Container(
+      width: 165,
+      height: 48,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(11),
+        color: Color(0xFFD6CDFE), // You can change the color as needed
+      ),
+      child: TextButton(
+          onPressed: () {
+            setState(() {
+              showPosts = false;
+            });
+          },
+          child: Center(
+              child: Text(
+            'Connections',
+            style: TextStyle(color: Colors.black),
+          ))),
+    );
+  }
+
+  Widget _buildPosts() {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('posts')
+          .orderBy('timestamp', descending: true)
+          .snapshots(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        return ListView.builder(
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            DocumentSnapshot post = snapshot.data!.docs[index];
+            return PostCard(post: post);
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildConnections() {
+    // Replace this with the widget for displaying connections
+    return Center(
+      child: Text('Connections Page'),
+    );
+  }
 }
+
+// Rest of the code for PostCard, CommentBottomSheet, FullScreenImage, and CommentsPage
 
 class PostCard extends StatefulWidget {
   final DocumentSnapshot post;
@@ -104,11 +183,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     _listenToLikes();
   }
 
-
-
-
-
-    Future<void> _listenToLikes() async {
+  Future<void> _listenToLikes() async {
     FirebaseFirestore.instance
         .collection('likes')
         .where('postId', isEqualTo: widget.post.id)
@@ -329,7 +404,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
       ),
     );
   }
-  
+
   // Future<void> _likePost() async {
   //   final FirebaseAuth auth = FirebaseAuth.instance;
   //   final User user = auth.currentUser!;
@@ -372,7 +447,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
   //     }
   //   });
   // }
-   Future<void> _likePost() async {
+  Future<void> _likePost() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User user = auth.currentUser!;
     final uid = user.uid;
