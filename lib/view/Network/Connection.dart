@@ -37,7 +37,7 @@ class ConnectionsPage extends StatelessWidget {
   }
 }
 
- class ConnectionCard extends StatefulWidget {
+class ConnectionCard extends StatefulWidget {
   final DocumentSnapshot user;
 
   const ConnectionCard({Key? key, required this.user}) : super(key: key);
@@ -114,7 +114,7 @@ class _ConnectionCardState extends State<ConnectionCard> {
               textAlign: TextAlign.center,
             ),
             AnimatedSwitcher(
-              duration: Duration(milliseconds: 50),
+              duration: Duration(milliseconds: 0),
               child: buildFollowButton(widget.user.id),
               transitionBuilder: (child, animation) {
                 return FadeTransition(
@@ -217,6 +217,12 @@ class _ConnectionCardState extends State<ConnectionCard> {
           .collection('followers')
           .doc(currentUserId)
           .set({});
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("You are following ${widget.user['name']}"),
+        ),
+      );
     }
 
     // Update the state to reflect the changes
@@ -284,7 +290,12 @@ class _ConnectionCardState extends State<ConnectionCard> {
           .doc(currentUserId)
           .delete();
     }
-
+    // Show Snackbar for unfollowing
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("You are unfollowing ${widget.user['name']}"),
+      ),
+    );
     // Update the state to reflect the changes
     setState(() {
       isFollowing = false;
