@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gigs/Animation/Like_animation.dart';
+import 'package:gigs/view/Network/Connection.dart';
 import 'package:gigs/view/Network/comments.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -21,15 +22,10 @@ class _ViewPostsPageState extends State<ViewPostsPage> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 241, 241, 241),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.black),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context); // Navigate back
-          },
-        ),
       ),
       body: Column(
         children: [
@@ -38,8 +34,20 @@ class _ViewPostsPageState extends State<ViewPostsPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildPostsButton(),
-                _buildConnectionsButton(),
+                _buildPostsButton(
+                  onPressed: () {
+                    setState(() {
+                      showPosts = true;
+                    });
+                  },
+                ),
+                _buildConnectionsButton(
+                  onPressed: () {
+                    setState(() {
+                      showPosts = false;
+                    });
+                  },
+                ),
               ],
             ),
           ),
@@ -54,8 +62,7 @@ class _ViewPostsPageState extends State<ViewPostsPage> {
     );
   }
 
-  
-  Widget _buildPostsButton() {
+  Widget _buildPostsButton({required VoidCallback onPressed}) {
     return Container(
       width: 165,
       height: 48,
@@ -64,11 +71,7 @@ class _ViewPostsPageState extends State<ViewPostsPage> {
         color: Color(0xFF130160), // You can change the color as needed
       ),
       child: TextButton(
-          onPressed: () {
-            setState(() {
-              showPosts = true;
-            });
-          },
+          onPressed: onPressed,
           child: Center(
               child: Text(
             'Posts',
@@ -77,8 +80,7 @@ class _ViewPostsPageState extends State<ViewPostsPage> {
     );
   }
 
-
-  Widget _buildConnectionsButton() {
+  Widget _buildConnectionsButton({required VoidCallback onPressed}) {
     return Container(
       width: 165,
       height: 48,
@@ -87,11 +89,7 @@ class _ViewPostsPageState extends State<ViewPostsPage> {
         color: Color(0xFFD6CDFE), // You can change the color as needed
       ),
       child: TextButton(
-          onPressed: () {
-            setState(() {
-              showPosts = false;
-            });
-          },
+          onPressed: onPressed,
           child: Center(
               child: Text(
             'Connections',
@@ -125,9 +123,7 @@ class _ViewPostsPageState extends State<ViewPostsPage> {
 
   Widget _buildConnections() {
     // Replace this with the widget for displaying connections
-    return Center(
-      child: Text('Connections Page'),
-    );
+    return ConnectionsPage();
   }
 }
 
@@ -555,3 +551,21 @@ class _CommentsPageState extends State<CommentsPage> {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

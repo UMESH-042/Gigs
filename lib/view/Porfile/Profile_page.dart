@@ -293,7 +293,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         var userData = snapshot.data!.docs.first.data();
                         String displayName = userData['name'] ?? '';
                         print(displayName);
-
+                        int followers = userData['followers'] ?? 0;
+                        int following = userData['following'] ?? 0;
+                        print(followers);
+                        print(following);
                         return Text(
                           displayName,
                           style: TextStyle(
@@ -351,28 +354,107 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ),
+            // Positioned(
+            //   bottom: screenHeight * 0.031,
+            //   left: screenWidth * 0.08,
+            //   child: Column(
+            //     crossAxisAlignment: CrossAxisAlignment.start,
+            //     children: [
+            //       Text(
+            //         "23K Followers",
+            //         style: TextStyle(fontSize: 14, color: Colors.white),
+            //       ),
+            //     ],
+            //   ),
+            // ),
             Positioned(
               bottom: screenHeight * 0.031,
               left: screenWidth * 0.08,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "23K Followers",
-                    style: TextStyle(fontSize: 14, color: Colors.white),
+                  StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                    stream: FirebaseFirestore.instance
+                        .collection('users')
+                        .where('email', isEqualTo: widget.currentUserEmail)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return Text(
+                          "User's Name", // Default name
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        );
+                      }
+
+                      var userData = snapshot.data!.docs.first.data();
+                      String displayName = userData['name'] ?? '';
+                      print(displayName);
+                      int followers = userData['followers'] ?? 0;
+                      int following = userData['following'] ?? 0;
+                      print(followers);
+                      print(following);
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$followers Followers',
+                            style: TextStyle(fontSize: 14, color: Colors.white),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),
             ),
+
             Positioned(
               bottom: screenHeight * 0.031,
               right: screenWidth * 0.4,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    "120k Following",
-                    style: TextStyle(fontSize: 14, color: Colors.white),
+                  StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                    stream: FirebaseFirestore.instance
+                        .collection('users')
+                        .where('email', isEqualTo: widget.currentUserEmail)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return Text(
+                          "User's Name", // Default name
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        );
+                      }
+
+                      var userData = snapshot.data!.docs.first.data();
+                      String displayName = userData['name'] ?? '';
+                      print(displayName);
+                      int followers = userData['followers'] ?? 0;
+                      int following = userData['following'] ?? 0;
+                      print(followers);
+                      print(following);
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$following Following',
+                            style: TextStyle(fontSize: 14, color: Colors.white),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),
