@@ -16,6 +16,12 @@ class ConnectionsPage extends StatelessWidget {
             );
           }
 
+          // Filter out the current user's card from the list
+          List<DocumentSnapshot> users = snapshot.data!.docs
+              .where(
+                  (user) => user.id != FirebaseAuth.instance.currentUser?.uid)
+              .toList();
+
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: GridView.builder(
@@ -24,9 +30,10 @@ class ConnectionsPage extends StatelessWidget {
                 crossAxisSpacing: 5.0,
                 mainAxisSpacing: 16.0,
               ),
-              itemCount: snapshot.data!.docs.length,
+              itemCount: users.length,
               itemBuilder: (context, index) {
-                DocumentSnapshot user = snapshot.data!.docs[index];
+                DocumentSnapshot user = users[index];
+
                 return ConnectionCard(user: user);
               },
             ),
