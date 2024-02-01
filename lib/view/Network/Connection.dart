@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gigs/view/Porfile/userProfile.dart';
 
 class ConnectionsPage extends StatelessWidget {
   @override
@@ -34,7 +35,19 @@ class ConnectionsPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 DocumentSnapshot user = users[index];
 
-                return ConnectionCard(user: user);
+
+                return GestureDetector(
+                    onTap: () {
+                      // Navigate to the user's profile page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ProfileScreen(useremail: user['email']),
+                        ),
+                      );
+                    },
+                    child: ConnectionCard(user: user));
               },
             ),
           );

@@ -260,15 +260,16 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
               final fileUrl = widget.userMap['fileUrl'];
               final userType = widget.userMap['userType'];
               final userId = widget.userMap['uid'];
-
+              final chatuserEmail = widget.userMap['email'];
+              print(chatuserEmail);
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ProfilePage(
-                              currentUserEmail: widget.currentUserEmail,
-                              imageUrl: imageUrl)));
+                          builder: (context) => ProfileScreen(
+                                useremail: chatuserEmail,
+                              )));
                 },
                 child: Container(
                   child: Row(
@@ -278,7 +279,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       ),
                       SizedBox(width: 8),
                       Expanded(
-                        child: FittedBox( 
+                        child: FittedBox(
                           fit: BoxFit.scaleDown,
                           alignment: Alignment.centerLeft,
                           child: Column(
