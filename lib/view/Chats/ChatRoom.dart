@@ -89,32 +89,79 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     super.dispose();
   }
 
+  // void onSendMessage(String message,
+  //     [String? imageUrl, String? fileUrl]) async {
+  //   if (message.isNotEmpty || imageUrl != null || fileUrl != null) {
+  //     try {
+  //       String? currentUsername = _auth.currentUser?.displayName;
+  //       if (_auth.currentUser?.displayName != widget.userMap['name']) {
+  //         // Show local notification to the current user
+  //         //  String? username=_auth.currentUser?.displayName;
+  //         String? token =
+  //             await getNotificationTokenForUser(widget.otherUserEmail);
+  //         if (token != null) {
+  //           sendNotification(currentUsername!, message, token);
+  //           print('Notification successful!');
+  //         } else {
+  //           print('Notification Failed!');
+  //         }
+  //       }
+  //       // String? token =
+  //       //     await getNotificationTokenForUser(widget.otherUserEmail);
+  //       // if (token != null) {
+  //       //   sendNotification(message, token);
+  //       //   print('Notification successful!');
+  //       // } else {
+  //       //   print('Notification Failed!');
+  //       // }
+  //       // print(token);
+
+  //       Map<String, dynamic> messageData = {
+  //         'sendBy': _auth.currentUser?.displayName,
+  //         'message': message,
+  //         'imageUrl': imageUrl,
+  //         'fileUrl': fileUrl,
+  //         'time': FieldValue.serverTimestamp(),
+  //         'repliedMessage': repliedMessage,
+  //       };
+
+  //       await _firestore
+  //           .collection('chatroom')
+  //           .doc(widget.chatRoomId)
+  //           .collection('chats')
+  //           .add(messageData);
+
+  //       _messageController.clear();
+  //       setState(() {
+  //         repliedMessage = null;
+  //       });
+  //     } catch (e) {
+  //       print('Error sending message: $e');
+  //     }
+  //   } else {
+  //     print('Enter some Text');
+  //   }
+  // }
   void onSendMessage(String message,
       [String? imageUrl, String? fileUrl]) async {
     if (message.isNotEmpty || imageUrl != null || fileUrl != null) {
       try {
         String? currentUsername = _auth.currentUser?.displayName;
+
         if (_auth.currentUser?.displayName != widget.userMap['name']) {
-          // Show local notification to the current user
-          //  String? username=_auth.currentUser?.displayName;
           String? token =
               await getNotificationTokenForUser(widget.otherUserEmail);
           if (token != null) {
-            sendNotification(currentUsername!, message, token);
+            if (fileUrl != null) {
+              sendFileNotification(currentUsername!, fileUrl, token);
+            } else {
+              sendNotification(currentUsername!, message, token);
+            }
             print('Notification successful!');
           } else {
             print('Notification Failed!');
           }
         }
-        // String? token =
-        //     await getNotificationTokenForUser(widget.otherUserEmail);
-        // if (token != null) {
-        //   sendNotification(message, token);
-        //   print('Notification successful!');
-        // } else {
-        //   print('Notification Failed!');
-        // }
-        // print(token);
 
         Map<String, dynamic> messageData = {
           'sendBy': _auth.currentUser?.displayName,
@@ -143,6 +190,45 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     }
   }
 
+  void sendFileNotification(
+      String userName, String fileUrl, String token) async {
+    final data = {
+      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      'id': '1',
+      'status': 'done',
+      'userName': userName,
+      'message': 'File Shared',
+    };
+
+    try {
+      http.Response response = await http.post(
+        Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization':
+              'key=AAAAGNLlsWY:APA91bHic5VqqER8euXs_uxxqwar5VHmAxw_2rVMaTH6QYaD2MG3TTGh6W_xxMfqyHzbvPHrvkDqyFUvk6J8sNy0W7CaowxSGP23x-VZmAVFNAV59xZoF74SLpK4L6E8mM6bVETHKSTm'
+        },
+        body: jsonEncode(<String, dynamic>{
+          'notification': <String, dynamic>{
+            'title': '$userName',
+            'body': 'File Shared',
+          },
+          'priority': 'high',
+          'data': data,
+          'to': '$token',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print("Notification sent successfully");
+      } else {
+        print("Error sending notification");
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
   sendNotification(String userName, String message, String token) async {
     final data = {
       'click_action': 'FLUTTER_NOTIFICATION_CLICK',
@@ -162,8 +248,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         },
         body: jsonEncode(<String, dynamic>{
           'notification': <String, dynamic>{
-            'title': '$userName: $message',
-            'body': '',
+            'title': '$userName',
+            'body': '$message',
           },
           'priority': 'high',
           'data': data,

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:gigs/view/Chats/ChatRoom.dart';
 import 'package:shimmer/shimmer.dart';
 
-
 class ChatScreen extends StatefulWidget {
   final String currentUserEmail;
   const ChatScreen({Key? key, required this.currentUserEmail})
@@ -31,7 +30,6 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     _usersStream = FirebaseFirestore.instance.collection('users').snapshots();
     WidgetsBinding.instance.addObserver(this);
     setStatus("Online");
-
 
     Future.delayed(Duration(seconds: 1), () {
       setState(() {
@@ -120,10 +118,9 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
-       final size = MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 249, 250, 251),
       appBar: AppBar(
@@ -137,7 +134,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         //     color: Colors.black,
         //   ),
         //   onPressed: () {
-            
+
         //   },
         // ),
         title: Container(
@@ -162,91 +159,100 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
           ),
         ),
       ),
-      body:isLoading? ShimmerList(): Column(
-        children: [
-          SizedBox(height: 20),
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: _usersStream,
-              builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                }
+      body: isLoading
+          ? ShimmerList()
+          : Column(
+              children: [
+                SizedBox(height: 20),
+                Expanded(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: _usersStream,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      }
 
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
 
-                _usersList = snapshot.data!.docs;
+                      _usersList = snapshot.data!.docs;
 
-                _usersList.removeWhere(
-                    (user) => user['email'] == widget.currentUserEmail);
+                      _usersList.removeWhere(
+                          (user) => user['email'] == widget.currentUserEmail);
 
-                if (_searchController.text.isNotEmpty) {
-                  _usersList = _usersList
-                      .where((user) => user['name']
-                          .toLowerCase()
-                          .contains(_searchController.text.toLowerCase()))
-                      .toList();
-                }
+                      if (_searchController.text.isNotEmpty) {
+                        _usersList = _usersList
+                            .where((user) => user['name']
+                                .toLowerCase()
+                                .contains(_searchController.text.toLowerCase()))
+                            .toList();
+                      }
 
-                return ListView.builder(
-                  itemCount: _usersList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final user = _usersList[index];
-                    final userName = user['name'];
-                    final userEmail = user['email'];
-                    final imageUrl = user['imageUrl'];
-                    final userType = user['userType'];
+                      return ListView.builder(
+                        itemCount: _usersList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final user = _usersList[index];
+                          final userName = user['name'];
+                          final userEmail = user['email'];
+                          final imageUrl = user['imageUrl'];
+                          final userType = user['userType'];
 
-                    return Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 8.0,
-                        horizontal: 16.0,
-                      ),
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: ListTile(
-                          onTap: () => openChatRoom(user),
-                          // leading: CircleAvatar(
-                          //   backgroundImage: NetworkImage(imageUrl),
-                          // ),
-                                       leading: imageUrl != null
-                ? CachedNetworkImage(
-                    imageUrl: imageUrl,
-                    placeholder: (context, url) => Container(
-                      width: 60,
-                      height: 60,
-                      color: Colors.white,
-                    ),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
-                    imageBuilder: (context, imageProvider) => CircleAvatar(
-                      backgroundImage: imageProvider,
-                      radius: 30.0,
-                    ),
-                  )
-                : CircleAvatar(
-                    backgroundColor: Colors.grey[400],
-                    child: Icon(Icons.person, color: Colors.white),
+                          return Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 8.0,
+                              horizontal: 16.0,
+                            ),
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: ListTile(
+                                onTap: () => openChatRoom(user),
+                                // leading: CircleAvatar(
+                                //   backgroundImage: NetworkImage(imageUrl),
+                                // ),
+                                leading: imageUrl != null
+                                    ? CachedNetworkImage(
+                                        imageUrl: imageUrl,
+                                        placeholder: (context, url) =>
+                                            Container(
+                                          width: 60,
+                                          height: 60,
+                                          color: Colors.white,
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            Icon(Icons.error),
+                                        imageBuilder:
+                                            (context, imageProvider) =>
+                                                CircleAvatar(
+                                          backgroundImage: imageProvider,
+                                          radius: 30.0,
+                                        ),
+                                      )
+                                    : CircleAvatar(
+                                        backgroundColor: Colors.grey[400],
+                                        child: Icon(Icons.person,
+                                            color: Colors.white),
+                                      ),
+                                title: userType == 'admin'
+                                    ? Text(userName + '(Admin)')
+                                    : Text(userName),
+                                subtitle: Text(userEmail),
+                                // Other user details can be displayed here
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
-                          title: userType=='admin'? Text(userName+'(Admin)'):Text(userName),
-                          subtitle: Text(userEmail),
-                          // Other user details can be displayed here
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -351,4 +357,3 @@ class ShimmerList extends StatelessWidget {
     );
   }
 }
-

@@ -66,7 +66,7 @@ class LocalNotificationService {
       await _flutterLocalNotificationsPlugin.show(
         id,
         message.notification!.title,
-        message.notification!.title,
+        message.notification!.body,
         notificationDetails,
       );
     } on Exception catch (e) {

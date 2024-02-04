@@ -13,7 +13,8 @@ import 'package:provider/provider.dart';
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(_handleBackgroundMessage);
+
+  
   LocalNotificationService.initialize();
 
   runApp(MyApp());
@@ -62,17 +63,3 @@ class _MyAppState extends State<MyApp> {
       );
 }
 
-Future<void> _handleBackgroundMessage(RemoteMessage message) async {
-  print('Handling a background message: ${message.messageId}');
-  _navigateToCallPage(message.data['callID']);
-}
-//added something
-void _navigateToCallPage(String callID) {
-  print('Navigating to the call page with callID: $callID');
-  // Use the Navigator to push the CallPage with the received callID.
-  // Assuming you have access to the current BuildContext, use it to push the CallPage.
-  Navigator.of(context as BuildContext)
-      .push(MaterialPageRoute(builder: (context) {
-    return Container();
-  }));
-}
