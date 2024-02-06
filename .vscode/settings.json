@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "D:/GIGS/gigs/windows/flutter"
+    "cmake.sourceDirectory": "D:/GIGS/gigs/windows/flutter",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:gigs/notifications/notificationList.dart';
 import 'package:gigs/view/Add_Jobs.dart';
 import 'package:gigs/view/UsersList.dart';
 import 'package:gigs/view/Display_Jobs.dart';
@@ -211,6 +212,20 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 Navigator.pop(context); // Close the drawer
                 // Add your navigation logic here
+              },
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.notifications_rounded),
+              title: Text(
+                'Notifications',
+                style: TextStyle(fontSize: 16),
+              ),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => NotificationListPage()));
               },
             ),
             Divider(),

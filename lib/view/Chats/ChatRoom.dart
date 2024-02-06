@@ -89,59 +89,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     super.dispose();
   }
 
-  // void onSendMessage(String message,
-  //     [String? imageUrl, String? fileUrl]) async {
-  //   if (message.isNotEmpty || imageUrl != null || fileUrl != null) {
-  //     try {
-  //       String? currentUsername = _auth.currentUser?.displayName;
-  //       if (_auth.currentUser?.displayName != widget.userMap['name']) {
-  //         // Show local notification to the current user
-  //         //  String? username=_auth.currentUser?.displayName;
-  //         String? token =
-  //             await getNotificationTokenForUser(widget.otherUserEmail);
-  //         if (token != null) {
-  //           sendNotification(currentUsername!, message, token);
-  //           print('Notification successful!');
-  //         } else {
-  //           print('Notification Failed!');
-  //         }
-  //       }
-  //       // String? token =
-  //       //     await getNotificationTokenForUser(widget.otherUserEmail);
-  //       // if (token != null) {
-  //       //   sendNotification(message, token);
-  //       //   print('Notification successful!');
-  //       // } else {
-  //       //   print('Notification Failed!');
-  //       // }
-  //       // print(token);
 
-  //       Map<String, dynamic> messageData = {
-  //         'sendBy': _auth.currentUser?.displayName,
-  //         'message': message,
-  //         'imageUrl': imageUrl,
-  //         'fileUrl': fileUrl,
-  //         'time': FieldValue.serverTimestamp(),
-  //         'repliedMessage': repliedMessage,
-  //       };
-
-  //       await _firestore
-  //           .collection('chatroom')
-  //           .doc(widget.chatRoomId)
-  //           .collection('chats')
-  //           .add(messageData);
-
-  //       _messageController.clear();
-  //       setState(() {
-  //         repliedMessage = null;
-  //       });
-  //     } catch (e) {
-  //       print('Error sending message: $e');
-  //     }
-  //   } else {
-  //     print('Enter some Text');
-  //   }
-  // }
   void onSendMessage(String message,
       [String? imageUrl, String? fileUrl]) async {
     if (message.isNotEmpty || imageUrl != null || fileUrl != null) {
@@ -219,7 +167,26 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         }),
       );
 
+      String? imageUrl;
+      try {
+        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get();
+
+        imageUrl = userSnapshot.get('imageUrl');
+      } catch (e) {
+        print("Error fetching imageUrl: $e");
+      }
+
       if (response.statusCode == 200) {
+        await FirebaseFirestore.instance.collection('notifications').add({
+          'userName': userName,
+          'message': "Shared a File",
+          'SendTo': widget.otherUserEmail,
+          'imageUrl': imageUrl,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
         print("Notification sent successfully");
       } else {
         print("Error sending notification");
@@ -256,8 +223,26 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           'to': '$token',
         }),
       );
+      String? imageUrl;
+      try {
+        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get();
+
+        imageUrl = userSnapshot.get('imageUrl');
+      } catch (e) {
+        print("Error fetching imageUrl: $e");
+      }
 
       if (response.statusCode == 200) {
+        await FirebaseFirestore.instance.collection('notifications').add({
+          'userName': userName,
+          'message': message,
+          'SendTo': widget.otherUserEmail,
+          'imageUrl': imageUrl,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
         print("Notification sent successfully");
       } else {
         print("Error sending notification");
