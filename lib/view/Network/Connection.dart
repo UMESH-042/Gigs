@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gigs/view/Porfile/userProfile.dart';
+import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
 
 class ConnectionsPage extends StatelessWidget {
   @override
@@ -238,6 +242,11 @@ class _ConnectionCardState extends State<ConnectionCard> {
           .doc(currentUserId)
           .set({});
 
+           sendNotification(
+ currentUserSnapshot['name'],
+      'followed you', targetUserSnapshot['token'],
+      );
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("You are following ${widget.user['name']}"),
@@ -322,5 +331,64 @@ class _ConnectionCardState extends State<ConnectionCard> {
       followersCount -= 1;
       isButtonDisabled = false;
     });
+  }
+
+
+  sendNotification(String userName, String message, String token) async {
+    final data = {
+      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      'id': '1',
+      'status': 'done',
+      'userName': userName,
+      'message': message,
+    };
+
+    try {
+      http.Response response = await http.post(
+        Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization':
+              'key=AAAAGNLlsWY:APA91bHic5VqqER8euXs_uxxqwar5VHmAxw_2rVMaTH6QYaD2MG3TTGh6W_xxMfqyHzbvPHrvkDqyFUvk6J8sNy0W7CaowxSGP23x-VZmAVFNAV59xZoF74SLpK4L6E8mM6bVETHKSTm'
+        },
+        body: jsonEncode(<String, dynamic>{
+          'notification': <String, dynamic>{
+            'title': '$userName',
+            'body': '$message',
+          },
+          'priority': 'high',
+          'data': data,
+          'to': '$token',
+        }),
+      );
+      String? imageUrl;
+      try {
+        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get();
+
+        imageUrl = userSnapshot.get('imageUrl');
+      } catch (e) {
+        print("Error fetching imageUrl: $e");
+      }
+
+      if (response.statusCode == 200) {
+          String notificationId = Uuid().v4();
+     await FirebaseFirestore.instance.collection('notifications').doc(notificationId).set({
+        'notificationId': notificationId,
+        'userName': userName,
+        'message': message,
+        'SendTo': widget.user['email'],
+        'imageUrl': imageUrl,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      print("Notification sent successfully");
+    } else {
+      print("Error sending notification");
+    }
+    } catch (e) {
+      print("Error: $e");
+    }
   }
 }

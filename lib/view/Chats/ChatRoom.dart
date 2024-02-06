@@ -14,6 +14,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
 
 // import 'package:flutter_svg/svg.dart';
 
@@ -88,7 +89,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     _chatroomSubscription?.cancel();
     super.dispose();
   }
-
 
   void onSendMessage(String message,
       [String? imageUrl, String? fileUrl]) async {
@@ -180,17 +180,19 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       }
 
       if (response.statusCode == 200) {
-        await FirebaseFirestore.instance.collection('notifications').add({
-          'userName': userName,
-          'message': "Shared a File",
-          'SendTo': widget.otherUserEmail,
-          'imageUrl': imageUrl,
-          'timestamp': FieldValue.serverTimestamp(),
-        });
-        print("Notification sent successfully");
-      } else {
-        print("Error sending notification");
-      }
+         String notificationId = Uuid().v4();
+        await FirebaseFirestore.instance.collection('notifications').doc(notificationId).set({
+        'notificationId': notificationId,
+        'userName': userName,
+        'message': "Shared a File",
+        'SendTo': widget.otherUserEmail,
+        'imageUrl': imageUrl,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      print("Notification sent successfully");
+    } else {
+      print("Error sending notification");
+    }
     } catch (e) {
       print("Error: $e");
     }
@@ -236,17 +238,19 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       }
 
       if (response.statusCode == 200) {
-        await FirebaseFirestore.instance.collection('notifications').add({
-          'userName': userName,
-          'message': message,
-          'SendTo': widget.otherUserEmail,
-          'imageUrl': imageUrl,
-          'timestamp': FieldValue.serverTimestamp(),
-        });
-        print("Notification sent successfully");
-      } else {
-        print("Error sending notification");
-      }
+          String notificationId = Uuid().v4();
+     await FirebaseFirestore.instance.collection('notifications').doc(notificationId).set({
+        'notificationId': notificationId,
+        'userName': userName,
+        'message': message,
+        'SendTo': widget.otherUserEmail,
+        'imageUrl': imageUrl,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      print("Notification sent successfully");
+    } else {
+      print("Error sending notification");
+    }
     } catch (e) {
       print("Error: $e");
     }
