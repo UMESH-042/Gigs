@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Variable to check if the user is already logged in.
-  bool isLoggedIn = false;
+  // bool isLoggedIn = false;
   bool _isLoggingIn = false;
 
   @override
@@ -59,22 +59,22 @@ class _LoginScreenState extends State<LoginScreen> {
     // Check if the user is already logged in using authStateChanges()
     _auth.authStateChanges().listen((User? user) {
       if (user != null) {
-        setState(() {
-          isLoggedIn = true;
-        });
+        // setState(() {
+        //   isLoggedIn = true;
+        // });
         // Try auto-login here since we have a user.
         _tryAutoLogin();
       } else {
-        setState(() {
-          isLoggedIn = false;
-        });
+        // setState(() {
+        //   isLoggedIn = false;
+        // });
       }
     });
   }
 
   // Add the method to handle automatic login if the user is already logged in.
   void _tryAutoLogin() async {
-    if (isLoggedIn) {
+    // if (isLoggedIn) {
       // Get the current user's email
       final String email = _auth.currentUser!.email!;
       if (_isLoggingIn) return; // If already logging in, do nothing
@@ -149,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         _clearFields();
       }
-    }
+    // }
   }
 
   @override

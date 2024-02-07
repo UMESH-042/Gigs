@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +11,10 @@ import 'package:gigs/APIs/Salary.dart';
 import 'package:gigs/APIs/companies_API.dart';
 import 'package:gigs/CompanyDetails/CompanyDetailsPage.dart';
 import 'package:gigs/view/Homes_Screen.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
 import 'bottomSheet.dart';
+import 'package:http/http.dart' as http;
 
 // added comment
 class AddJobs extends StatefulWidget {
@@ -138,6 +142,46 @@ class _AddJobsState extends State<AddJobs> {
       });
 
       print('Job added to Firestore');
+
+      String? imageUrl;
+      String? userName;
+      try {
+        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get();
+
+        imageUrl = userSnapshot.get('imageUrl');
+        userName = userSnapshot.get('name');
+      } catch (e) {
+        print("Error fetching imageUrl: $e");
+      }
+      sendNotificationToAllUsers(userName!, 'New Job has been Added in $selectedCategory');
+      // try {
+      //   QuerySnapshot usersSnapshot =
+      //       await FirebaseFirestore.instance.collection('users').get();
+
+      //   for (QueryDocumentSnapshot user in usersSnapshot.docs) {
+      //     String userId = user.id;
+      //     String notificationId = Uuid().v4();
+
+      //     // Send notification to the user
+      //     await FirebaseFirestore.instance
+      //         .collection('notifications')
+      //         .doc(notificationId)
+      //         .set({
+      //       'notificationId': notificationId,
+      //       'userName': userName,
+      //       'message': 'New Job Has been Added: $jobDescription',
+      //       'sendTo': userId,
+      //       'imageUrl': imageUrl,
+      //       'timestamp': FieldValue.serverTimestamp(),
+      //     });
+      //   }
+      //   print('Notification Send Successfully');
+      // } catch (e) {
+      //   print('Error sending notification to all users: $e');
+      // }
     } catch (e) {
       print('Error adding job to Firestore: $e');
     }
@@ -182,7 +226,7 @@ class _AddJobsState extends State<AddJobs> {
           //   ),
           // ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               addJobToFirestore(
                   selectedJobPosition,
                   selectedJobLocation,
@@ -376,6 +420,76 @@ class _AddJobsState extends State<AddJobs> {
       ),
       resizeToAvoidBottomInset: true,
     );
+  }
+
+  Future<void> sendNotificationToAllUsers(
+      String userName, String message) async {
+    try {
+      String? imageUrl;
+      try {
+        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get();
+
+        imageUrl = userSnapshot.get('imageUrl');
+      } catch (e) {
+        print("Error fetching imageUrl: $e");
+      }
+
+      QuerySnapshot usersSnapshot =
+          await FirebaseFirestore.instance.collection('users').get();
+
+      for (QueryDocumentSnapshot user in usersSnapshot.docs) {
+        String token = user.get('token');
+
+        final data = {
+          'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+          'id': '1',
+          'status': 'done',
+          'userName': userName,
+          'message': message,
+        };
+
+        http.Response response = await http.post(
+          Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization':
+                'key=AAAAGNLlsWY:APA91bHic5VqqER8euXs_uxxqwar5VHmAxw_2rVMaTH6QYaD2MG3TTGh6W_xxMfqyHzbvPHrvkDqyFUvk6J8sNy0W7CaowxSGP23x-VZmAVFNAV59xZoF74SLpK4L6E8mM6bVETHKSTm'
+          },
+          body: jsonEncode(<String, dynamic>{
+            'notification': <String, dynamic>{
+              'title': '$userName',
+              'body': '$message',
+            },
+            'priority': 'high',
+            'data': data,
+            'to': '$token',
+          }),
+        );
+
+        if (response.statusCode == 200) {
+          String notificationId = Uuid().v4();
+          await FirebaseFirestore.instance
+              .collection('notifications')
+              .doc(notificationId)
+              .set({
+            'notificationId': notificationId,
+            'userName': userName,
+            'message': message,
+            'SendTo': user['email'],
+            'imageUrl': imageUrl,
+            'timestamp': FieldValue.serverTimestamp(),
+          });
+          print("Notification sent to ${user['email']} successfully");
+        } else {
+          print("Error sending notification to ${user['email']}");
+        }
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
   }
 }
 

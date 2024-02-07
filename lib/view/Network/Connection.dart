@@ -39,7 +39,6 @@ class ConnectionsPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 DocumentSnapshot user = users[index];
 
-
                 return GestureDetector(
                     onTap: () {
                       // Navigate to the user's profile page
@@ -242,9 +241,10 @@ class _ConnectionCardState extends State<ConnectionCard> {
           .doc(currentUserId)
           .set({});
 
-           sendNotification(
- currentUserSnapshot['name'],
-      'followed you', targetUserSnapshot['token'],
+      sendNotification(
+        currentUserSnapshot['name'],
+        'followed you',
+        targetUserSnapshot['token'],
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -333,7 +333,6 @@ class _ConnectionCardState extends State<ConnectionCard> {
     });
   }
 
-
   sendNotification(String userName, String message, String token) async {
     final data = {
       'click_action': 'FLUTTER_NOTIFICATION_CLICK',
@@ -374,19 +373,22 @@ class _ConnectionCardState extends State<ConnectionCard> {
       }
 
       if (response.statusCode == 200) {
-          String notificationId = Uuid().v4();
-     await FirebaseFirestore.instance.collection('notifications').doc(notificationId).set({
-        'notificationId': notificationId,
-        'userName': userName,
-        'message': message,
-        'SendTo': widget.user['email'],
-        'imageUrl': imageUrl,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-      print("Notification sent successfully");
-    } else {
-      print("Error sending notification");
-    }
+        String notificationId = Uuid().v4();
+        await FirebaseFirestore.instance
+            .collection('notifications')
+            .doc(notificationId)
+            .set({
+          'notificationId': notificationId,
+          'userName': userName,
+          'message': message,
+          'SendTo': widget.user['email'],
+          'imageUrl': imageUrl,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+        print("Notification sent successfully");
+      } else {
+        print("Error sending notification");
+      }
     } catch (e) {
       print("Error: $e");
     }
