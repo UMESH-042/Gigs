@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:gigs/Screens/Feedback.dart';
 import 'package:gigs/notifications/notificationList.dart';
 import 'package:gigs/view/Add_Jobs.dart';
 import 'package:gigs/view/UsersList.dart';
@@ -214,7 +215,6 @@ class _HomePageState extends State<HomePage> {
                 // Add your navigation logic here
               },
             ),
-            Divider(),
             ListTile(
               leading: Icon(Icons.notifications_rounded),
               title: Text(
@@ -228,7 +228,20 @@ class _HomePageState extends State<HomePage> {
                         builder: (context) => NotificationListPage()));
               },
             ),
-            Divider(),
+            ListTile(
+              leading: Icon(Icons.feedback),
+              title: Text(
+                'Feedback',
+                style: TextStyle(fontSize: 16),
+              ),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            FeedbackPage())); // Add your logout logic here
+              },
+            ),
             ListTile(
               leading: Icon(Icons.exit_to_app),
               title: Text(

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
@@ -9,6 +10,8 @@ import 'package:gigs/firebase/firebaseService.dart';
 import 'package:gigs/view/Porfile/Profile_page.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:velocity_x/velocity_x.dart';
+import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
 
 class ApplicationPage extends StatefulWidget {
   final String jobPosition;
@@ -589,6 +592,27 @@ class _ApplicationPageState extends State<ApplicationPage> {
                           // Save the file to Firebase Storage and get the download URL
                           await saveFileToFirestore(userEmail, applicationData);
 
+                          String? userName;
+                          String? userToken =
+                              await getUserTokenByEmail(widget.postedBy);
+                          print('user token is :- $userToken');
+                          try {
+                            DocumentSnapshot userSnapshot =
+                                await FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                                    .get();
+
+                            userName = userSnapshot.get('name');
+                          } catch (e) {
+                            print("Error fetching imageUrl: $e");
+                          }
+
+                          sendNotification(
+                              userName!,
+                              "Applied for ${widget.jobPosition}",
+                              userToken!,
+                              widget.postedBy);
                           // Close the "Please wait" dialog
                           Navigator.pop(context);
 
@@ -692,6 +716,88 @@ class _ApplicationPageState extends State<ApplicationPage> {
         ),
       ),
     );
+  }
+
+  sendNotification(String userName, String message, String token,
+      String postedByEmail) async {
+    final data = {
+      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      'id': '1',
+      'status': 'done',
+      'userName': userName,
+      'message': message,
+    };
+
+    try {
+      http.Response response = await http.post(
+        Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization':
+              'key=AAAAGNLlsWY:APA91bHic5VqqER8euXs_uxxqwar5VHmAxw_2rVMaTH6QYaD2MG3TTGh6W_xxMfqyHzbvPHrvkDqyFUvk6J8sNy0W7CaowxSGP23x-VZmAVFNAV59xZoF74SLpK4L6E8mM6bVETHKSTm'
+        },
+        body: jsonEncode(<String, dynamic>{
+          'notification': <String, dynamic>{
+            'title': '$userName',
+            'body': '$message',
+          },
+          'priority': 'high',
+          'data': data,
+          'to': '$token',
+        }),
+      );
+      String? imageUrl;
+      try {
+        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get();
+
+        imageUrl = userSnapshot.get('imageUrl');
+      } catch (e) {
+        print("Error fetching imageUrl: $e");
+      }
+
+      if (response.statusCode == 200) {
+        String notificationId = Uuid().v4();
+        await FirebaseFirestore.instance
+            .collection('notifications')
+            .doc(notificationId)
+            .set({
+          'notificationId': notificationId,
+          'userName': userName,
+          'message': message,
+          'SendTo': postedByEmail,
+          'imageUrl': imageUrl,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+        print("Notification sent successfully");
+      } else {
+        print("Error sending notification");
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
+  Future<String?> getUserTokenByEmail(String email) async {
+    try {
+      // Query the users collection to get the user with the specified email
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Get the first document (user) and retrieve the user's token
+        String? userToken = querySnapshot.docs[0].get('token');
+        return userToken;
+      }
+    } catch (e) {
+      print('Error getting user token: $e');
+    }
+
+    return null; // Return null if the user with the specified email is not found or an error occurs
   }
 
   Future<String> getUserEmail() async {
