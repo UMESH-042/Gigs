@@ -1,7 +1,11 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_pdf_viewer/easy_pdf_viewer.dart';
 import 'package:flutter/material.dart';
 
-class ApplicantDetailsPage extends StatelessWidget {
+import 'package:gigs/view/Porfile/userProfile.dart';
+
+class ApplicantDetailsPage extends StatefulWidget {
   final String jobPosition;
   final String companyName;
   final String jobLocation;
@@ -12,8 +16,12 @@ class ApplicantDetailsPage extends StatelessWidget {
   final String salary;
   final String postedBy;
   final String workplaceType;
+  final Map resumeData;
+  final String information;
+  final String email;
 
   ApplicantDetailsPage({
+    Key? key,
     required this.jobPosition,
     required this.companyName,
     required this.jobLocation,
@@ -24,47 +32,184 @@ class ApplicantDetailsPage extends StatelessWidget {
     required this.salary,
     required this.postedBy,
     required this.workplaceType,
-  });
+    required this.resumeData,
+    required this.information,
+    required this.email,
+  }) : super(key: key);
+
+  @override
+  State<ApplicantDetailsPage> createState() => _ApplicantDetailsPageState();
+}
+
+class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
+  PDFDocument? document;
+  String? Filename;
+
+  @override
+  void initState() {
+    super.initState();
+    loadDocument();
+  }
+
+  void loadDocument() async {
+    try {
+      // Load PDF document from URL or local file path
+      document = await PDFDocument.fromURL(widget.resumeData['URL']);
+      Filename = widget.resumeData['FileName'];
+      setState(() {});
+    } catch (e) {
+      print('Error loading PDF: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 241, 241, 241),
       appBar: AppBar(
-        title: Text('Applicant Details'),
+        title: Text(
+          'Applicant Details',
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.black),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Display detailed information about the applicant
-            // Customize this based on your design
-            Text(
-              'Job Position: $jobPosition',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Text('Company Name: $companyName'),
-            Text('Job Location: $jobLocation'),
-            Text('Employment Type: $employmentType'),
-            Text('Job Description: $jobDescription'),
-            Text('Category: $category'),
-            Text('Timestamp: ${getTimeAgo(timestamp.toDate())}'),
-            Text('Salary: $salary'),
-            Text('Posted By: $postedBy'),
-            Text('Workplace Type: $workplaceType'),
-            // Add more details as needed
-
-            SizedBox(height: 20),
-
-            // Add a button to view the user's profile
-            ElevatedButton(
-              onPressed: () {
-                // Implement navigation to view user's profile
-                // You can use Navigator.push to navigate to the profile page
-              },
-              child: Text('View User Profile'),
-            ),
-          ],
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+           Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ProfileScreen(useremail: widget.email),
+                        ),
+                      );
+        },
+        label: Text("Applicant's Profile"),
+        icon: Icon(Icons.person),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+        ),
+        backgroundColor: Color(0xFF130160),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 30,
+              ),
+              _buildLabelAndContent('About Applicant', widget.information),
+              SizedBox(height: 20),
+              label('Resume'),
+              if (document != null)
+                GestureDetector(
+                  onTap: () {
+                    // Navigate to PDF viewer when the container is tapped
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PDFViewer(document: document!),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                PDFViewer(document: document!),
+                          ),
+                        );
+                      },
+                      child: CustomPaint(
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          height: 140.0,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20.0),
+                            color: Color.fromARGB(255, 227, 217, 229),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Icon(Icons.insert_drive_file,
+                                      size: 40,
+                                      color: Color.fromARGB(255, 209, 75, 37)),
+                                  SizedBox(width: 8),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        Filename!,
+                                        style: TextStyle(fontSize: 16.0),
+                                      ),
+                                      Text(
+                                        '${widget.resumeData['FileSize']} KB',
+                                        style: TextStyle(fontSize: 12.0),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              SizedBox(
+                height: 30,
+              ),
+              label('Job Details'),
+              SizedBox(
+                height: 35,
+              ),
+              _buildLabelAndContent('Company Name', widget.companyName),
+              SizedBox(
+                height: 10,
+              ),
+              _buildLabelAndContent('Job Location', widget.jobLocation),
+              SizedBox(
+                height: 10,
+              ),
+              _buildLabelAndContent('Employment Type', widget.employmentType),
+              SizedBox(
+                height: 10,
+              ),
+              _buildLabelAndContent('Job Description', widget.jobDescription),
+              SizedBox(
+                height: 10,
+              ),
+              _buildLabelAndContent('Category', widget.category),
+              SizedBox(
+                height: 10,
+              ),
+              _buildLabelAndContent(
+                  'Posted', getTimeAgo(widget.timestamp.toDate())),
+              SizedBox(
+                height: 10,
+              ),
+              _buildLabelAndContent('Salary', widget.salary),
+              SizedBox(
+                height: 10,
+              ),
+              _buildLabelAndContent('Workplace Type', widget.workplaceType),
+            ],
+          ),
         ),
       ),
     );
@@ -87,5 +232,38 @@ class ApplicantDetailsPage extends StatelessWidget {
     } else {
       return 'just now';
     }
+  }
+
+  Widget _buildLabelAndContent(String label, String content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.indigo[900]!,
+            fontWeight: FontWeight.w600,
+            fontSize: 17,
+            letterSpacing: 0.2,
+          ),
+        ),
+        SizedBox(height: 12),
+        Text(
+          content,
+          style: TextStyle(fontSize: 16),
+        ),
+        SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget label(String label) {
+    return Text(label,
+        style: TextStyle(
+          color: Colors.indigo[900]!,
+          fontWeight: FontWeight.w600,
+          fontSize: 20,
+          letterSpacing: 0.2,
+        ));
   }
 }

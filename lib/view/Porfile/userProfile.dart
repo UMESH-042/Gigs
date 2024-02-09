@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gigs/view/Network/comments.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ProfileScreen extends StatefulWidget {
@@ -30,6 +31,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool PostsByuser = false;
   bool JobsByUser = false;
 
+  bool isLoading = true;
+
   List<Map<String, dynamic>> userPosts = [];
 
   @override
@@ -45,18 +48,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     skills = [];
     workExperience = [];
     userPosts = [];
+
     fetchUserData();
   }
 
   Future<void> fetchUserData() async {
     try {
-      // Fetch data from the "users" collection
       QuerySnapshot usersSnapshot = await FirebaseFirestore.instance
           .collection('users')
           .where('email', isEqualTo: widget.useremail)
           .get();
 
-      // Fetch data from the "userProfile" collection using document ID (email)
       DocumentSnapshot userProfileSnapshot = await FirebaseFirestore.instance
           .collection('usersProfile')
           .doc(widget.useremail)
@@ -242,7 +244,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      aboutMe,
+                      aboutMe!='' ? aboutMe : 'No Data available',
                       style: TextStyle(fontSize: 16),
                     ),
                     SizedBox(height: 16),
@@ -267,7 +269,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 'Jobs Section',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ],
+            ]
           ],
         ),
       ),
@@ -275,18 +277,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget buildDataSection(String title, List<String> data) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 16),
-        Text(
-          '$title:',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 8),
-        for (String item in data) Text('- $item'),
-      ],
-    );
+    return data.isNotEmpty
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 16),
+              Text(
+                '$title:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              for (String item in data) Text('- $item'),
+            ],
+          )
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 16),
+              Text(
+                '$title:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text('No Data Available'),
+            ],
+          );
   }
 
   Widget _buildButtonForPostsByUser({
@@ -352,7 +367,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-   Widget _buildPosts() {
+  Widget _buildPosts() {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('posts')
@@ -377,9 +392,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-
-
-
 
 class PostCard extends StatefulWidget {
   final DocumentSnapshot post;
@@ -652,7 +664,6 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
       ),
     );
   }
-
 
   Future<void> _likePost() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
