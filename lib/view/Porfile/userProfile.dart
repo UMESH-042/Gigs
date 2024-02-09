@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gigs/view/Network/comments.dart';
+import 'package:gigs/view/Porfile/Application_Page.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:shimmer/shimmer.dart';
@@ -244,7 +245,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      aboutMe!='' ? aboutMe : 'No Data available',
+                      aboutMe != '' ? aboutMe : 'No Data available',
                       style: TextStyle(fontSize: 16),
                     ),
                     SizedBox(height: 16),
@@ -263,12 +264,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildPosts()
             ],
             if (JobsByUser) ...[
-              // Display Posts content
-              // You can replace this with the actual content for Posts
-              Text(
-                'Jobs Section',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              _buildJobs(),
             ]
           ],
         ),
@@ -389,6 +385,297 @@ class _ProfileScreenState extends State<ProfileScreen> {
           },
         );
       },
+    );
+  }
+
+  Widget _buildJobs() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('jobs')
+            .where('postedBy', isEqualTo: widget.useremail)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(child: Text('No jobs available.'));
+          }
+
+          return ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              DocumentSnapshot jobs = snapshot.data!.docs[index];
+              print(jobs['jobPosition']);
+              print(jobs['company']);
+              print(jobs['jobLocation']);
+              print(jobs['employmentType']);
+              print(jobs['jobDescription']);
+              print(jobs['category']);
+              print(jobs['timestamp']);
+              print(jobs['salary']);
+              print(jobs['postedBy']);
+              print(jobs['workplaceType']);
+              return Column(
+                children: [
+                  _buildJobsCard(
+                      jobs['jobPosition'],
+                      jobs['company'],
+                      jobs['jobLocation'],
+                      jobs['employmentType'],
+                      jobs['jobDescription'],
+                      jobs['category'],
+                      jobs['timestamp'],
+                      jobs['salary'],
+                      jobs['postedBy'],
+                      jobs['workplaceType'], () {
+                    saveJob(jobs.data() as Map<String, dynamic>);
+                  })
+                ],
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildJobsCard(
+    String jobPosition,
+    String company,
+    String jobLocation,
+    String employmentType,
+    String jobDescription,
+    String category,
+    Timestamp timestamp,
+    String salary,
+    String postedBy,
+    String workplaceType,
+    Function() onSavePressed,
+  ) {
+    print(toTitleCase(jobPosition));
+    List<String> locationParts = jobLocation.split(',');
+
+    String firstWordBeforeComma = locationParts.length > 1
+        ? locationParts[0].trim().split(' ')[0]
+        : jobLocation.trim().split(' ')[0];
+
+    String lastWord = locationParts.last.trim();
+
+    String shortenedLocation = '$firstWordBeforeComma, $lastWord';
+    print(shortenedLocation);
+
+    var domain = company.toLowerCase();
+    double salaryValue = double.parse(salary);
+    String timeAgo = getTimeAgo(timestamp.toDate());
+    String formattedSalary = salaryValue > 1000
+        ? '\$${(salaryValue / 1000).toString()} K/Mo'
+        : '${salaryValue.toInt()}';
+
+    return GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ApplicationPage(
+                jobPosition: jobPosition,
+                companyName: company,
+                jobDescription: jobDescription,
+                employmentType: employmentType,
+                category: category,
+                postedBy: postedBy,
+                salary: salary,
+                workplaceType: workplaceType,
+                timestamp: timestamp,
+                jobLocation: jobLocation,
+              ),
+            ),
+          );
+        },
+        child: Container(
+          margin: EdgeInsets.only(bottom: 16),
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(
+                            'https://poweredwith.nyc3.cdn.digitaloceanspaces.com/images/domains/$domain.com.jpg'), // Use company logo URL
+                        radius: 30,
+                      ),
+                      SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            toTitleCase(jobPosition),
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          Text(company),
+                          Text(shortenedLocation),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8.0,
+                    children: [
+                      SizedBox(width: 4.0),
+                      Chip(label: Text(toTitleCase(jobPosition))),
+                      Chip(label: Text(employmentType)),
+                      Chip(label: Text(category)),
+                      SizedBox(width: 4.0)
+                    ],
+                  ),
+                  SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        timeAgo, // Display time ago
+                        style: TextStyle(
+                            color: const Color.fromARGB(255, 118, 117, 117),
+                            fontSize: 13),
+                      ),
+                      Text(
+                        formattedSalary, // Display formatted salary
+                        style: TextStyle(
+                            color: const Color.fromARGB(255, 16, 16, 16)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: GestureDetector(
+                  onTap: onSavePressed,
+                  child: Icon(
+                    Icons.bookmark_border_outlined,
+                    size: 30,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ));
+  }
+
+  String getCurrentUserId() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      return user.uid;
+    } else {
+      // Handle the case when the user is not signed in
+      return ''; // or throw an exception, return null, etc.
+    }
+  }
+
+  void saveJob(Map<String, dynamic> jobDetails) async {
+    // Add the current user's ID to the job details
+    String currentUserId = getCurrentUserId();
+    jobDetails['userId'] = currentUserId;
+
+    // Generate a unique job ID for the saved job
+    String jobId = getUniqueJobId(jobDetails); // Implement this function
+
+    // Check if the job is already saved
+    if (await isJobSaved(currentUserId, jobId)) {
+      // Job is already saved, show a message to the user
+      showSnackbar('Job has already been saved!');
+    } else {
+      // Save the job details in the "savedJobs" collection
+      await FirebaseFirestore.instance
+          .collection('savedJobs')
+          .doc(jobId)
+          .set(jobDetails);
+
+      // Notify the user that the job has been saved
+      showSnackbar('Job saved successfully!');
+    }
+  }
+
+  Future<bool> isJobSaved(String userId, String jobId) async {
+    // Check if the job with the specified ID is already saved by the user
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection('savedJobs')
+        .doc(jobId)
+        .get();
+
+    return snapshot.exists && snapshot['userId'] == userId;
+  }
+
+  void showSnackbar(String message) {
+    // Display a Snackbar with the specified message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
+  String getUniqueJobId(Map<String, dynamic> jobDetails) {
+    // Create a unique job ID based on relevant fields
+    String jobPosition = jobDetails['jobPosition'];
+    String companyName = jobDetails['company'];
+    String uniqueKey = '$jobPosition-$companyName';
+
+    String jobId = uniqueKey.hashCode.toUnsigned(30).toString();
+
+    return jobId;
+  }
+
+  String getTimeAgo(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inDays > 365) {
+      return '${(difference.inDays / 365).floor()} years ago';
+    } else if (difference.inDays > 30) {
+      return '${(difference.inDays / 30).floor()} months ago';
+    } else if (difference.inDays > 0) {
+      return '${difference.inDays} days ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} hours ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} minutes ago';
+    } else {
+      return 'just now';
+    }
+  }
+
+  String toTitleCase(String text) {
+    return text.replaceAllMapped(
+      RegExp(r'\b\w'),
+      (match) => match.group(0)!.toUpperCase(),
     );
   }
 }
