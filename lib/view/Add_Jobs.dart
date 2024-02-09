@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:gigs/APIs/Add_Job_Description.dart';
 import 'package:gigs/APIs/Job_Category_API.dart';
@@ -10,6 +11,7 @@ import 'package:gigs/APIs/Places_API.dart';
 import 'package:gigs/APIs/Salary.dart';
 import 'package:gigs/APIs/companies_API.dart';
 import 'package:gigs/CompanyDetails/CompanyDetailsPage.dart';
+import 'package:gigs/notifications/notification_service.dart';
 import 'package:gigs/view/Homes_Screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
@@ -34,7 +36,7 @@ class _AddJobsState extends State<AddJobs> {
   String currentUserEmail = '';
   String selectedSalary = '';
   String selectedCategory = '';
-
+ NotificationsService notificationsService = NotificationsService();
   @override
   void initState() {
     super.initState();
@@ -47,6 +49,12 @@ class _AddJobsState extends State<AddJobs> {
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       _showInitialDialog();
     });
+      FirebaseMessaging.instance.getInitialMessage();
+    FirebaseMessaging.onMessage.listen((event) {
+      // print('FCM Message Received');
+      LocalNotificationService.display(event);
+    });
+      notificationsService.initialiseNotifications();
   }
 
   void _showInitialDialog() {

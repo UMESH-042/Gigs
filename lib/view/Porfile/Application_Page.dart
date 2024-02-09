@@ -4,9 +4,11 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:gigs/firebase/firebaseService.dart';
+import 'package:gigs/notifications/notification_service.dart';
 import 'package:gigs/view/Porfile/Profile_page.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:velocity_x/velocity_x.dart';
@@ -51,6 +53,7 @@ class _ApplicationPageState extends State<ApplicationPage> {
   File? selectedFile;
   String? selectedFileName;
   String? fileSizeError;
+   NotificationsService notificationsService = NotificationsService();
 
   // Function to handle the file selection
   Future<void> _selectFile() async {
@@ -138,6 +141,12 @@ class _ApplicationPageState extends State<ApplicationPage> {
     super.initState();
     // Initialize timeago
     timeago.setLocaleMessages('en', timeago.EnMessages());
+     FirebaseMessaging.instance.getInitialMessage();
+    FirebaseMessaging.onMessage.listen((event) {
+      // print('FCM Message Received');
+      LocalNotificationService.display(event);
+    });
+      notificationsService.initialiseNotifications();
   }
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getCompanyDetails() async {

@@ -6,7 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:gigs/Screens/ApplicantsList.dart';
 import 'package:gigs/Screens/Feedback.dart';
+import 'package:gigs/Screens/MyApplicationsPage.dart';
 import 'package:gigs/notifications/notificationList.dart';
 import 'package:gigs/view/Add_Jobs.dart';
 import 'package:gigs/view/UsersList.dart';
@@ -200,8 +202,13 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(fontSize: 16),
               ),
               onTap: () {
-                Navigator.pop(context); // Close the drawer
-                // Add your navigation logic here
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        MyApplicationsPage(userEmail: widget.currentUserEmail),
+                  ),
+                );
               },
             ),
             ListTile(
@@ -211,8 +218,13 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(fontSize: 16),
               ),
               onTap: () {
-                Navigator.pop(context); // Close the drawer
-                // Add your navigation logic here
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ApplicantListPage(
+                        currentUserEmail: widget.currentUserEmail),
+                  ),
+                );
               },
             ),
             ListTile(

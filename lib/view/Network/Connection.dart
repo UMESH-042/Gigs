@@ -2,12 +2,19 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:gigs/notifications/notification_service.dart';
 import 'package:gigs/view/Porfile/userProfile.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 
-class ConnectionsPage extends StatelessWidget {
+class ConnectionsPage extends StatefulWidget {
+  @override
+  State<ConnectionsPage> createState() => _ConnectionsPageState();
+}
+
+class _ConnectionsPageState extends State<ConnectionsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,11 +80,18 @@ class _ConnectionCardState extends State<ConnectionCard> {
   bool isFollowing = false;
   int followersCount = 0;
   bool isButtonDisabled = false;
+   NotificationsService notificationsService = NotificationsService();
 
   @override
   void initState() {
     super.initState();
     checkIfFollowing();
+      FirebaseMessaging.instance.getInitialMessage();
+    FirebaseMessaging.onMessage.listen((event) {
+      // print('FCM Message Received');
+      LocalNotificationService.display(event);
+    });
+      notificationsService.initialiseNotifications();
   }
 
   void checkIfFollowing() async {
