@@ -53,7 +53,7 @@ class _ApplicationPageState extends State<ApplicationPage> {
   File? selectedFile;
   String? selectedFileName;
   String? fileSizeError;
-   NotificationsService notificationsService = NotificationsService();
+  NotificationsService notificationsService = NotificationsService();
 
   // Function to handle the file selection
   Future<void> _selectFile() async {
@@ -141,12 +141,12 @@ class _ApplicationPageState extends State<ApplicationPage> {
     super.initState();
     // Initialize timeago
     timeago.setLocaleMessages('en', timeago.EnMessages());
-     FirebaseMessaging.instance.getInitialMessage();
+    FirebaseMessaging.instance.getInitialMessage();
     FirebaseMessaging.onMessage.listen((event) {
       // print('FCM Message Received');
       LocalNotificationService.display(event);
     });
-      notificationsService.initialiseNotifications();
+    notificationsService.initialiseNotifications();
   }
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getCompanyDetails() async {
