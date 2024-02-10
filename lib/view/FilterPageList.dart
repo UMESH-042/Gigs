@@ -22,7 +22,8 @@ class _FilterPageState extends State<FilterPage> {
   String selectedEmploymentType = '';
   String selectedCategory = '';
   String jobLocation = '';
-  String searchQuery = '';
+  String searchQuery1 = '';
+  String searchQuery2 = '';
 
   @override
   void initState() {
@@ -184,7 +185,7 @@ class _FilterPageState extends State<FilterPage> {
                     child: TextField(
                       onChanged: (value) {
                         setState(() {
-                          searchQuery = value.toLowerCase();
+                          searchQuery1 = value.toLowerCase();
                         });
                       },
                       decoration: InputDecoration(
@@ -215,6 +216,11 @@ class _FilterPageState extends State<FilterPage> {
                       borderRadius: BorderRadius.circular(15.0),
                     ),
                     child: TextField(
+                      onChanged: (value) {
+                        setState(() {
+                          searchQuery2 = value.toLowerCase();
+                        });
+                      },
                       decoration: InputDecoration(
                         hintText: 'Location',
                         border: InputBorder.none,
@@ -370,10 +376,14 @@ class _FilterPageState extends State<FilterPage> {
                                 selectedEmploymentType) &&
                         (selectedCategory.isEmpty ||
                             jobData['category'] == selectedCategory) &&
-                        (searchQuery.isEmpty ||
+                        (searchQuery1.isEmpty ||
                             jobData['jobPosition']
                                 .toLowerCase()
-                                .contains(searchQuery));
+                                .contains(searchQuery1)) &&
+                        (searchQuery2.isEmpty ||
+                            jobData['jobLocation']
+                                .toLowerCase()
+                                .contains(searchQuery2));
                   }).toList();
 
                   if (jobs.isEmpty) {

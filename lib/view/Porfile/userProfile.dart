@@ -7,9 +7,7 @@ import 'package:gigs/view/Network/comments.dart';
 import 'package:gigs/view/Porfile/Application_Page.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:easy_pdf_viewer/easy_pdf_viewer.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String useremail;
@@ -284,36 +282,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Widget buildDataSection(String title, List<String> data) {
-  //   return data.isNotEmpty
-  //       ? Column(
-  //           crossAxisAlignment: CrossAxisAlignment.start,
-  //           children: [
-  //             SizedBox(height: 16),
-  //             Text('$title',
-  //                 style: TextStyle(
-  //                   color: Colors.indigo[900]!,
-  //                   fontWeight: FontWeight.w600,
-  //                   fontSize: 20,
-  //                   letterSpacing: 0.2,
-  //                 )),
-  //             SizedBox(height: 8),
-  //             for (String item in data) Text('- $item'),
-  //           ],
-  //         )
-  //       : Column(
-  //           crossAxisAlignment: CrossAxisAlignment.start,
-  //           children: [
-  //             SizedBox(height: 16),
-  //             Text(
-  //               '$title:',
-  //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-  //             ),
-  //             SizedBox(height: 8),
-  //             Text('No Data Available'),
-  //           ],
-  //         );
-  // }
 Widget buildDataSection(String title, List<String> data) {
   return data.isNotEmpty
       ? Column(
