@@ -28,6 +28,8 @@ Future<User?> createAccount(String name, String email, String password) async {
         "uid": _auth.currentUser!.uid,
         "userType": "user",
         "imageUrl":"",
+        "following":0,
+        "followers":0,
       });
       return user;
     } else {

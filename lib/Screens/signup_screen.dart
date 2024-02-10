@@ -281,45 +281,17 @@ class _CreateAccountState extends State<CreateAccount> {
                     child: Container(
                       width: size.width,
                       alignment: Alignment.center,
-                      child: field(size,"Full name", "Name", Icons.lock, _name),
+                      child:
+                          field(size, "Full name", "Name", Icons.lock, _name),
                     ),
                   ),
                   Container(
                     width: size.width,
                     alignment: Alignment.center,
-                    child: field(size,"Email", "Email", Icons.account_box, _email),
+                    child: field(
+                        size, "Email", "Email", Icons.account_box, _email),
                   ),
-                  // Padding(
-                  //   padding: const EdgeInsets.symmetric(vertical: 18.0),
-                  //   child: Container(
-                  //     width: size.width,
-                  //     alignment: Alignment.center,
-                  //     child: Stack(
-                  //       alignment: Alignment.centerRight,
-                  //       children: [
-                  //         field(
-                  //           size,"Password",
-                  //           "Password",
-                  //           Icons.lock,
-                  //           _password,
-                  //           obscureText: _obscurePassword,
-                  //         ),
-                  //         IconButton(
-                  //           onPressed: () {
-                  //             setState(() {
-                  //               _obscurePassword = !_obscurePassword;
-                  //             });
-                  //           },
-                  //           icon: Icon(
-                  //             _obscurePassword
-                  //                 ? Icons.visibility_off
-                  //                 : Icons.visibility,
-                  //           ),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
+                
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       vertical: 18.0,
@@ -417,7 +389,6 @@ class _CreateAccountState extends State<CreateAccount> {
               });
               print("Account Created Successfully");
               showSnackBar("Account Created Successfully");
-              _clearFields();
               //                Navigator.pushReplacement(
               //   context,
               //   MaterialPageRoute(
@@ -438,6 +409,7 @@ class _CreateAccountState extends State<CreateAccount> {
                               ),
                             ),
                           )));
+              _clearFields();
             } else {
               print("Account Creation Failed");
               setState(() {
@@ -551,10 +523,10 @@ class _CreateAccountState extends State<CreateAccount> {
               hintStyle: TextStyle(color: Colors.grey),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-            //  focusedBorder: OutlineInputBorder(
-            //     borderRadius: BorderRadius.circular(10),
-            //     borderSide: BorderSide(color: Color(0xFF130160)), // Violet color
-            //   ),     
+              //  focusedBorder: OutlineInputBorder(
+              //     borderRadius: BorderRadius.circular(10),
+              //     borderSide: BorderSide(color: Color(0xFF130160)), // Violet color
+              //   ),
             ),
           ),
         ),

@@ -175,7 +175,7 @@ class _ApplicationPageState extends State<ApplicationPage> {
   String getTimeAgo(Timestamp timestamp) {
     DateTime dateTime = timestamp.toDate();
     Duration timeAgo = DateTime.now().difference(dateTime);
-    return timeago.format(DateTime.now().subtract(timeAgo), locale: 'en');
+    return timeago.format(DateTime.now().subtract(timeAgo), locale: 'en_short');
   }
 
   String getFirstWordBeforeComma(String input) {
@@ -284,6 +284,13 @@ class _ApplicationPageState extends State<ApplicationPage> {
                           '${getTimeAgo(widget.timestamp)}',
                           style: TextStyle(fontSize: 16),
                         ),
+                        // Expanded(
+                        //   child: Text(
+                        //     '${getTimeAgo(widget.timestamp)}',
+                        //     style: TextStyle(fontSize: 16),
+                        //     overflow: TextOverflow.ellipsis,
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),

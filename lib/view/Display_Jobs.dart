@@ -168,6 +168,7 @@ class _DisplayJobsState extends State<DisplayJobs> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     print(remoteJobCount);
     print(employmentTypeFTCount);
     print(employmentTypePTCount);
@@ -190,10 +191,11 @@ class _DisplayJobsState extends State<DisplayJobs> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 25),
+              SizedBox(height: size.height / 45),
               // Advertisements Card
               Container(
-                height: 178, // Adjust the height as needed
+                // height: 178, // Adjust the height as needed
+                height: size.height / 5,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Color.fromARGB(
@@ -252,6 +254,8 @@ class _DisplayJobsState extends State<DisplayJobs> {
 
                     var jobs = snapshot.data!.docs;
                     return ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
                       itemCount: jobs.length,
                       itemBuilder: (context, index) {
                         var job = jobs[index].data() as Map<String, dynamic>;
@@ -296,9 +300,15 @@ class _DisplayJobsState extends State<DisplayJobs> {
   }
 
   Widget _buildJobCard(String label) {
+    final double cardWidth = MediaQuery.of(context).size.width * 0.46;
+    final double cardHeight = MediaQuery.of(context).size.height * 0.23;
+
     return Container(
-      width: 175, // Adjust the width as needed
-      height: 188, // Adjust the height as needed
+      // width: 175, // Adjust the width as needed
+      // height: 188, // Adjust the height as needed
+      width: cardWidth,
+      height: cardHeight,
+
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 176, 221, 243), // Change color as needed
         borderRadius: BorderRadius.circular(10),
@@ -396,7 +406,8 @@ class _DisplayJobsState extends State<DisplayJobs> {
     return Container(
       // margin: EdgeInsets.only(bottom: 16),
       // padding: EdgeInsets.all(16),
- margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.016),
+      margin:
+          EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.016),
       padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
       decoration: BoxDecoration(
         color: Colors.white,
