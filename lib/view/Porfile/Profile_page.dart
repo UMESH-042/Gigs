@@ -1169,7 +1169,59 @@ class Appreciation extends StatelessWidget {
                 ),
               ],
             ),
-            for (var i = 0; i < AppreciationData.length; i++)
+//             for (var i = 0; i < AppreciationData.length; i++)
+//               Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Divider(
+//                     color: Color.fromARGB(255, 221, 220, 220),
+//                     thickness: 1,
+//                   ),
+//                   SizedBox(height: 10),
+//                   Text(
+//                     AppreciationData[i]['awardname'] ?? '',
+//                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+//                   ),
+//                   Row(
+//                     children: [
+//                       Text(
+//                         AppreciationData[i]['AchievementAchieved'] ?? '',
+//                         style: TextStyle(fontSize: 16),
+//                       ),
+//                       Spacer(),
+//                       IconButton(
+//                         icon: Icon(
+//                           Icons.edit,
+//                           color: Colors.orange, // Orange edit icon color
+//                         ),
+//                         onPressed: () {},
+//                       ),
+//                     ],
+//                   ),
+//                   Row(
+//                     children: [
+//                       // Text(
+//                       //   AppreciationData[i]['startDate'] ?? '',
+//                       //   style: TextStyle(fontSize: 14),
+//                       // ),
+//                       SizedBox(width: 5),
+//                       Text('--'),
+//                       SizedBox(width: 5),
+//                       Text(
+//                         AppreciationData[i]['endDate'] ?? '',
+//                         style: TextStyle(fontSize: 14),
+//                       ),
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+          for (var i = 0; i < AppreciationData.length; i++) ...[
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1178,21 +1230,33 @@ class Appreciation extends StatelessWidget {
                     thickness: 1,
                   ),
                   SizedBox(height: 10),
-                  Text(
-                    AppreciationData[i]['awardname'] ?? '',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      AppreciationData[i]['awardname'] ?? '',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                   Row(
                     children: [
-                      Text(
-                        AppreciationData[i]['AchievementAchieved'] ?? '',
-                        style: TextStyle(fontSize: 16),
+                      Expanded(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            AppreciationData[i]['AchievementAchieved'] ?? '',
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
                       ),
-                      Spacer(),
                       IconButton(
                         icon: Icon(
                           Icons.edit,
-                          color: Colors.orange, // Orange edit icon color
+                          color: Colors.orange,
                         ),
                         onPressed: () {},
                       ),
@@ -1200,21 +1264,27 @@ class Appreciation extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      // Text(
-                      //   AppreciationData[i]['startDate'] ?? '',
-                      //   style: TextStyle(fontSize: 14),
-                      // ),
-                      SizedBox(width: 5),
-                      Text('--'),
-                      SizedBox(width: 5),
                       Text(
-                        AppreciationData[i]['endDate'] ?? '',
+                        '--',
                         style: TextStyle(fontSize: 14),
+                      ),
+                      SizedBox(width: 5),
+                      Expanded(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            AppreciationData[i]['endDate'] ?? '',
+                            style: TextStyle(
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ],
               ),
+            ],
           ],
         ),
       ),

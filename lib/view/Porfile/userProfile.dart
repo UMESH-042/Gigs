@@ -7,6 +7,7 @@ import 'package:gigs/view/Network/comments.dart';
 import 'package:gigs/view/Porfile/Application_Page.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+
 import 'package:timeago/timeago.dart' as timeago;
 
 class ProfileScreen extends StatefulWidget {

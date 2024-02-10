@@ -16,9 +16,11 @@ import 'package:gigs/view/Display_Jobs.dart';
 import 'package:gigs/view/Network/Network.dart';
 import 'package:gigs/view/Porfile/Profile_page.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Screens/login_screen.dart';
 import 'SavedJobs.dart';
 import 'bottomSheet.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 class HomePage extends StatefulWidget {
   final String currentUserEmail;
@@ -39,7 +41,10 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
   List<Widget> _screens = [];
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
+  final GlobalKey _hamburgerIconKey = new GlobalKey();
+  final GlobalKey _avatarIconKey = new GlobalKey();
+  final GlobalKey _bottomNavigationBarKey = new GlobalKey();
+  // final GlobalKey _AddJobPostIconKey = new GlobalKey();
   Future<void> storeNotificationToken() async {
     String? token = await FirebaseMessaging.instance.getToken();
     FirebaseFirestore.instance
@@ -61,6 +66,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) => showShowcaseIfNeeded());
     super.initState();
     storeNotificationToken();
     _screens = [
@@ -74,6 +80,29 @@ class _HomePageState extends State<HomePage> {
     ];
     _loadUserData();
     _requestNotificationPermissions();
+  }
+
+  void startShowCase() {
+    ShowCaseWidget.of(context).startShowCase(
+        [_hamburgerIconKey, _avatarIconKey, _bottomNavigationBarKey]);
+  }
+
+  Future<bool> _hasShownShowcase(String email) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('showcase_$email') ?? false;
+  }
+
+  Future<void> _markShowcaseAsShown(String email) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('showcase_$email', true);
+  }
+
+  void showShowcaseIfNeeded() async {
+    bool hasShownShowcase = await _hasShownShowcase(widget.currentUserEmail);
+    if (!hasShownShowcase) {
+      startShowCase();
+      _markShowcaseAsShown(widget.currentUserEmail);
+    }
   }
 
   // Function to handle the logout action
@@ -128,36 +157,53 @@ class _HomePageState extends State<HomePage> {
           ? AppBar(
               backgroundColor: const Color.fromARGB(255, 243, 240, 240),
               elevation: 0,
-              actions: [
-                IconButton(
-                  icon: Icon(Icons.menu_outlined, color: Colors.black),
-                  onPressed: () {
-                    // _logout();
-                    _scaffoldKey.currentState?.openDrawer();
+              leading: Showcase(
+                key: _hamburgerIconKey,
+                description: 'Click here to open the drawer.',
+                child: Builder(
+                  builder: (BuildContext context) {
+                    return Container(
+                      margin: EdgeInsets.only(left: 3),
+                      // margin: EdgeInsets.only(left: 17),
+                      child: IconButton(
+                        icon: Icon(Icons.menu_outlined, color: Colors.black),
+                        onPressed: () {
+                          // _logout();
+                          _scaffoldKey.currentState?.openDrawer();
+                        },
+                      ),
+                    );
                   },
                 ),
+              ),
+              actions: [
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Container(
                         margin: EdgeInsets.only(right: 17),
-                        child: IconButton(
-                          padding: EdgeInsets.all(0),
-                          icon: CircleAvatar(
-                            backgroundImage: NetworkImage(_userImageUrl),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ProfilePage(
-                                  currentUserEmail: widget.currentUserEmail,
-                                  imageUrl: _userImageUrl,
+                        child: Showcase(
+                          key: _avatarIconKey,
+                          description:
+                              'Click here to view your profile and Add your Details.',
+                          child: IconButton(
+                            padding: EdgeInsets.all(0),
+                            icon: CircleAvatar(
+                              backgroundImage: NetworkImage(_userImageUrl),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProfilePage(
+                                    currentUserEmail: widget.currentUserEmail,
+                                    imageUrl: _userImageUrl,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ],
@@ -277,56 +323,61 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: CurvedNavigationBar(
-        color: Colors.white,
-        buttonBackgroundColor: Colors.white,
-        animationCurve: Curves.fastOutSlowIn,
-        index: _currentIndex,
-        items: [
-          Image.asset(
-            'assets/homes_icon.png',
-            width: 28,
-            height: 28,
-          ),
-          Image.asset(
-            'assets/sharing_icon.png',
-            width: 28,
-            height: 28,
-          ),
-          Image.asset(
-            'assets/add_icon.png',
-            width: 40,
-            height: 40,
-          ),
-          Image.asset(
-            'assets/chat_icon.png',
-            width: 28,
-            height: 28,
-          ),
-          Image.asset(
-            'assets/save_icon.png',
-            width: 28,
-            height: 28,
-          ),
-        ],
-        onTap: (index) {
-          if (index == 2) {
-            showModalBottomSheet(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25.0),
-              ),
-              context: context,
-              isScrollControlled: true,
-              builder: (context) => AddBottomSheet(
-                useremail: widget.currentUserEmail,
-              ),
-            );
-          } else {
-            setState(() {
-              _currentIndex = index;
-            });
-          }
-        },
+      bottomNavigationBar: Showcase(
+        key: _bottomNavigationBarKey,
+        description:
+            'Explore different sections using the bottom navigation bar.',
+        child: CurvedNavigationBar(
+          color: Colors.white,
+          buttonBackgroundColor: Colors.white,
+          animationCurve: Curves.fastOutSlowIn,
+          index: _currentIndex,
+          items: [
+            Image.asset(
+              'assets/homes_icon.png',
+              width: 28,
+              height: 28,
+            ),
+            Image.asset(
+              'assets/sharing_icon.png',
+              width: 28,
+              height: 28,
+            ),
+            Image.asset(
+              'assets/add_icon.png',
+              width: 40,
+              height: 40,
+            ),
+            Image.asset(
+              'assets/chat_icon.png',
+              width: 28,
+              height: 28,
+            ),
+            Image.asset(
+              'assets/save_icon.png',
+              width: 28,
+              height: 28,
+            ),
+          ],
+          onTap: (index) {
+            if (index == 2) {
+              showModalBottomSheet(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                ),
+                context: context,
+                isScrollControlled: true,
+                builder: (context) => AddBottomSheet(
+                  useremail: widget.currentUserEmail,
+                ),
+              );
+            } else {
+              setState(() {
+                _currentIndex = index;
+              });
+            }
+          },
+        ),
       ),
     );
   }
