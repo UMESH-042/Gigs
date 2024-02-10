@@ -31,38 +31,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String selectedGender = '';
   String selectedCountryCode = '+1';
 
-  // Future<void> _changeImage() async {
-  //   FilePickerResult? result = await FilePicker.platform.pickFiles(
-  //     type: FileType.image,
-  //     allowMultiple: false,
-  //   );
-
-  //   if (result != null && result.files.isNotEmpty) {
-  //     PlatformFile file = result.files.first;
-
-  //     // Assuming you are using Firebase to store user data
-  //     // Update the 'imageUrl' in the 'users' collection
-  //     await FirebaseFirestore.instance
-  //         .collection('users')
-  //         .where('email', isEqualTo: widget.currentUserEmail)
-  //         .get()
-  //         .then((QuerySnapshot<Map<String, dynamic>> snapshot) {
-  //       if (snapshot.docs.isNotEmpty) {
-  //         final DocumentReference<Map<String, dynamic>> documentReference =
-  //             snapshot.docs.first.reference;
-  //         documentReference.update({'imageUrl': file.path});
-  //       }
-  //     });
-
-  //     // Update the local 'imageUrl' to reflect the change
-  //     Navigator.pushReplacement(
-  //         context,
-  //         MaterialPageRoute(
-  //             builder: (context) => EditProfilePage(
-  //                 currentUserEmail: widget.currentUserEmail,
-  //                 imageUrl: widget.imageUrl)));
-  //   }
-  // }
   Future<void> _changeImage() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -343,9 +311,129 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ),
               Center(
                 child: ElevatedButton(
-                  onPressed: () async {},
+                  onPressed: () async {
+
+                    // if (_fullnameController.text.isNotEmpty &&
+                    //     _emailController.text.isNotEmpty) {
+                    //   // Update Full Name and Email in the 'users' collection
+                    //   await FirebaseFirestore.instance
+                    //       .collection('users')
+                    //       .where('email', isEqualTo: widget.currentUserEmail)
+                    //       .get()
+                    //       .then((QuerySnapshot<Map<String, dynamic>>
+                    //           snapshot) async {
+                    //     if (snapshot.docs.isNotEmpty) {
+                    //       final DocumentReference<Map<String, dynamic>>
+                    //           documentReference = snapshot.docs.first.reference;
+                    //       await documentReference.update({
+                    //         'name': _fullnameController.text,
+                    //         'email': _emailController.text,
+                    //       });
+                    //     }
+                    //   });
+                    // }
+
+                    // // Update DateOfBirth, Gender, PhoneNumber, and Location in the 'users' collection
+                    // await FirebaseFirestore.instance
+                    //     .collection('users')
+                    //     .where('email', isEqualTo: widget.currentUserEmail)
+                    //     .get()
+                    //     .then((QuerySnapshot<Map<String, dynamic>>
+                    //         snapshot) async {
+                    //   if (snapshot.docs.isNotEmpty) {
+                    //     final DocumentReference<Map<String, dynamic>>
+                    //         documentReference = snapshot.docs.first.reference;
+                    //     await documentReference.update({
+                    //       'dateOfBirth': _DOBController.text,
+                    //       'gender': selectedGender,
+                    //       'phoneNumber':
+                    //           selectedCountryCode + _phoneNumberController.text,
+                    //       'location': _locationController.text,
+                    //     });
+                    //   }
+                    // });
+                     if (_fullnameController.text.isNotEmpty && _emailController.text.isNotEmpty) {
+      // Update Full Name and Email in the 'users' collection
+      await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: widget.currentUserEmail)
+          .get()
+          .then((QuerySnapshot<Map<String, dynamic>> snapshot) async {
+        if (snapshot.docs.isNotEmpty) {
+          final DocumentReference<Map<String, dynamic>> documentReference =
+              snapshot.docs.first.reference;
+          await documentReference.update({
+            'name': _fullnameController.text,
+            'email': _emailController.text,
+          });
+        }
+      });
+    }
+
+    // Check and update DateOfBirth if not empty
+    if (_DOBController.text.isNotEmpty) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: widget.currentUserEmail)
+          .get()
+          .then((QuerySnapshot<Map<String, dynamic>> snapshot) async {
+        if (snapshot.docs.isNotEmpty) {
+          final DocumentReference<Map<String, dynamic>> documentReference =
+              snapshot.docs.first.reference;
+          await documentReference.update({'dateOfBirth': _DOBController.text});
+        }
+      });
+    }
+
+    // Check and update Gender if not empty
+    if (selectedGender.isNotEmpty) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: widget.currentUserEmail)
+          .get()
+          .then((QuerySnapshot<Map<String, dynamic>> snapshot) async {
+        if (snapshot.docs.isNotEmpty) {
+          final DocumentReference<Map<String, dynamic>> documentReference =
+              snapshot.docs.first.reference;
+          await documentReference.update({'gender': selectedGender});
+        }
+      });
+    }
+
+    // Check and update PhoneNumber if not empty
+    if (_phoneNumberController.text.isNotEmpty) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: widget.currentUserEmail)
+          .get()
+          .then((QuerySnapshot<Map<String, dynamic>> snapshot) async {
+        if (snapshot.docs.isNotEmpty) {
+          final DocumentReference<Map<String, dynamic>> documentReference =
+              snapshot.docs.first.reference;
+          await documentReference.update({
+            'phoneNumber': selectedCountryCode + _phoneNumberController.text,
+          });
+        }
+      });
+    }
+
+    // Check and update Location if not empty
+    if (_locationController.text.isNotEmpty) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: widget.currentUserEmail)
+          .get()
+          .then((QuerySnapshot<Map<String, dynamic>> snapshot) async {
+        if (snapshot.docs.isNotEmpty) {
+          final DocumentReference<Map<String, dynamic>> documentReference =
+              snapshot.docs.first.reference;
+          await documentReference.update({'location': _locationController.text});
+        }
+      });
+    }
+                  },
                   style: ElevatedButton.styleFrom(
-                    primary: Color(0xFF130160), 
+                    primary: Color(0xFF130160),
                     onPrimary: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
