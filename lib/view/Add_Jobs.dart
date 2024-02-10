@@ -165,31 +165,11 @@ class _AddJobsState extends State<AddJobs> {
         print("Error fetching imageUrl: $e");
       }
       sendNotificationToAllUsers(userName!, 'New Job has been Added in $selectedCategory');
-      // try {
-      //   QuerySnapshot usersSnapshot =
-      //       await FirebaseFirestore.instance.collection('users').get();
+     
+       await Future.delayed(
+            Duration(milliseconds: 500)); // Adjust the delay time as needed
 
-      //   for (QueryDocumentSnapshot user in usersSnapshot.docs) {
-      //     String userId = user.id;
-      //     String notificationId = Uuid().v4();
-
-      //     // Send notification to the user
-      //     await FirebaseFirestore.instance
-      //         .collection('notifications')
-      //         .doc(notificationId)
-      //         .set({
-      //       'notificationId': notificationId,
-      //       'userName': userName,
-      //       'message': 'New Job Has been Added: $jobDescription',
-      //       'sendTo': userId,
-      //       'imageUrl': imageUrl,
-      //       'timestamp': FieldValue.serverTimestamp(),
-      //     });
-      //   }
-      //   print('Notification Send Successfully');
-      // } catch (e) {
-      //   print('Error sending notification to all users: $e');
-      // }
+        Navigator.pop(context); // Navigate after the delay
     } catch (e) {
       print('Error adding job to Firestore: $e');
     }
@@ -224,15 +204,6 @@ class _AddJobsState extends State<AddJobs> {
           },
         ),
         actions: [
-          // TextButton(
-          //   onPressed: () {
-          //     // Handle the "Post" button action
-          //   },
-          //   child: Text(
-          //     "Post",
-          //     style: TextStyle(color: Color(0xFFFCA34D), fontSize: 17),
-          //   ),
-          // ),
           TextButton(
             onPressed: () async {
               addJobToFirestore(
@@ -244,15 +215,6 @@ class _AddJobsState extends State<AddJobs> {
                   JobDescription,
                   selectedSalary,
                   selectedCategory);
-              Navigator.pop(context);
-              Navigator.pop(context);
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => HomePage(
-                          currentUserEmail: currentUserEmail,
-                          requiresProfileSetup: true)));
-              // Handle any other necessary actions after posting the job
             },
             child: Text(
               "Post",

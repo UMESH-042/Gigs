@@ -312,7 +312,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
               Center(
                 child: ElevatedButton(
                   onPressed: () async {
-
                     // if (_fullnameController.text.isNotEmpty &&
                     //     _emailController.text.isNotEmpty) {
                     //   // Update Full Name and Email in the 'users' collection
@@ -352,85 +351,96 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     //     });
                     //   }
                     // });
-                     if (_fullnameController.text.isNotEmpty && _emailController.text.isNotEmpty) {
-      // Update Full Name and Email in the 'users' collection
-      await FirebaseFirestore.instance
-          .collection('users')
-          .where('email', isEqualTo: widget.currentUserEmail)
-          .get()
-          .then((QuerySnapshot<Map<String, dynamic>> snapshot) async {
-        if (snapshot.docs.isNotEmpty) {
-          final DocumentReference<Map<String, dynamic>> documentReference =
-              snapshot.docs.first.reference;
-          await documentReference.update({
-            'name': _fullnameController.text,
-            'email': _emailController.text,
-          });
-        }
-      });
-    }
+                    if (_fullnameController.text.isNotEmpty &&
+                        _emailController.text.isNotEmpty) {
+                      // Update Full Name and Email in the 'users' collection
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .where('email', isEqualTo: widget.currentUserEmail)
+                          .get()
+                          .then((QuerySnapshot<Map<String, dynamic>>
+                              snapshot) async {
+                        if (snapshot.docs.isNotEmpty) {
+                          final DocumentReference<Map<String, dynamic>>
+                              documentReference = snapshot.docs.first.reference;
+                          await documentReference.update({
+                            'name': _fullnameController.text,
+                            'email': _emailController.text,
+                          });
+                        }
+                      });
+                    }
 
-    // Check and update DateOfBirth if not empty
-    if (_DOBController.text.isNotEmpty) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .where('email', isEqualTo: widget.currentUserEmail)
-          .get()
-          .then((QuerySnapshot<Map<String, dynamic>> snapshot) async {
-        if (snapshot.docs.isNotEmpty) {
-          final DocumentReference<Map<String, dynamic>> documentReference =
-              snapshot.docs.first.reference;
-          await documentReference.update({'dateOfBirth': _DOBController.text});
-        }
-      });
-    }
+                    // Check and update DateOfBirth if not empty
+                    if (_DOBController.text.isNotEmpty) {
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .where('email', isEqualTo: widget.currentUserEmail)
+                          .get()
+                          .then((QuerySnapshot<Map<String, dynamic>>
+                              snapshot) async {
+                        if (snapshot.docs.isNotEmpty) {
+                          final DocumentReference<Map<String, dynamic>>
+                              documentReference = snapshot.docs.first.reference;
+                          await documentReference
+                              .update({'dateOfBirth': _DOBController.text});
+                        }
+                      });
+                    }
 
-    // Check and update Gender if not empty
-    if (selectedGender.isNotEmpty) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .where('email', isEqualTo: widget.currentUserEmail)
-          .get()
-          .then((QuerySnapshot<Map<String, dynamic>> snapshot) async {
-        if (snapshot.docs.isNotEmpty) {
-          final DocumentReference<Map<String, dynamic>> documentReference =
-              snapshot.docs.first.reference;
-          await documentReference.update({'gender': selectedGender});
-        }
-      });
-    }
+                    // Check and update Gender if not empty
+                    if (selectedGender.isNotEmpty) {
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .where('email', isEqualTo: widget.currentUserEmail)
+                          .get()
+                          .then((QuerySnapshot<Map<String, dynamic>>
+                              snapshot) async {
+                        if (snapshot.docs.isNotEmpty) {
+                          final DocumentReference<Map<String, dynamic>>
+                              documentReference = snapshot.docs.first.reference;
+                          await documentReference
+                              .update({'gender': selectedGender});
+                        }
+                      });
+                    }
 
-    // Check and update PhoneNumber if not empty
-    if (_phoneNumberController.text.isNotEmpty) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .where('email', isEqualTo: widget.currentUserEmail)
-          .get()
-          .then((QuerySnapshot<Map<String, dynamic>> snapshot) async {
-        if (snapshot.docs.isNotEmpty) {
-          final DocumentReference<Map<String, dynamic>> documentReference =
-              snapshot.docs.first.reference;
-          await documentReference.update({
-            'phoneNumber': selectedCountryCode + _phoneNumberController.text,
-          });
-        }
-      });
-    }
+                    // Check and update PhoneNumber if not empty
+                    if (_phoneNumberController.text.isNotEmpty) {
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .where('email', isEqualTo: widget.currentUserEmail)
+                          .get()
+                          .then((QuerySnapshot<Map<String, dynamic>>
+                              snapshot) async {
+                        if (snapshot.docs.isNotEmpty) {
+                          final DocumentReference<Map<String, dynamic>>
+                              documentReference = snapshot.docs.first.reference;
+                          await documentReference.update({
+                            'phoneNumber': selectedCountryCode +
+                                _phoneNumberController.text,
+                          });
+                        }
+                      });
+                    }
 
-    // Check and update Location if not empty
-    if (_locationController.text.isNotEmpty) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .where('email', isEqualTo: widget.currentUserEmail)
-          .get()
-          .then((QuerySnapshot<Map<String, dynamic>> snapshot) async {
-        if (snapshot.docs.isNotEmpty) {
-          final DocumentReference<Map<String, dynamic>> documentReference =
-              snapshot.docs.first.reference;
-          await documentReference.update({'location': _locationController.text});
-        }
-      });
-    }
+                    // Check and update Location if not empty
+                    if (_locationController.text.isNotEmpty) {
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .where('email', isEqualTo: widget.currentUserEmail)
+                          .get()
+                          .then((QuerySnapshot<Map<String, dynamic>>
+                              snapshot) async {
+                        if (snapshot.docs.isNotEmpty) {
+                          final DocumentReference<Map<String, dynamic>>
+                              documentReference = snapshot.docs.first.reference;
+                          await documentReference
+                              .update({'location': _locationController.text});
+                        }
+                      });
+                    }
+                    Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Color(0xFF130160),
