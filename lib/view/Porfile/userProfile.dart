@@ -284,36 +284,79 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget buildDataSection(String title, List<String> data) {
-    return data.isNotEmpty
-        ? Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 16),
-              Text('$title',
-                  style: TextStyle(
-                    color: Colors.indigo[900]!,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 20,
-                    letterSpacing: 0.2,
-                  )),
-              SizedBox(height: 8),
-              for (String item in data) Text('- $item'),
-            ],
-          )
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 16),
-              Text(
-                '$title:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  // Widget buildDataSection(String title, List<String> data) {
+  //   return data.isNotEmpty
+  //       ? Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             SizedBox(height: 16),
+  //             Text('$title',
+  //                 style: TextStyle(
+  //                   color: Colors.indigo[900]!,
+  //                   fontWeight: FontWeight.w600,
+  //                   fontSize: 20,
+  //                   letterSpacing: 0.2,
+  //                 )),
+  //             SizedBox(height: 8),
+  //             for (String item in data) Text('- $item'),
+  //           ],
+  //         )
+  //       : Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             SizedBox(height: 16),
+  //             Text(
+  //               '$title:',
+  //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  //             ),
+  //             SizedBox(height: 8),
+  //             Text('No Data Available'),
+  //           ],
+  //         );
+  // }
+Widget buildDataSection(String title, List<String> data) {
+  return data.isNotEmpty
+      ? Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 16),
+            Text(
+              '$title',
+              style: TextStyle(
+                color: Colors.indigo[900]!,
+                fontWeight: FontWeight.w600,
+                fontSize: 20,
+                letterSpacing: 0.2,
               ),
-              SizedBox(height: 8),
-              Text('No Data Available'),
-            ],
-          );
-  }
+            ),
+            SizedBox(height: 8),
+            Wrap(
+              spacing: 8.0, // Adjust the spacing between chips
+              runSpacing: 4.0, // Adjust the spacing between chip rows
+              children: [
+                for (String item in data)
+                  Chip(
+                    label: Text(item),
+                    backgroundColor: Colors.grey[300],
+                    // You can customize chip properties like shape, padding, etc.
+                  ),
+              ],
+            ),
+          ],
+        )
+      : Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 16),
+            Text(
+              '$title:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text('No Data Available'),
+          ],
+        );
+}
 
   Widget buildAchievementSection(String title, dynamic data) {
     if (data != null && data is List<Map<String, dynamic>>) {
