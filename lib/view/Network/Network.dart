@@ -19,6 +19,7 @@ class _ViewPostsPageState extends State<ViewPostsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 241, 241, 241),
       appBar: AppBar(
@@ -51,9 +52,9 @@ class _ViewPostsPageState extends State<ViewPostsPage> {
               ],
             ),
           ),
-          SizedBox(
-              height:
-                  10), // Adjust the spacing between buttons and posts/connections
+          SizedBox(height: size.height * 0.02),
+          // Adjust the spacing between buttons and posts/connections
+          //  SizedBox(height: 10,),
           Expanded(
             child: showPosts ? _buildPosts() : _buildConnections(),
           ),
@@ -63,9 +64,13 @@ class _ViewPostsPageState extends State<ViewPostsPage> {
   }
 
   Widget _buildPostsButton({required VoidCallback onPressed}) {
+    final double buttonWidth = 0.4 * MediaQuery.of(context).size.width;
+    final double buttonHeight = 48;
     return Container(
-      width: 165,
-      height: 48,
+      // width: 165,
+      // height: 48,
+      width: buttonWidth,
+      height: buttonHeight,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(11),
         color: Color(0xFF130160), // You can change the color as needed
@@ -81,9 +86,13 @@ class _ViewPostsPageState extends State<ViewPostsPage> {
   }
 
   Widget _buildConnectionsButton({required VoidCallback onPressed}) {
+      final double buttonWidth = 0.4 * MediaQuery.of(context).size.width;
+    final double buttonHeight = 48;
     return Container(
-      width: 165,
-      height: 48,
+      width: buttonWidth,
+      height: buttonHeight,
+      // width: 165,
+      // height: 48,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(11),
         color: Color(0xFFD6CDFE), // You can change the color as needed
@@ -111,6 +120,7 @@ class _ViewPostsPageState extends State<ViewPostsPage> {
           );
         }
         return ListView.builder(
+          shrinkWrap: true,
           itemCount: snapshot.data!.docs.length,
           itemBuilder: (context, index) {
             DocumentSnapshot post = snapshot.data!.docs[index];
@@ -168,7 +178,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     _likeAnimation = Tween<double>(begin: 24, end: 30).animate(
       CurvedAnimation(
         parent: _likeAnimationController,
-        curve: Curves.easeInOut,
+        curve: Curves.ease,
       ),
     );
 
@@ -372,13 +382,6 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                       IconButton(
                         icon: Icon(Icons.mode_comment_outlined),
                         onPressed: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) =>
-                          //         CommentsPage(postId: widget.post.id),
-                          //   ),
-                          // );
                           _showCommentBottomSheet();
                         },
                       ),
@@ -388,9 +391,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                   ),
                   IconButton(
                     icon: Icon(Icons.share),
-                    onPressed: () {
-                      // Implement logic for sharing the post
-                    },
+                    onPressed: () {},
                   ),
                 ],
               ),
@@ -401,48 +402,6 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     );
   }
 
-  // Future<void> _likePost() async {
-  //   final FirebaseAuth auth = FirebaseAuth.instance;
-  //   final User user = auth.currentUser!;
-  //   final uid = user.uid;
-
-  //   QuerySnapshot existingLikes = await FirebaseFirestore.instance
-  //       .collection('likes')
-  //       .where('postId', isEqualTo: widget.post.id)
-  //       .where('userId', isEqualTo: uid)
-  //       .get();
-
-  //   if (existingLikes.docs.isEmpty) {
-  //     // If the user hasn't liked the post, add a new like
-  //     await FirebaseFirestore.instance.collection('likes').add({
-  //       'postId': widget.post.id,
-  //       'userId': uid,
-  //     });
-  //   } else {
-  //     // If the user has already liked the post, remove the like
-  //     await FirebaseFirestore.instance
-  //         .collection('likes')
-  //         .doc(existingLikes.docs.first.id)
-  //         .delete();
-  //   }
-
-  //   // Update the liked state and refresh likes count
-
-  //   // Toggle the like state
-  //   setState(() {
-  //     _getLikesCount();
-  //     isLiked = !isLiked;
-  //   });
-
-  //   // Play the like animation
-  //   _likeAnimationController.forward(from: 0);
-  //   _likeAnimationController.addStatusListener((status) {
-  //     if (status == AnimationStatus.completed) {
-  //       // _likeAnimationController..reset()..forward();
-  //       _likeAnimationController.reset();
-  //     }
-  //   });
-  // }
   Future<void> _likePost() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User user = auth.currentUser!;
@@ -551,8 +510,3 @@ class _CommentsPageState extends State<CommentsPage> {
     );
   }
 }
-
-
-
-
-

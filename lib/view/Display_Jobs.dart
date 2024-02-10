@@ -317,9 +317,14 @@ class _DisplayJobsState extends State<DisplayJobs> {
   }
 
   Widget _buildJobCardforFT(String label) {
+    final double cardWidth = MediaQuery.of(context).size.width * 0.42;
+    final double cardHeight = MediaQuery.of(context).size.height * 0.11;
+
     return Container(
-      width: 175, // Adjust the width as needed
-      height: 90, // Adjust the height as needed
+      // width: 175, // Adjust the width as needed
+      // height: 90, // Adjust the height as needed
+      width: cardWidth,
+      height: cardHeight,
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 193, 168, 236), // Change color as needed
         borderRadius: BorderRadius.circular(10),
@@ -338,9 +343,13 @@ class _DisplayJobsState extends State<DisplayJobs> {
   }
 
   Widget _buildJobCardforPT(String label) {
+    final double cardWidth = MediaQuery.of(context).size.width * 0.42;
+    final double cardHeight = MediaQuery.of(context).size.height * 0.11;
     return Container(
-      width: 175, // Adjust the width as needed
-      height: 90, // Adjust the height as needed
+      width: cardWidth,
+      height: cardHeight,
+      // width: 175, // Adjust the width as needed
+      // height: 90, // Adjust the height as needed
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 238, 200, 144), // Change color as needed
         borderRadius: BorderRadius.circular(10),
@@ -385,8 +394,10 @@ class _DisplayJobsState extends State<DisplayJobs> {
     var domain = companyName.toLowerCase();
 
     return Container(
-      margin: EdgeInsets.only(bottom: 16),
-      padding: EdgeInsets.all(16),
+      // margin: EdgeInsets.only(bottom: 16),
+      // padding: EdgeInsets.all(16),
+ margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.016),
+      padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
