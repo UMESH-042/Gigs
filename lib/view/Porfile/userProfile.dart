@@ -1,3 +1,4 @@
+import 'package:easy_pdf_viewer/easy_pdf_viewer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -8,6 +9,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:easy_pdf_viewer/easy_pdf_viewer.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String useremail;
@@ -22,12 +24,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late String username;
   late String profileImageUrl;
   late String aboutMe;
-  List<String> resumeData = [];
+  List<Map<String, dynamic>> resumeData = [];
   List<Map<String, dynamic>> appreciation = [];
   List<Map<String, dynamic>> education = [];
   List<String> languages = [];
   List<String> skills = [];
- List<Map<String, dynamic>> workExperience = [];
+  List<Map<String, dynamic>> workExperience = [];
   bool aboutUser = true;
   bool PostsByuser = false;
   bool JobsByUser = false;
@@ -99,8 +101,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       processField(userProfileSnapshot, 'Resume', (field) {
         setState(() {
-          resumeData =
-              List<String>.from((field as List).map((e) => e.toString()));
+          resumeData = List<Map<String, dynamic>>.from(
+              (field as List).map((e) => Map<String, dynamic>.from(e)));
         });
       });
 
@@ -135,8 +137,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       processField(userProfileSnapshot, 'workExperience', (field) {
         setState(() {
-          workExperience =
-              List<Map<String, dynamic>>.from(
+          workExperience = List<Map<String, dynamic>>.from(
               (field as List).map((e) => Map<String, dynamic>.from(e)));
         });
       });
@@ -255,16 +256,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     SizedBox(height: 16),
                     buildAchievementSection('Appreciation', appreciation),
-                       SizedBox(height: 16),
+                    SizedBox(height: 16),
                     buildEducationSection('Education', education),
                     SizedBox(height: 16),
                     buildDataSection('Languages', languages),
                     SizedBox(height: 16),
                     buildDataSection('Skills', skills),
                     SizedBox(height: 16),
-                    buildWorkExperienceSection('Work Experience', workExperience),
+                    buildWorkExperienceSection(
+                        'Work Experience', workExperience),
                     SizedBox(height: 16),
-                    buildDataSection('Resume Data', resumeData),
+                    buildResumeDataSection('Resume', resumeData),
                   ],
                 ),
               ),
@@ -339,7 +341,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                           SizedBox(height: 8),
+                          SizedBox(height: 8),
                           _buildLabelAndContent('Achievement Achieved',
                               item['AchievementAchieved']),
                           _buildLabelAndContent(
@@ -413,7 +415,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   letterSpacing: 0.2,
                 ),
               ),
-             
               for (Map<String, dynamic> item in data)
                 Card(
                   margin: EdgeInsets.symmetric(vertical: 8),
@@ -423,7 +424,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                         SizedBox(height: 8),
+                        SizedBox(height: 8),
                         _buildLabelAndContent(
                             'Level of Education', item['levelOfEducation']),
                         _buildLabelAndContent(
@@ -454,7 +455,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
   }
 
-Widget buildWorkExperienceSection(String title, List<Map<String, dynamic>> data) {
+  Widget buildWorkExperienceSection(
+      String title, List<Map<String, dynamic>> data) {
+    return data.isNotEmpty
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 16),
+              Text(
+                '$title',
+                style: TextStyle(
+                  color: Colors.indigo[900]!,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              SizedBox(height: 8),
+              for (Map<String, dynamic> item in data)
+                Container(
+                  width: double.infinity, // This makes the container full width
+                  child: Card(
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    elevation: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildLabelAndContent('Job Title', item['jobTitle']),
+                          _buildLabelAndContent(
+                              'Description', item['description']),
+                          _buildLabelAndContent('Company', item['company']),
+                          _buildLabelAndContent(
+                              'Start Date', item['startDate']),
+                          _buildLabelAndContent('End Date', item['endDate']),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          )
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 16),
+              Text(
+                '$title:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text('No Data Available'),
+            ],
+          );
+  }
+
+ 
+  Widget buildResumeDataSection(String title, List<Map<String, dynamic>> data) {
   return data.isNotEmpty
       ? Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,23 +527,72 @@ Widget buildWorkExperienceSection(String title, List<Map<String, dynamic>> data)
                 letterSpacing: 0.2,
               ),
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 10),
             for (Map<String, dynamic> item in data)
-              Container(
-                width: double.infinity, // This makes the container full width
-                child: Card(
-                  margin: EdgeInsets.symmetric(vertical: 8),
-                  elevation: 2,
+              GestureDetector(
+                onTap: () async {
+                  if (item['URL'] != null &&
+                      item['FileName'] != null &&
+                      item['FileSize'] != null) {
+                    // Navigate to PDF viewer when the container is tapped
+                    String url = item['URL'];
+                    PDFDocument document;
+                    try {
+                      // Load PDF document from URL
+                      document = await PDFDocument.fromURL(url);
+                      // Navigate to PDF viewer when the container is tapped
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PDFViewer(document: document),
+                        ),
+                      );
+                    } catch (e) {
+                      print('Error loading PDF: $e');
+                    }
+                  } else {
+                    print('URL is null for ${item['FileName']}');
+                  }
+                },
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  height: 140.0,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20.0),
+                    color: Color.fromARGB(255, 227, 217, 229),
+                  ),
                   child: Padding(
-                    padding: const EdgeInsets.all(12.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildLabelAndContent('Job Title', item['jobTitle']),
-                        _buildLabelAndContent('Description', item['description']),
-                        _buildLabelAndContent('Company', item['company']),
-                        _buildLabelAndContent('Start Date', item['startDate']),
-                        _buildLabelAndContent('End Date', item['endDate']),
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(Icons.insert_drive_file,
+                                size: 40,
+                                color: Color.fromARGB(255, 209, 75, 37)),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    item['FileName'] ?? 'No Data Available',
+                                    style: TextStyle(fontSize: 16.0),
+                                  ),
+                                  SizedBox(height: 10,),
+                                  Text(
+                                    '${item['FileSize']} KB' ?? 'No Data Available',
+                                    style: TextStyle(fontSize: 12.0),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -506,7 +613,6 @@ Widget buildWorkExperienceSection(String title, List<Map<String, dynamic>> data)
           ],
         );
 }
-
 
 
   Widget _buildLabelAndContent(String label, String content) {
