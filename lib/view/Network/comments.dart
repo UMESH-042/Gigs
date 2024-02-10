@@ -132,101 +132,112 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
     return generateDarkColor();
   }
 
+  
   Widget _buildCommentList() {
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection('comments')
-          .where('postId', isEqualTo: widget.postId)
-          .orderBy('timestamp', descending: true)
-          .snapshots(),
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData) {
-          return Text('Loading...');
-        }
+  return StreamBuilder(
+    stream: FirebaseFirestore.instance
+        .collection('comments')
+        .where('postId', isEqualTo: widget.postId)
+        .orderBy('timestamp', descending: true)
+        .snapshots(),
+    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+      if (!snapshot.hasData) {
+        return Text('Loading...');
+      }
 
-        var comments = snapshot.data!.docs;
+      var comments = snapshot.data!.docs;
 
-        return ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: comments.length,
-          itemBuilder: (context, index) {
-            var comment = comments[index];
-            var commentText = comment['text'];
-            var commentUser = comment['userId'];
-            var timestamp = comment['timestamp'] as Timestamp;
-            Color randomColor = _generateRandomColor(commentUser);
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ListTile(
-                  leading: FutureBuilder(
-                    future: _getUsername(commentUser),
-                    builder: (context, AsyncSnapshot<String> usernameSnapshot) {
-                      if (usernameSnapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return CircleAvatar(child: Text(''));
-                      } else if (usernameSnapshot.hasError) {
-                        return CircleAvatar(child: Text(''));
-                      }
+      return ListView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: comments.length,
+        itemBuilder: (context, index) {
+          var comment = comments[index];
+          var commentText = comment['text'];
+          var commentUser = comment['userId'];
+          var timestamp = comment['timestamp'] as Timestamp?;
 
-                      var username = usernameSnapshot.data ?? 'Unknown User';
+          // Handle null timestamp
+          if (timestamp == null) {
+            timestamp = Timestamp.now(); // Use current time as a fallback
+          }
 
-                      return CircleAvatar(
-                        backgroundColor: randomColor,
-                        child: Text(
-                          username[0],
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      );
-                    },
-                  ),
-                  title: FutureBuilder(
-                    future: _getUsername(commentUser),
-                    builder: (context, AsyncSnapshot<String> usernameSnapshot) {
-                      if (usernameSnapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Text('Loading...');
-                      } else if (usernameSnapshot.hasError) {
-                        return Text('Error loading username');
-                      }
+          Color randomColor = _generateRandomColor(commentUser);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ListTile(
+                leading: FutureBuilder(
+                  future: _getUsername(commentUser),
+                  builder: (context, AsyncSnapshot<String> usernameSnapshot) {
+                    if (usernameSnapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return CircleAvatar(child: Text(''));
+                    } else if (usernameSnapshot.hasError) {
+                      return CircleAvatar(child: Text(''));
+                    }
 
-                      var username = usernameSnapshot.data ?? 'Unknown User';
+                    var username = usernameSnapshot.data ?? 'Unknown User';
 
-                      return Text(
-                        username,
-                        style: TextStyle(fontSize: 14),
-                        // style: TextStyle(
-                        //   fontWeight: FontWeight.bold,
-                        // ),
-                      );
-                    },
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        commentText,
-                        style: TextStyle(fontWeight: FontWeight.w800,fontSize: 17),
+                    return CircleAvatar(
+                      backgroundColor: randomColor,
+                      child: Text(
+                        username[0],
+                        style: TextStyle(color: Colors.white),
                       ),
-                    ],
-                  ),
-                  trailing: Text(
-                    _formatTimestamp(timestamp),
-                    style: TextStyle(color: Colors.grey),
-                  ),
+                    );
+                  },
                 ),
-                Divider(thickness: 1, color: Colors.grey),
-                SizedBox(height: 8),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
+                title: FutureBuilder(
+                  future: _getUsername(commentUser),
+                  builder: (context, AsyncSnapshot<String> usernameSnapshot) {
+                    if (usernameSnapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return Text('Loading...');
+                    } else if (usernameSnapshot.hasError) {
+                      return Text('Error loading username');
+                    }
 
-  String _formatTimestamp(Timestamp timestamp) {
+                    var username = usernameSnapshot.data ?? 'Unknown User';
+
+                    return Text(
+                      username,
+                      style: TextStyle(fontSize: 14),
+                    );
+                  },
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      commentText,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 17,
+                      ),
+                    ),
+                  ],
+                ),
+                trailing: Text(
+                  _formatTimestamp(timestamp),
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              Divider(thickness: 1, color: Colors.grey),
+              SizedBox(height: 8),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
+
+  String _formatTimestamp(Timestamp? timestamp) {
+    if (timestamp == null) {
+      return 'Unknown Time';
+    }
     var timeAgo = timeago.format(
       timestamp.toDate(),
       allowFromNow: true,
