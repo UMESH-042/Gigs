@@ -23,11 +23,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late String profileImageUrl;
   late String aboutMe;
   List<String> resumeData = [];
-  List<String> appreciation = [];
-  List<String> education = [];
+  List<Map<String, dynamic>> appreciation = [];
+  List<Map<String, dynamic>> education = [];
   List<String> languages = [];
   List<String> skills = [];
-  List<String> workExperience = [];
+ List<Map<String, dynamic>> workExperience = [];
   bool aboutUser = true;
   bool PostsByuser = false;
   bool JobsByUser = false;
@@ -107,14 +107,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       processField(userProfileSnapshot, 'appreciation', (field) {
         setState(() {
           appreciation =
-              List<String>.from((field as List).map((e) => e.toString()));
+              // List<String>.from((field as List).map((e) => e.toString()));
+              List<Map<String, dynamic>>.from(
+                  (field as List).map((e) => Map<String, dynamic>.from(e)));
         });
       });
 
       processField(userProfileSnapshot, 'education', (field) {
         setState(() {
-          education =
-              List<String>.from((field as List).map((e) => e.toString()));
+          education = List<Map<String, dynamic>>.from(
+              (field as List).map((e) => Map<String, dynamic>.from(e)));
         });
       });
 
@@ -134,7 +136,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       processField(userProfileSnapshot, 'workExperience', (field) {
         setState(() {
           workExperience =
-              List<String>.from((field as List).map((e) => e.toString()));
+              List<Map<String, dynamic>>.from(
+              (field as List).map((e) => Map<String, dynamic>.from(e)));
         });
       });
     } catch (e) {
@@ -238,22 +241,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 16),
-                    Text(
-                      'About Me:',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
+                    Text('About Me',
+                        style: TextStyle(
+                          color: Colors.indigo[900]!,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 20,
+                          letterSpacing: 0.2,
+                        )),
                     SizedBox(height: 8),
                     Text(
                       aboutMe != '' ? aboutMe : 'No Data available',
                       style: TextStyle(fontSize: 16),
                     ),
                     SizedBox(height: 16),
-                    buildDataSection('Appreciation', appreciation),
-                    buildDataSection('Education', education),
+                    buildAchievementSection('Appreciation', appreciation),
+                       SizedBox(height: 16),
+                    buildEducationSection('Education', education),
+                    SizedBox(height: 16),
                     buildDataSection('Languages', languages),
+                    SizedBox(height: 16),
                     buildDataSection('Skills', skills),
-                    buildDataSection('Work Experience', workExperience),
+                    SizedBox(height: 16),
+                    buildWorkExperienceSection('Work Experience', workExperience),
+                    SizedBox(height: 16),
                     buildDataSection('Resume Data', resumeData),
                   ],
                 ),
@@ -278,10 +288,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 16),
-              Text(
-                '$title:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              Text('$title',
+                  style: TextStyle(
+                    color: Colors.indigo[900]!,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 20,
+                    letterSpacing: 0.2,
+                  )),
               SizedBox(height: 8),
               for (String item in data) Text('- $item'),
             ],
@@ -298,6 +311,232 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Text('No Data Available'),
             ],
           );
+  }
+
+  Widget buildAchievementSection(String title, dynamic data) {
+    if (data != null && data is List<Map<String, dynamic>>) {
+      return data.isNotEmpty
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 16),
+                Text(
+                  '$title',
+                  style: TextStyle(
+                    color: Colors.indigo[900]!,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 20,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+                SizedBox(height: 8),
+                for (Map<String, dynamic> item in data)
+                  Card(
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    elevation: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                           SizedBox(height: 8),
+                          _buildLabelAndContent('Achievement Achieved',
+                              item['AchievementAchieved']),
+                          _buildLabelAndContent(
+                              'Description', item['description']),
+                          _buildLabelAndContent(
+                              'Award Name', item['awardname']),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 16),
+                Text(
+                  '$title:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Text('No Data Available'),
+              ],
+            );
+    } else if (data != null && data is List<String>) {
+      return data.isNotEmpty
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 16),
+                Text('$title',
+                    style: TextStyle(
+                      color: Colors.indigo[900]!,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                      letterSpacing: 0.2,
+                    )),
+                SizedBox(height: 8),
+                for (String item in data) Text('- $item'),
+              ],
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 16),
+                Text(
+                  '$title:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Text('No Data Available'),
+              ],
+            );
+    } else {
+      return Container(); // Handle other data types as needed
+    }
+  }
+
+  Widget buildEducationSection(String title, List<Map<String, dynamic>> data) {
+    return data.isNotEmpty
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 16),
+              Text(
+                '$title',
+                style: TextStyle(
+                  color: Colors.indigo[900]!,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                  letterSpacing: 0.2,
+                ),
+              ),
+             
+              for (Map<String, dynamic> item in data)
+                Card(
+                  margin: EdgeInsets.symmetric(vertical: 8),
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                         SizedBox(height: 8),
+                        _buildLabelAndContent(
+                            'Level of Education', item['levelOfEducation']),
+                        _buildLabelAndContent(
+                            'Institution Name', item['institutionName']),
+                        _buildLabelAndContent(
+                            'Description', item['description']),
+                        _buildLabelAndContent(
+                            'Field of Study', item['fieldOfStudy']),
+                        _buildLabelAndContent('Start Date', item['startDate']),
+                        _buildLabelAndContent('End Date', item['endDate']),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          )
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 16),
+              Text(
+                '$title:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text('No Data Available'),
+            ],
+          );
+  }
+
+Widget buildWorkExperienceSection(String title, List<Map<String, dynamic>> data) {
+  return data.isNotEmpty
+      ? Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 16),
+            Text(
+              '$title',
+              style: TextStyle(
+                color: Colors.indigo[900]!,
+                fontWeight: FontWeight.w600,
+                fontSize: 20,
+                letterSpacing: 0.2,
+              ),
+            ),
+            SizedBox(height: 8),
+            for (Map<String, dynamic> item in data)
+              Container(
+                width: double.infinity, // This makes the container full width
+                child: Card(
+                  margin: EdgeInsets.symmetric(vertical: 8),
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLabelAndContent('Job Title', item['jobTitle']),
+                        _buildLabelAndContent('Description', item['description']),
+                        _buildLabelAndContent('Company', item['company']),
+                        _buildLabelAndContent('Start Date', item['startDate']),
+                        _buildLabelAndContent('End Date', item['endDate']),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        )
+      : Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 16),
+            Text(
+              '$title:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text('No Data Available'),
+          ],
+        );
+}
+
+
+
+  Widget _buildLabelAndContent(String label, String content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.indigo[900]!,
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+            letterSpacing: 0.2,
+          ),
+        ),
+        SizedBox(height: 8),
+        Card(
+          elevation: 0,
+          margin: EdgeInsets.zero,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              content,
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+        ),
+        SizedBox(height: 16),
+      ],
+    );
   }
 
   Widget _buildButtonForPostsByUser({
