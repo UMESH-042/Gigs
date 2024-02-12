@@ -23,7 +23,7 @@ class _PostPageState extends State<PostPage> {
   String _userImageUrl = "";
   String _userName = "";
   String _imageUrl = "";
-  
+
   TextEditingController _posttitlecontroller = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   bool _isImageUploading = false;
@@ -94,7 +94,7 @@ class _PostPageState extends State<PostPage> {
           'imageUrl': _imageUrl,
           'userImageUrl': _userImageUrl,
           'userName': _userName,
-          'email':widget.useremail,
+          'email': widget.useremail,
           'timestamp': FieldValue.serverTimestamp(),
         });
 
@@ -118,7 +118,6 @@ class _PostPageState extends State<PostPage> {
       print("Error posting: $e");
     }
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -126,6 +125,7 @@ class _PostPageState extends State<PostPage> {
       return Center(
         child: CircularProgressIndicator(), // or any other loading widget
       );
+      
     } else {
       return Scaffold(
         backgroundColor: Color.fromARGB(255, 241, 241, 241),

@@ -166,46 +166,93 @@ class _ConnectionCardState extends State<ConnectionCard> {
   //     ),
   //   );
   // }
-   @override
+  
+  //  @override
+  // Widget build(BuildContext context) {
+  //   return Card(
+  //     elevation: 5.0,
+  //     shape: RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.circular(10.0),
+  //     ),
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       crossAxisAlignment: CrossAxisAlignment.center,
+  //       children: [
+  //         CircleAvatar(
+  //           backgroundImage: NetworkImage(widget.user['imageUrl']),
+  //           radius: 27.0,
+  //         ),
+  //         SizedBox(height: 8),
+  //         Text(
+  //           widget.user['name'] ?? '',
+  //           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+  //           textAlign: TextAlign.center,
+  //         ),
+  //         SizedBox(height: 8),
+  //         Text(
+  //           '$followersCount Followers',
+  //           style: TextStyle(fontSize: 14),
+  //           textAlign: TextAlign.center,
+  //         ),
+  //         Flexible(
+  //           child: AnimatedSwitcher(
+  //             duration: Duration(milliseconds: 0),
+  //             child: buildFollowButton(widget.user.id),
+  //             transitionBuilder: (child, animation) {
+  //               return FadeTransition(
+  //                 opacity: animation,
+  //                 child: child,
+  //               );
+  //             },
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+    @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 5.0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          CircleAvatar(
-            backgroundImage: NetworkImage(widget.user['imageUrl']),
-            radius: 27.0,
-          ),
-          SizedBox(height: 8),
-          Text(
-            widget.user['name'] ?? '',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 8),
-          Text(
-            '$followersCount Followers',
-            style: TextStyle(fontSize: 14),
-            textAlign: TextAlign.center,
-          ),
-          Flexible(
-            child: AnimatedSwitcher(
-              duration: Duration(milliseconds: 0),
-              child: buildFollowButton(widget.user.id),
-              transitionBuilder: (child, animation) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: child,
-                );
-              },
+      child: Container(
+        padding: EdgeInsets.all(8.0), // Adjust the padding as needed
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              backgroundImage: NetworkImage(widget.user['imageUrl']),
+              radius: 27.0,
             ),
-          ),
-        ],
+            SizedBox(height: 8),
+            Text(
+              widget.user['name'] ?? '',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 8),
+            Text(
+              '$followersCount Followers',
+              style: TextStyle(fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
+            Flexible(
+              child: AnimatedSwitcher(
+                duration: Duration(milliseconds: 0),
+                child: buildFollowButton(widget.user.id),
+                transitionBuilder: (child, animation) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
