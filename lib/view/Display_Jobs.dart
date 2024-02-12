@@ -172,131 +172,146 @@ class _DisplayJobsState extends State<DisplayJobs> {
     print(remoteJobCount);
     print(employmentTypeFTCount);
     print(employmentTypePTCount);
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 243, 240, 240),
-      body: Container(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Hello',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
+    return GestureDetector(
+        onVerticalDragEnd: (details) {
+          // Check if the user has scrolled down
+          if (details.primaryVelocity! < 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    FilterPage(), // Replace NewPage with your new page widget
               ),
-              Text(
-                _userName,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: size.height / 45),
-              // Advertisements Card
-              Container(
-                // height: 178, // Adjust the height as needed
-                height: size.height / 5,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(
-                      255, 31, 11, 118), // Change color as needed
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                // Add your advertisement content here
-                child: Center(
-                  child: Text(
-                    'Advertisement',
+            );
+          }
+        },
+        child: Scaffold(
+          backgroundColor: const Color.fromARGB(255, 243, 240, 240),
+          body: Container(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Hello',
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
+                  ),
+                  Text(
+                    _userName,
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-              ),
-              SizedBox(height: 24),
-              // Find Your Job Text
-              Text(
-                'Find Your job',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-              ),
-              SizedBox(height: 24),
+                  SizedBox(height: size.height / 45),
+                  // Advertisements Card
+                  Container(
+                    // height: 178, // Adjust the height as needed
+                    height: size.height / 5,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(
+                          255, 31, 11, 118), // Change color as needed
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    // Add your advertisement content here
+                    child: Center(
+                      child: Text(
+                        'Advertisement',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                  // Find Your Job Text
+                  Text(
+                    'Find Your job',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                  ),
+                  SizedBox(height: 24),
 
-              // Cards for Remote, Full Time, Part Time
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildJobCard('Remote Job'),
-                  Column(
+                  // Cards for Remote, Full Time, Part Time
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildJobCardforFT('Full Time'),
-                      SizedBox(height: 8),
-                      _buildJobCardforPT('Part Time'),
+                      _buildJobCard('Remote Job'),
+                      Column(
+                        children: [
+                          _buildJobCardforFT('Full Time'),
+                          SizedBox(height: 8),
+                          _buildJobCardforPT('Part Time'),
+                        ],
+                      ),
                     ],
+                  ),
+                  // SizedBox(height: 24),
+                  SizedBox(height: 16),
+                  Text(
+                    'Recent Job List',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                  ),
+                  SizedBox(height: 16),
+                  Expanded(
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('jobs')
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return CircularProgressIndicator();
+                        }
+
+                        var jobs = snapshot.data!.docs;
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: jobs.length,
+                          itemBuilder: (context, index) {
+                            var job =
+                                jobs[index].data() as Map<String, dynamic>;
+
+                            return GestureDetector(
+                              onVerticalDragEnd: (details) {
+                                // Check if the user has scrolled down
+                                if (details.primaryVelocity! < 0) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          FilterPage(), // Replace NewPage with your new page widget
+                                    ),
+                                  );
+                                }
+                              },
+                              child: _buildJobDisplayCard(
+                                  job['jobPosition'],
+                                  job['company'],
+                                  job['jobLocation'],
+                                  job['employmentType'],
+                                  job['jobDescription'],
+                                  job['category'],
+                                  job['postedBy'],
+                                  job['salary'],
+                                  job['workplaceType'],
+                                  job['timestamp'], () {
+                                saveJob(job);
+                              }),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
-              // SizedBox(height: 24),
-              SizedBox(height: 16),
-              Text(
-                'Recent Job List',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-              ),
-              SizedBox(height: 16),
-              Expanded(
-                child: StreamBuilder<QuerySnapshot>(
-                  stream:
-                      FirebaseFirestore.instance.collection('jobs').snapshots(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return CircularProgressIndicator();
-                    }
-
-                    var jobs = snapshot.data!.docs;
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: jobs.length,
-                      itemBuilder: (context, index) {
-                        var job = jobs[index].data() as Map<String, dynamic>;
-
-                        return GestureDetector(
-                          onVerticalDragEnd: (details) {
-                            // Check if the user has scrolled down
-                            if (details.primaryVelocity! < 0) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      FilterPage(), // Replace NewPage with your new page widget
-                                ),
-                              );
-                            }
-                          },
-                          child: _buildJobDisplayCard(
-                              job['jobPosition'],
-                              job['company'],
-                              job['jobLocation'],
-                              job['employmentType'],
-                              job['jobDescription'],
-                              job['category'],
-                              job['postedBy'],
-                              job['salary'],
-                              job['workplaceType'],
-                              job['timestamp'], () {
-                            saveJob(job);
-                          }),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 
   Widget _buildJobCard(String label) {
