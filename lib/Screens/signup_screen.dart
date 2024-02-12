@@ -125,6 +125,8 @@ class _CreateAccountState extends State<CreateAccount> {
       'uid': user.uid,
       'imageUrl': user.photoURL,
       'status': 'Online',
+      'following':0,
+      'followers':0
     };
 
     try {
@@ -187,7 +189,7 @@ class _CreateAccountState extends State<CreateAccount> {
           print("Invalid UserType");
         }
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login Successful!')),
+          SnackBar(content: Text('Sign Up Successful!')),
         );
       });
 

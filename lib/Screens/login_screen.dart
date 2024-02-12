@@ -25,9 +25,6 @@ class _LoginScreenState extends State<LoginScreen> {
   late AnimationController _snackBarController;
   late Animation<double> _snackBarAnimation;
 
-  
-
-
   Future<String?> checkUserStatus(String email) async {
     final snapshot = await FirebaseFirestore.instance
         .collection('users')
@@ -73,84 +70,170 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // Add the method to handle automatic login if the user is already logged in.
+  // void _tryAutoLogin() async {
+  //   // if (isLoggedIn) {
+  //   // Get the current user's email
+  //   final String email = _auth.currentUser!.email!;
+  //   if (_isLoggingIn) return; // If already logging in, do nothing
+
+  //   _isLoggingIn = true;
+
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         content: Row(
+  //           children: [
+  //             CircularProgressIndicator(),
+  //             SizedBox(width: 20),
+  //             Text("Logging you in..."),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+
+  //   final status = await checkUserStatus(email);
+  //   Navigator.pop(context); // Close the AlertDialog
+
+  //   _isLoggingIn = false;
+  //   if (status == 'Blocked') {
+  //     // Show a blocked SnackBar
+  //     final snackBar = SnackBar(content: Text('You are blocked'));
+  //     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  //   } else {
+  //     // Proceed with login
+  //     setState(() {
+  //       isloading = false;
+  //     });
+
+  //     getUserType(_auth.currentUser!.uid).then((String? userType) {
+  //       if (userType == 'admin') {
+  //         // Navigate to AdminScreen
+  //         print('Login As Admin');
+
+  //         Navigator.pushReplacement(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (_) => AdminHomeScreen(
+  //               currentuserEmail: email,
+  //             ),
+  //           ),
+  //         );
+  //       } else if (userType == 'user') {
+  //         // Navigate to HomeScreen
+  //         print('Login As User');
+
+  //         Navigator.pushReplacement(
+  //             context,
+  //             MaterialPageRoute(
+  //                 builder: (_) => ShowCaseWidget(
+  //                       builder: Builder(
+  //                         builder: (context) => HomePage(
+  //                           currentUserEmail: email,
+  //                           requiresProfileSetup: true,
+  //                         ),
+  //                       ),
+  //                     )));
+  //       } else {
+  //         print("Invalid UserType");
+  //       }
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Login Successful!')),
+  //       );
+  //     });
+
+  //     _clearFields();
+  //   }
+  //   // }
+  // }
+
+
   void _tryAutoLogin() async {
-    // if (isLoggedIn) {
-      // Get the current user's email
-      final String email = _auth.currentUser!.email!;
-      if (_isLoggingIn) return; // If already logging in, do nothing
+  final User? user = _auth.currentUser;
 
-      _isLoggingIn = true;
+  if (user != null) {
+    final String email = user.email!;
+    if (_isLoggingIn) return;
 
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: Row(
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(width: 20),
-                Text("Logging you in..."),
-              ],
+    _isLoggingIn = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text("Logging you in..."),
+            ],
+          ),
+        );
+      },
+    );
+
+    final status = await checkUserStatus(email);
+    Navigator.pop(context); // Close the AlertDialog
+
+    _isLoggingIn = false;
+    if (status == 'Blocked') {
+      // Show a blocked SnackBar
+      final snackBar = SnackBar(content: Text('You are blocked'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else if (status == null) {
+      // User status not found, show a Snackbar and prevent login
+      final snackBar = SnackBar(content: Text('Please sign up first'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else {
+      // Proceed with login
+      setState(() {
+        isloading = false;
+      });
+
+      getUserType(user.uid).then((String? userType) {
+        if (userType == 'admin') {
+          // Navigate to AdminScreen
+          print('Login As Admin');
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AdminHomeScreen(
+                currentuserEmail: email,
+              ),
             ),
           );
-        },
-      );
+        } else if (userType == 'user') {
+          // Navigate to HomeScreen
+          print('Login As User');
 
-      final status = await checkUserStatus(email);
-      Navigator.pop(context); // Close the AlertDialog
-
-      _isLoggingIn = false;
-      if (status == 'Blocked') {
-        // Show a blocked SnackBar
-        final snackBar = SnackBar(content: Text('You are blocked'));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      } else {
-        // Proceed with login
-        setState(() {
-          isloading = false;
-        });
-
-        getUserType(_auth.currentUser!.uid).then((String? userType) {
-          if (userType == 'admin') {
-            // Navigate to AdminScreen
-            print('Login As Admin');
-
-            Navigator.pushReplacement(
+          Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (_) => AdminHomeScreen(
-                  currentuserEmail: email,
-                ),
-              ),
-            );
-          } else if (userType == 'user') {
-            // Navigate to HomeScreen
-            print('Login As User');
-
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => ShowCaseWidget(
-                          builder: Builder(
-                            builder: (context) => HomePage(
-                              currentUserEmail: email,
-                              requiresProfileSetup: true,
-                            ),
+                  builder: (_) => ShowCaseWidget(
+                        builder: Builder(
+                          builder: (context) => HomePage(
+                            currentUserEmail: email,
+                            requiresProfileSetup: true,
                           ),
-                        )));
-          } else {
-            print("Invalid UserType");
-          }
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Login Successful!')),
-          );
-        });
+                        ),
+                      )));
+        } else {
+          print("Invalid UserType");
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login Successful!')),
+        );
+      });
 
-        _clearFields();
-      }
-    // }
+      _clearFields();
+    }
   }
+}
+
 
   @override
   void dispose() {
@@ -318,81 +401,170 @@ class _LoginScreenState extends State<LoginScreen> {
     _password.clear();
   }
 
+  // void _handleGoogleSignIn() async {
+  //   if (_isLoggingIn) return;
+  //   setState(() {
+  //     isloading = true;
+  //     _isLoggingIn = true;
+  //   });
+
+  //   final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  //   if (googleUser != null) {
+  //     try {
+  //       final GoogleSignInAuthentication googleAuth =
+  //           await googleUser.authentication;
+
+  //       // Sign in with Firebase using the Google ID Token
+  //       final AuthCredential credential = GoogleAuthProvider.credential(
+  //         accessToken: googleAuth.accessToken,
+  //         idToken: googleAuth.idToken,
+  //       );
+
+  //       final UserCredential userCredential =
+  //           await FirebaseAuth.instance.signInWithCredential(credential);
+  //       final User? user = userCredential.user;
+  //       if (user != null) {
+  //         print("Google Sign-In Successful");
+
+  //         // Check the user's status (Blocked or not) using local data instead of Firestore query
+  //         final status = await checkUserStatus(user.email!);
+
+  //         if (status == 'Blocked') {
+  //           // User is blocked, show an error SnackBar and prevent login
+  //           final snackBar = SnackBar(content: Text('You are blocked'));
+  //           ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+  //           // Sign out the user from Google as they are blocked
+  //           await GoogleSignIn().signOut();
+  //           setState(() {
+  //             isloading = false;
+  //             _isLoggingIn = false;
+  //           });
+  //         } else {
+  //           // User is not blocked, proceed with login
+  //           // Store the user information in Firestore
+  //           await storeUserDataInFirestore(user);
+  //         }
+  //       } else {
+  //         print("Google Sign-In Failed");
+  //         // Show a failure SnackBar
+  //         final snackBar = SnackBar(content: Text('Google Sign-In Failed'));
+  //         ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  //         setState(() {
+  //           isloading = false;
+  //           _isLoggingIn = false;
+  //         });
+  //       }
+  //     } catch (e) {
+  //       print("Google Sign-In Error: $e");
+  //       // Show an error SnackBar
+  //       final snackBar = SnackBar(content: Text('Google Sign-In Error'));
+  //       ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  //       setState(() {
+  //         isloading = false;
+  //         _isLoggingIn = false;
+  //       });
+  //     }
+  //   } else {
+  //     print("Google Sign-In Aborted");
+  //     // Show a cancellation SnackBar
+  //     final snackBar = SnackBar(content: Text('Google Sign-In Aborted'));
+  //     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  //     setState(() {
+  //       isloading = false;
+  //       _isLoggingIn = false;
+  //     });
+  //   }
+  // }
+
+
   void _handleGoogleSignIn() async {
-    if (_isLoggingIn) return;
-    setState(() {
-      isloading = true;
-      _isLoggingIn = true;
-    });
+  if (_isLoggingIn) return;
+  setState(() {
+    isloading = true;
+    _isLoggingIn = true;
+  });
 
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-    if (googleUser != null) {
-      try {
-        final GoogleSignInAuthentication googleAuth =
-            await googleUser.authentication;
+  final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  if (googleUser != null) {
+    try {
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
-        // Sign in with Firebase using the Google ID Token
-        final AuthCredential credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
+      // Sign in with Firebase using the Google ID Token
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
 
-        final UserCredential userCredential =
-            await FirebaseAuth.instance.signInWithCredential(credential);
-        final User? user = userCredential.user;
-        if (user != null) {
-          print("Google Sign-In Successful");
+      final UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      final User? user = userCredential.user;
+      if (user != null) {
+        print("Google Sign-In Successful");
 
-          // Check the user's status (Blocked or not) using local data instead of Firestore query
-          final status = await checkUserStatus(user.email!);
+        // Check the user's status (Blocked or not) using local data instead of Firestore query
+        final status = await checkUserStatus(user.email!);
 
-          if (status == 'Blocked') {
-            // User is blocked, show an error SnackBar and prevent login
-            final snackBar = SnackBar(content: Text('You are blocked'));
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-            // Sign out the user from Google as they are blocked
-            await GoogleSignIn().signOut();
-            setState(() {
-              isloading = false;
-              _isLoggingIn = false;
-            });
-          } else {
-            // User is not blocked, proceed with login
-            // Store the user information in Firestore
-            await storeUserDataInFirestore(user);
-          }
-        } else {
-          print("Google Sign-In Failed");
-          // Show a failure SnackBar
-          final snackBar = SnackBar(content: Text('Google Sign-In Failed'));
+        if (status == 'Blocked') {
+          // User is blocked, show an error SnackBar and prevent login
+          final snackBar = SnackBar(content: Text('You are blocked'));
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+          // Sign out the user from Google as they are blocked
+          await GoogleSignIn().signOut();
           setState(() {
             isloading = false;
             _isLoggingIn = false;
           });
+        } else if (status == null) {
+          // User status not found, show a Snackbar and prevent login
+          final snackBar = SnackBar(content: Text('Please sign up first'));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+          // Sign out the user from Google
+          await GoogleSignIn().signOut();
+          setState(() {
+            isloading = false;
+            _isLoggingIn = false;
+          });
+        } else {
+          // User is not blocked, proceed with login
+          // Store the user information in Firestore
+          await storeUserDataInFirestore(user);
         }
-      } catch (e) {
-        print("Google Sign-In Error: $e");
-        // Show an error SnackBar
-        final snackBar = SnackBar(content: Text('Google Sign-In Error'));
+      } else {
+        print("Google Sign-In Failed");
+        // Show a failure SnackBar
+        final snackBar = SnackBar(content: Text('Google Sign-In Failed'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
         setState(() {
           isloading = false;
           _isLoggingIn = false;
         });
       }
-    } else {
-      print("Google Sign-In Aborted");
-      // Show a cancellation SnackBar
-      final snackBar = SnackBar(content: Text('Google Sign-In Aborted'));
+    } catch (e) {
+      print("Google Sign-In Error: $e");
+      // Show an error SnackBar
+      final snackBar = SnackBar(content: Text('Google Sign-In Error'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       setState(() {
         isloading = false;
         _isLoggingIn = false;
       });
     }
+  } else {
+    print("Google Sign-In Aborted");
+    // Show a cancellation SnackBar
+    final snackBar = SnackBar(content: Text('Google Sign-In Aborted'));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    setState(() {
+      isloading = false;
+      _isLoggingIn = false;
+    });
   }
+}
+
 
   Future<void> storeUserDataInFirestore(User user) async {
     final userData = {
@@ -675,10 +847,10 @@ class _LoginScreenState extends State<LoginScreen> {
               hintStyle: TextStyle(color: Colors.grey),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-            //  focusedBorder: OutlineInputBorder(
-            //     borderRadius: BorderRadius.circular(10),
-            //     borderSide: BorderSide(color: Color(0xFF130160)), // Violet color
-            //   ),     
+              //  focusedBorder: OutlineInputBorder(
+              //     borderRadius: BorderRadius.circular(10),
+              //     borderSide: BorderSide(color: Color(0xFF130160)), // Violet color
+              //   ),
             ),
           ),
         ),
