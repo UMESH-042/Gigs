@@ -44,6 +44,8 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey _hamburgerIconKey = new GlobalKey();
   final GlobalKey _avatarIconKey = new GlobalKey();
   final GlobalKey _bottomNavigationBarKey = new GlobalKey();
+  late List<int> _navigationStack;
+
   // final GlobalKey _AddJobPostIconKey = new GlobalKey();
   Future<void> storeNotificationToken() async {
     String? token = await FirebaseMessaging.instance.getToken();
@@ -80,6 +82,7 @@ class _HomePageState extends State<HomePage> {
       SavedJobsPage(),
     ];
     _loadUserData();
+    _navigationStack = [0];
   }
 
   void startShowCase() {
@@ -151,234 +154,269 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     print(_userName);
     print(_userImageUrl);
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: _currentIndex == 0
-          ? AppBar(
-              backgroundColor: const Color.fromARGB(255, 243, 240, 240),
-              elevation: 0,
-              leading: Showcase(
-                key: _hamburgerIconKey,
-                description: 'Click here to open the drawer.',
-                child: Builder(
-                  builder: (BuildContext context) {
-                    return Container(
-                      margin: EdgeInsets.only(left: 3),
-                      // margin: EdgeInsets.only(left: 17),
-                      child: IconButton(
-                        icon: Icon(Icons.menu_outlined, color: Colors.black),
-                        onPressed: () {
-                          // _logout();
-                          _scaffoldKey.currentState?.openDrawer();
-                        },
+    return WillPopScope(
+        onWillPop: () async {
+          if (_navigationStack.length > 1) {
+            // Pop from the stack to get the previous index
+            _navigationStack.removeLast();
+            int previousIndex = _navigationStack.last;
+            setState(() {
+              _currentIndex = previousIndex;
+            });
+            return false; // Don't close the app
+          } else {
+            // Handle exiting the app or show a confirmation dialog
+            return showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Confirm Exit'),
+                  content: Text('Do you want to exit the app?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: Text('No'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: Text('Yes'),
+                    ),
+                  ],
+                );
+              },
+            ).then((value) => value ?? false);
+          }
+        },
+        child: Scaffold(
+          key: _scaffoldKey,
+          appBar: _currentIndex == 0
+              ? AppBar(
+                  backgroundColor: const Color.fromARGB(255, 243, 240, 240),
+                  elevation: 0,
+                  leading: Showcase(
+                    key: _hamburgerIconKey,
+                    description: 'Click here to open the drawer.',
+                    child: Builder(
+                      builder: (BuildContext context) {
+                        return Container(
+                          margin: EdgeInsets.only(left: 3),
+                          // margin: EdgeInsets.only(left: 17),
+                          child: IconButton(
+                            icon:
+                                Icon(Icons.menu_outlined, color: Colors.black),
+                            onPressed: () {
+                              // _logout();
+                              _scaffoldKey.currentState?.openDrawer();
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  actions: [
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(right: 17),
+                            child: Showcase(
+                              key: _avatarIconKey,
+                              description:
+                                  'Click here to view your profile and Add your Details.',
+                              child: IconButton(
+                                padding: EdgeInsets.all(0),
+                                icon: CircleAvatar(
+                                  backgroundImage: NetworkImage(_userImageUrl),
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ProfilePage(
+                                        currentUserEmail:
+                                            widget.currentUserEmail,
+                                        imageUrl: _userImageUrl,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : null,
+          drawer: Drawer(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                DrawerHeader(
+                  decoration: BoxDecoration(
+                    color: Color(0xFF130160),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(_userImageUrl),
+                        radius: 40,
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        _userName, // Replace with the actual user name
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                    ],
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.apps),
+                  title: Text(
+                    'My Applications',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MyApplicationsPage(
+                            userEmail: widget.currentUserEmail),
                       ),
                     );
                   },
                 ),
-              ),
-              actions: [
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(right: 17),
-                        child: Showcase(
-                          key: _avatarIconKey,
-                          description:
-                              'Click here to view your profile and Add your Details.',
-                          child: IconButton(
-                            padding: EdgeInsets.all(0),
-                            icon: CircleAvatar(
-                              backgroundImage: NetworkImage(_userImageUrl),
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ProfilePage(
-                                    currentUserEmail: widget.currentUserEmail,
-                                    imageUrl: _userImageUrl,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
+                ListTile(
+                  leading: Icon(Icons.people),
+                  title: Text(
+                    'Applicants List',
+                    style: TextStyle(fontSize: 16),
                   ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ApplicantListPage(
+                            currentUserEmail: widget.currentUserEmail),
+                      ),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.notifications_rounded),
+                  title: Text(
+                    'Notifications',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => NotificationListPage()));
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.feedback),
+                  title: Text(
+                    'Feedback',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                FeedbackPage())); // Add your logout logic here
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.exit_to_app),
+                  title: Text(
+                    'Logout',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context); // Close the drawer
+                    _logout(); // Add your logout logic here
+                  },
                 ),
               ],
-            )
-          : null,
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Color(0xFF130160),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(_userImageUrl),
-                    radius: 40,
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    _userName, // Replace with the actual user name
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.apps),
-              title: Text(
-                'My Applications',
-                style: TextStyle(fontSize: 16),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        MyApplicationsPage(userEmail: widget.currentUserEmail),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.people),
-              title: Text(
-                'Applicants List',
-                style: TextStyle(fontSize: 16),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ApplicantListPage(
-                        currentUserEmail: widget.currentUserEmail),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.notifications_rounded),
-              title: Text(
-                'Notifications',
-                style: TextStyle(fontSize: 16),
-              ),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => NotificationListPage()));
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.feedback),
-              title: Text(
-                'Feedback',
-                style: TextStyle(fontSize: 16),
-              ),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            FeedbackPage())); // Add your logout logic here
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.exit_to_app),
-              title: Text(
-                'Logout',
-                style: TextStyle(fontSize: 16),
-              ),
-              onTap: () {
-                Navigator.pop(context); // Close the drawer
-                _logout(); // Add your logout logic here
-              },
-            ),
-          ],
-        ),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: _screens[_currentIndex],
             ),
           ),
-        ],
-      ),
-      bottomNavigationBar: Showcase(
-        key: _bottomNavigationBarKey,
-        description:
-            'Explore different sections using the bottom navigation bar.',
-        child: CurvedNavigationBar(
-          color: Colors.white,
-          buttonBackgroundColor: Colors.white,
-          animationCurve: Curves.fastOutSlowIn,
-          index: _currentIndex,
-          items: [
-            Image.asset(
-              'assets/homes_icon.png',
-              width: 28,
-              height: 28,
-            ),
-            Image.asset(
-              'assets/sharing_icon.png',
-              width: 28,
-              height: 28,
-            ),
-            Image.asset(
-              'assets/add_icon.png',
-              width: 40,
-              height: 40,
-            ),
-            Image.asset(
-              'assets/chat_icon.png',
-              width: 28,
-              height: 28,
-            ),
-            Image.asset(
-              'assets/save_icon.png',
-              width: 28,
-              height: 28,
-            ),
-          ],
-          onTap: (index) {
-            if (index == 2) {
-              showModalBottomSheet(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25.0),
+          body: Column(
+            children: [
+              Expanded(
+                child: Center(
+                  child: _screens[_currentIndex],
                 ),
-                context: context,
-                isScrollControlled: true,
-                builder: (context) => AddBottomSheet(
-                  useremail: widget.currentUserEmail,
+              ),
+            ],
+          ),
+          bottomNavigationBar: Showcase(
+            key: _bottomNavigationBarKey,
+            description:
+                'Explore different sections using the bottom navigation bar.',
+            child: CurvedNavigationBar(
+              color: Colors.white,
+              buttonBackgroundColor: Colors.white,
+              animationCurve: Curves.fastOutSlowIn,
+              index: _currentIndex,
+              items: [
+                Image.asset(
+                  'assets/homes_icon.png',
+                  width: 28,
+                  height: 28,
                 ),
-              );
-            } else {
-              setState(() {
-                _currentIndex = index;
-              });
-            }
-          },
-        ),
-      ),
-    );
+                Image.asset(
+                  'assets/sharing_icon.png',
+                  width: 28,
+                  height: 28,
+                ),
+                Image.asset(
+                  'assets/add_icon.png',
+                  width: 40,
+                  height: 40,
+                ),
+                Image.asset(
+                  'assets/chat_icon.png',
+                  width: 28,
+                  height: 28,
+                ),
+                Image.asset(
+                  'assets/save_icon.png',
+                  width: 28,
+                  height: 28,
+                ),
+              ],
+              onTap: (index) {
+                if (index == 2) {
+                  showModalBottomSheet(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) => AddBottomSheet(
+                      useremail: widget.currentUserEmail,
+                    ),
+                  );
+                } else {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                }
+              },
+            ),
+          ),
+        ));
   }
 }

@@ -306,6 +306,7 @@ class _ApplicationPageState extends State<ApplicationPage> {
                             });
                           },
                         ),
+                          SizedBox(width: MediaQuery.of(context).size.width * 0.03),
                         _buildCircularButtonCompanyDetails(
                           onPressed: () {
                             setState(() {
