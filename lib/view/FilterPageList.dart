@@ -367,13 +367,13 @@ class _FilterPageState extends State<FilterPage> {
                             jobData['jobPosition'] == selectedJobPosition) &&
                         (selectedEmploymentType.isEmpty ||
                             jobData['employmentType'] ==
-                                selectedEmploymentType) ||
+                                selectedEmploymentType) &&
                         // Check for row chips filters
                         (selectedJobPosition.isEmpty ||
                             jobData['jobPosition'] == selectedJobPosition) &&
                         (selectedEmploymentType.isEmpty ||
                             jobData['employmentType'] ==
-                                selectedEmploymentType) ||
+                                selectedEmploymentType) &&
                         (selectedCategory.isEmpty ||
                             jobData['category'] == selectedCategory) &&
                         (searchQuery1.isEmpty ||
