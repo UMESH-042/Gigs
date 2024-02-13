@@ -66,6 +66,7 @@ dependencies:
   timeago: ^3.6.0
   awesome_notifications: ^0.8.2
   flutter_image_compress: ^2.1.0
+  open_url: ^2.0.1
 
 
 

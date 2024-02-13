@@ -11,6 +11,7 @@ import 'package:gigs/firebase/firebaseService.dart';
 import 'package:gigs/notifications/notification_service.dart';
 import 'package:gigs/view/Porfile/Profile_page.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
@@ -478,8 +479,8 @@ class _ApplicationPageState extends State<ApplicationPage> {
                               SizedBox(
                                 height: 10,
                               ),
-                              _buildLabelAndContent(
-                                  "Website", companyData?['websiteLink']),
+                                _buildLabelAndContent(
+                                    "Website", companyData?['websiteLink']),
                               SizedBox(
                                 height: 10,
                               ),
@@ -892,6 +893,7 @@ class _ApplicationPageState extends State<ApplicationPage> {
       ],
     );
   }
+
 
   Widget label(String label) {
     return Text(label,
