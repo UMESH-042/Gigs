@@ -125,8 +125,8 @@ class _CreateAccountState extends State<CreateAccount> {
       'uid': user.uid,
       'imageUrl': user.photoURL,
       'status': 'Online',
-      'following':0,
-      'followers':0
+      'following': 0,
+      'followers': 0
     };
 
     try {
@@ -293,7 +293,6 @@ class _CreateAccountState extends State<CreateAccount> {
                     child: field(
                         size, "Email", "Email", Icons.account_box, _email),
                   ),
-                
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       vertical: 18.0,
@@ -377,20 +376,38 @@ class _CreateAccountState extends State<CreateAccount> {
 
   Widget customButton(Size size) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         if (_name.text.isNotEmpty &&
             _email.text.isNotEmpty &&
             _password.text.isNotEmpty) {
+          if (_isLoggingIn) return;
+
           setState(() {
             isloading = true;
           });
+
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                content: Row(
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(width: 20),
+                    Text("Please wait..."),
+                  ],
+                ),
+              );
+            },
+          );
           createAccount(_name.text, _email.text, _password.text).then((user) {
             if (user != null) {
+              print("Account Created Successfully");
               setState(() {
                 isloading = false;
               });
-              print("Account Created Successfully");
-              showSnackBar("Account Created Successfully");
+
               //                Navigator.pushReplacement(
               //   context,
               //   MaterialPageRoute(
@@ -400,17 +417,33 @@ class _CreateAccountState extends State<CreateAccount> {
               //         ),
               //       ),
               // );
-              Navigator.pushReplacement(
+              // Navigator.pushReplacement(
+              //     context,
+              //     MaterialPageRoute(
+              //         builder: (_) => ShowCaseWidget(
+              //               builder: Builder(
+              //                 builder: (context) => HomePage(
+              //                   currentUserEmail: user.email!,
+              //                   requiresProfileSetup: true,
+              //                 ),
+              //               ),
+              //             )));
+              Future.delayed(Duration(seconds: 5), () {
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                      builder: (_) => ShowCaseWidget(
-                            builder: Builder(
-                              builder: (context) => HomePage(
-                                currentUserEmail: user.email!,
-                                requiresProfileSetup: true,
-                              ),
-                            ),
-                          )));
+                    builder: (_) => ShowCaseWidget(
+                      builder: Builder(
+                        builder: (context) => HomePage(
+                          currentUserEmail: user.email!,
+                          requiresProfileSetup: true,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              });
+
               _clearFields();
             } else {
               print("Account Creation Failed");

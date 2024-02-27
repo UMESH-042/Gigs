@@ -69,7 +69,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     _requestNotificationPermissions();
+
     WidgetsBinding.instance.addPostFrameCallback((_) => showShowcaseIfNeeded());
+    
+
     super.initState();
     storeNotificationToken();
     _screens = [
