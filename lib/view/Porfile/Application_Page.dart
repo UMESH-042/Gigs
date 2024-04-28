@@ -307,7 +307,8 @@ class _ApplicationPageState extends State<ApplicationPage> {
                             });
                           },
                         ),
-                          SizedBox(width: MediaQuery.of(context).size.width * 0.03),
+                        SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.03),
                         _buildCircularButtonCompanyDetails(
                           onPressed: () {
                             setState(() {
@@ -479,8 +480,8 @@ class _ApplicationPageState extends State<ApplicationPage> {
                               SizedBox(
                                 height: 10,
                               ),
-                                _buildLabelAndContent(
-                                    "Website", companyData?['websiteLink']),
+                              _buildLabelAndContent(
+                                  "Website", companyData?['websiteLink']),
                               SizedBox(
                                 height: 10,
                               ),
@@ -893,7 +894,6 @@ class _ApplicationPageState extends State<ApplicationPage> {
       ],
     );
   }
-
 
   Widget label(String label) {
     return Text(label,

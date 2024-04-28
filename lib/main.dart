@@ -13,10 +13,8 @@ import 'package:provider/provider.dart';
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
   
   LocalNotificationService.initialize();
-
   runApp(MyApp());
 }
 
@@ -42,24 +40,23 @@ class _MyAppState extends State<MyApp> {
 //             backgroundColor: Color(0xFF130160)));
 //   }
 // }
- @override
+  @override
   Widget build(BuildContext context) => ChangeNotifierProvider(
         create: (context) => ThemeProvider(),
         builder: (context, _) {
           final themeProvider = Provider.of<ThemeProvider>(context);
 
           return MaterialApp(
-            themeMode: themeProvider.themeMode,
-            debugShowCheckedModeBanner: false,
-            theme: ThemeData.light(),
-            darkTheme: ThemeData.dark(),
-                home: AnimatedSplashScreen(
-            duration: 2000,
-            splash: Image.asset('assets/splash_logo.png'),
-            nextScreen: LandingPage(),
-            splashTransition: SplashTransition.fadeTransition,
-            backgroundColor: Color(0xFF130160)));
+              themeMode: themeProvider.themeMode,
+              debugShowCheckedModeBanner: false,
+              theme: ThemeData.light(),
+              darkTheme: ThemeData.dark(),
+              home: AnimatedSplashScreen(
+                  duration: 2000,
+                  splash: Image.asset('assets/splash_logo.png'),
+                  nextScreen: LandingPage(),
+                  splashTransition: SplashTransition.fadeTransition,
+                  backgroundColor: Color(0xFF130160)));
         },
       );
 }
-

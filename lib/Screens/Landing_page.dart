@@ -218,7 +218,7 @@ class LandingPage extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     final double imageHeight = size.height * 0.4; // Adjust this value according to your need
 
-    return Scaffold(
+    return Scaffold(  
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
